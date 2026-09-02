@@ -1,0 +1,8 @@
+{
+  "name": "روابط | منصة الوساطة العقارية",
+  "description": "منصة روابط الرقمية للوساطة العقارية الموثوقة في محافظة كفر الشيخ - عرض وتسويق وإدارة العقارات وفق أحدث معايير الأمان والخصوصية.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

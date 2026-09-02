@@ -1,0 +1,237 @@
+import React, { useState } from 'react';
+import { useApp } from '../../context/AppContext';
+import { 
+  HelpCircle, 
+  FileText, 
+  Video, 
+  ShieldCheck, 
+  Sparkles, 
+  ChevronDown, 
+  ChevronUp, 
+  Download, 
+  ExternalLink,
+  PhoneCall,
+  CheckCircle2,
+  Layers,
+  ArrowRight
+} from 'lucide-react';
+
+interface HelpGuideViewProps {
+  onOpenAddProperty: () => void;
+}
+
+export const HelpGuideView: React.FC<HelpGuideViewProps> = ({ onOpenAddProperty }) => {
+  const { helpResources, settings } = useApp();
+  const [openFaq, setOpenFaq] = useState<number | null>(0);
+
+  const faqs = [
+    {
+      q: 'لماذا لا تظهر أرقام هواتف الملاك أو عناوينهم الدقيقة على الموقع العام؟',
+      a: 'تلتزم منصة روابط بحماية سرية وخصوصية أصحاب العقارات والوسطاء، وتجنبهم الاتصالات المزعجة والسماسرة العشوائيين. تتم كافة الاستفسارات وترتيب المعاينات الميدانية عبر فريق روابط الرسمي وممثلي المبيعات المعتمدين.'
+    },
+    {
+      q: 'كم يستغرق فحص ومراجعة العقار بعد إرساله؟',
+      a: 'يتم فحص العقار والتحقق من صحة الصور والبيانات السعرية عبر مراجعي روابط خلال فترة تتراوح بين ساعتين إلى 24 ساعة كحد أقصى.'
+    },
+    {
+      q: 'كيف يعمل نظام النسخ (Revisions) عند تعديل عقار معتمد ومنشور؟',
+      a: 'عند قيامك بتعديل السعر أو المواصفات لعقار منشور، يظل العقار الأصلي معروضاً للجمهور بدون انقطاع، بينما تنشأ نسخة جديدة تخضع لفحص سريع من الإدارة ثم تُنشر فور اعتمادها لتحل محل النسخة السابقة.'
+    },
+    {
+      q: 'ما هي مميزات الحصول على شارة "موثق من روابط" للبائعين والمكاتب؟',
+      a: 'توثيق الحساب يمنح عقاراتك شارة التوثيق الذهبية، وأولوية الظهور في نتائج البحث المتقدمة، وسرعة في إتمام المعاينات مع المشترين الجادين.'
+    },
+    {
+      q: 'هل توجد رسوم على إضافة العقار؟',
+      a: 'إضافة العقار وفحصه مجاني تماماً على منصة روابط. تُستحق عمولة الوساطة المتفق عليها فقط عند إتمام صفقة البيع أو التأجير بنجاح.'
+    }
+  ];
+
+  return (
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12 text-right">
+      
+      {/* Hero Guide Banner */}
+      <div className="bg-gradient-to-r from-emerald-900 via-slate-900 to-slate-900 text-white rounded-3xl p-8 sm:p-10 border border-emerald-800/40 shadow-xl space-y-4">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-bold">
+          <HelpCircle className="w-4 h-4" />
+          <span>مركز المساعدة وإرشادات النشر في كفر الشيخ</span>
+        </div>
+        <h1 className="text-2xl sm:text-4xl font-black">
+          دليل أصحاب العقارات والوسطاء الشامل
+        </h1>
+        <p className="text-xs sm:text-sm text-slate-300 max-w-2xl leading-relaxed font-medium">
+          تعرف على كيفية نشر عقاراتك باحترافية، ومعايير قبول الإعلانات، وحماية بياناتك وسريتها وفق نموذج الوساطة الموثوق لمنصة روابط.
+        </p>
+
+        <div className="pt-2 flex flex-wrap items-center gap-3">
+          <button
+            onClick={onOpenAddProperty}
+            className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-extrabold rounded-2xl transition shadow-lg shadow-emerald-600/30"
+          >
+            + أضف عقارك الآن
+          </button>
+
+          <a
+            href={`tel:${settings.primary_phone}`}
+            className="px-5 py-3 bg-white/10 hover:bg-white/20 text-white text-xs sm:text-sm font-bold rounded-2xl transition border border-white/20 flex items-center gap-2"
+          >
+            <PhoneCall className="w-4 h-4 text-emerald-400" />
+            <span>تحدث مع مستشار روابط: {settings.primary_phone}</span>
+          </a>
+        </div>
+      </div>
+
+      {/* 4-Step Publishing Workflow */}
+      <div className="space-y-6">
+        <div className="text-right">
+          <h2 className="text-xl sm:text-2xl font-black text-slate-900">كيف تعمل منصة روابط؟</h2>
+          <p className="text-xs text-slate-500 font-medium mt-1">رحلة العقار من التسجيل وحتى إتمام الصفقة</p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          
+          <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-xs space-y-3 relative overflow-hidden">
+            <div className="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-800 font-black flex items-center justify-center text-sm">
+              1
+            </div>
+            <h3 className="text-sm font-extrabold text-slate-900">إدخال بيانات العقار</h3>
+            <p className="text-xs text-slate-600 leading-relaxed">
+              قم بملء النموذج السهل في 4 خطوات مع رفع صور واضحة وتحديد العنوان الدقيق سراً.
+            </p>
+          </div>
+
+          <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-xs space-y-3 relative overflow-hidden">
+            <div className="w-8 h-8 rounded-xl bg-blue-100 text-blue-800 font-black flex items-center justify-center text-sm">
+              2
+            </div>
+            <h3 className="text-sm font-extrabold text-slate-900">الفحص الهندسي والمراجعة</h3>
+            <p className="text-xs text-slate-600 leading-relaxed">
+              يقوم مراجع روابط بفحص العقار والتحقق من سلامة الأوراق ومنع أي تضارب سعري.
+            </p>
+          </div>
+
+          <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-xs space-y-3 relative overflow-hidden">
+            <div className="w-8 h-8 rounded-xl bg-purple-100 text-purple-800 font-black flex items-center justify-center text-sm">
+              3
+            </div>
+            <h3 className="text-sm font-extrabold text-slate-900">النشر والتسويق الآمن</h3>
+            <p className="text-xs text-slate-600 leading-relaxed">
+              ينشر العقار برقم مرجعي مميز بدون كشف رقم هاتفك للمحافظة على خصوصيتك.
+            </p>
+          </div>
+
+          <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-xs space-y-3 relative overflow-hidden">
+            <div className="w-8 h-8 rounded-xl bg-amber-100 text-amber-800 font-black flex items-center justify-center text-sm">
+              4
+            </div>
+            <h3 className="text-sm font-extrabold text-slate-900">معاينة جادة وإتمام</h3>
+            <p className="text-xs text-slate-600 leading-relaxed">
+              يرافق مندوب المبيعات المشتري الجاد للمعاينة الميدانية ومساعدتك في توقيع العقود.
+            </p>
+          </div>
+
+        </div>
+      </div>
+
+      {/* Downloadable Guides and Video Resources (U-11) */}
+      <div className="space-y-6">
+        <div className="text-right">
+          <h2 className="text-xl sm:text-2xl font-black text-slate-900">الموارد التعليمية والكتيبات الإرشادية</h2>
+          <p className="text-xs text-slate-500 font-medium mt-1">كتيبات PDF وفيديوهات تدريبية لكيفية تصوير العقارات وتجهيز المستندات</p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          
+          <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-xs space-y-4">
+            <div className="w-10 h-10 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center">
+              <FileText className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="text-sm font-extrabold text-slate-900">دليل تصوير العقارات الاحترافي</h3>
+              <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                كتيب إرشادي شامل من 12 صفحة يشرح زوايا التصوير والإضاءة لزيادة جاذبية عقارك.
+              </p>
+            </div>
+            <button 
+              onClick={() => alert('جاري تجهيز وتحميل ملف الدليل بصيغة PDF...')}
+              className="w-full py-2.5 bg-slate-50 hover:bg-slate-100 text-slate-800 text-xs font-bold rounded-xl border border-slate-200 flex items-center justify-center gap-1.5 transition"
+            >
+              <Download className="w-4 h-4" />
+              <span>تحميل دليل التصوير (PDF)</span>
+            </button>
+          </div>
+
+          <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-xs space-y-4">
+            <div className="w-10 h-10 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center">
+              <ShieldCheck className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="text-sm font-extrabold text-slate-900">دليل توثيق الملكية والأوراق القانونية</h3>
+              <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                شرح للمستندات المطلوبة (عقد مسجل، صحة توقيع، تراخيص البناء، شهادة البيانات).
+              </p>
+            </div>
+            <button 
+              onClick={() => alert('جاري تجهيز وتحميل ملف الأوراق القانونية بصيغة PDF...')}
+              className="w-full py-2.5 bg-slate-50 hover:bg-slate-100 text-slate-800 text-xs font-bold rounded-xl border border-slate-200 flex items-center justify-center gap-1.5 transition"
+            >
+              <Download className="w-4 h-4" />
+              <span>تحميل المستندات القانونية (PDF)</span>
+            </button>
+          </div>
+
+          <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-xs space-y-4">
+            <div className="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+              <Video className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="text-sm font-extrabold text-slate-900">شرح فيديو: كيفية إضافة عقار وتعديله</h3>
+              <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                فيديو قصير يوضح خطوات استخدام المنصة ونظام النسخ للمبتدئين.
+              </p>
+            </div>
+            <a 
+              href="https://youtube.com" 
+              target="_blank" 
+              rel="noreferrer"
+              className="w-full py-2.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-bold rounded-xl border border-emerald-200 flex items-center justify-center gap-1.5 transition"
+            >
+              <ExternalLink className="w-4 h-4" />
+              <span>مشاهدة الفيديو على يوتيوب</span>
+            </a>
+          </div>
+
+        </div>
+      </div>
+
+      {/* FAQ Accordion */}
+      <div className="bg-white rounded-3xl p-8 border border-slate-200 shadow-xs space-y-6">
+        <h2 className="text-xl font-black text-slate-900">الأسئلة الأكثر شيوعاً (FAQ)</h2>
+
+        <div className="divide-y divide-slate-100">
+          {faqs.map((faq, idx) => {
+            const isOpen = openFaq === idx;
+            return (
+              <div key={idx} className="py-4">
+                <button
+                  onClick={() => setOpenFaq(isOpen ? null : idx)}
+                  className="w-full text-right flex items-center justify-between gap-4 font-extrabold text-sm text-slate-900 hover:text-emerald-700 transition"
+                >
+                  <span>{faq.q}</span>
+                  {isOpen ? <ChevronUp className="w-4 h-4 text-emerald-600 shrink-0" /> : <ChevronDown className="w-4 h-4 text-slate-400 shrink-0" />}
+                </button>
+
+                {isOpen && (
+                  <p className="mt-3 text-xs text-slate-600 leading-relaxed font-medium animate-in fade-in">
+                    {faq.a}
+                  </p>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+    </div>
+  );
+};
