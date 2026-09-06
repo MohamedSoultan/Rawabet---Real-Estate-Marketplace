@@ -1,6 +1,7 @@
 import React from 'react';
 import { useApp } from '../../context/AppContext';
 import { Property, PropertyVersion } from '../../types';
+import { getOptimizedImageUrl, DEFAULT_FALLBACK_IMAGE } from '../../utils/imageOptimizer';
 import { 
   GitCompare, 
   Trash2, 
@@ -60,7 +61,7 @@ export const PropertyComparisonView: React.FC<PropertyComparisonViewProps> = ({
     <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-10 space-y-6 font-sans text-right">
       
       {/* Header Banner */}
-      <div className="bg-[#001e00] text-white rounded-3xl p-5 sm:p-8 border border-[#003a00] shadow-xl relative overflow-hidden flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
+      <div className="bg-[#001e00] text-white rounded-xl p-5 sm:p-8 border border-[#003a00] shadow-xl relative overflow-hidden flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
         <div className="space-y-1.5 z-10">
           <div className="flex items-center gap-2">
             <span className="p-2 rounded-xl bg-[#14a800] text-white">
@@ -69,7 +70,7 @@ export const PropertyComparisonView: React.FC<PropertyComparisonViewProps> = ({
             <h1 className="text-xl sm:text-2xl font-black text-white">
               مقارنة العقارات المباشرة
             </h1>
-            <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-[#002f00] text-[#14a800] border border-[#14a800]/30">
+            <span className="text-xs font-bold px-2.5 py-0.5 rounded-lg bg-[#002f00] text-[#14a800] border border-[#14a800]/30">
               {comparedProperties.length} / 4 عقارات
             </span>
           </div>
@@ -103,8 +104,8 @@ export const PropertyComparisonView: React.FC<PropertyComparisonViewProps> = ({
 
       {comparedProperties.length === 0 ? (
         /* Empty State */
-        <div className="bg-white rounded-3xl p-12 sm:p-16 border border-[#e4ebe4] text-center space-y-4 shadow-2xs">
-          <div className="w-16 h-16 rounded-full bg-[#f2f7f2] text-[#14a800] flex items-center justify-center mx-auto">
+        <div className="bg-white rounded-xl p-12 sm:p-16 border border-[#e4ebe4] text-center space-y-4 shadow-2xs">
+          <div className="w-16 h-16 rounded-xl bg-[#f2f7f2] text-[#14a800] flex items-center justify-center mx-auto">
             <GitCompare className="w-8 h-8" />
           </div>
           <div className="space-y-1 max-w-md mx-auto">
@@ -124,7 +125,7 @@ export const PropertyComparisonView: React.FC<PropertyComparisonViewProps> = ({
         </div>
       ) : (
         /* Comparison Table / Matrix */
-        <div className="bg-white rounded-3xl border border-[#e4ebe4] shadow-2xs overflow-hidden">
+        <div className="bg-white rounded-xl border border-[#e4ebe4] shadow-2xs overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-right border-collapse min-w-[700px]">
               <thead>
@@ -142,13 +143,18 @@ export const PropertyComparisonView: React.FC<PropertyComparisonViewProps> = ({
                       <th key={prop.id} className="p-4 text-xs font-black text-[#001e00] min-w-[240px] border-r border-[#e4ebe4] align-top">
                         <div className="space-y-3">
                           {/* Image & Remove */}
-                          <div className="relative rounded-2xl overflow-hidden aspect-video bg-slate-100 border border-slate-200">
+                          <div className="relative rounded-xl overflow-hidden aspect-video bg-slate-100 border border-slate-200">
                             {cover ? (
                               <img
-                                src={cover.path}
+                                src={getOptimizedImageUrl(cover.path, { width: 480, quality: 80 })}
                                 alt={ver?.title || 'عقار'}
                                 referrerPolicy="no-referrer"
+                                loading="lazy"
+                                decoding="async"
                                 className="w-full h-full object-cover"
+                                onError={(e) => {
+                                  (e.target as HTMLImageElement).src = DEFAULT_FALLBACK_IMAGE;
+                                }}
                               />
                             ) : (
                               <div className="w-full h-full flex items-center justify-center text-slate-400 bg-slate-100">
@@ -158,7 +164,7 @@ export const PropertyComparisonView: React.FC<PropertyComparisonViewProps> = ({
                             <button
                               type="button"
                               onClick={() => removeFromCompare(prop.id)}
-                              className="absolute top-2 left-2 p-1.5 rounded-full bg-white/90 hover:bg-rose-500 hover:text-white text-slate-700 transition cursor-pointer shadow-xs"
+                              className="absolute top-2 left-2 p-1.5 rounded-lg bg-white/90 hover:bg-rose-500 hover:text-white text-slate-700 transition cursor-pointer shadow-xs"
                               title="إزالة من المقارنة"
                             >
                               <X className="w-4 h-4" />

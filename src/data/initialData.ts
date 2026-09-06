@@ -104,64 +104,16 @@ export const INITIAL_TRANSACTION_TYPES: TransactionType[] = [
 
 export const INITIAL_USERS: User[] = [
   {
-    id: 'user-admin-1',
-    name: 'إدارة روابط العقارية',
-    email: 'admin@rawabet.com',
-    mobile: '01000920759',
-    email_verified_at: '2026-01-01T10:00:00Z',
-    account_status: 'ACTIVE',
-    role: 'SUPER_ADMIN',
-    last_login_at: '2026-09-01T08:00:00Z',
-    created_at: '2026-01-01T00:00:00Z',
-    updated_at: '2026-01-01T00:00:00Z',
-  },
-  {
-    id: 'user-reviewer-1',
-    name: 'م. كريم عادل (مراجع عقارات)',
-    email: 'reviewer@rawabet.com',
-    mobile: '01000920749',
-    email_verified_at: '2026-01-02T10:00:00Z',
-    account_status: 'ACTIVE',
-    role: 'PROPERTY_REVIEWER',
-    custom_permissions: [
-      'property.view_pending',
-      'property.review',
-      'property.edit_pending',
-      'property.approve',
-      'property.reject',
-      'property.view_private_source'
-    ],
-    last_login_at: '2026-09-01T07:30:00Z',
-    created_at: '2026-01-02T00:00:00Z',
-    updated_at: '2026-01-02T00:00:00Z',
-  },
-  {
-    id: 'user-sales-1',
-    name: 'سارة يوسف (مسؤول مبيعات)',
-    email: 'sales@rawabet.com',
-    mobile: '01023456780',
-    email_verified_at: '2026-01-03T10:00:00Z',
-    account_status: 'ACTIVE',
-    role: 'SALES_USER',
-    custom_permissions: [
-      'lead.view',
-      'lead.edit',
-      'lead.change_status',
-      'lead.add_note',
-      'lead.contact'
-    ],
-    last_login_at: '2026-09-01T06:45:00Z',
-    created_at: '2026-01-03T00:00:00Z',
-    updated_at: '2026-01-03T00:00:00Z',
-  },
-  {
     id: 'user-owner-1',
-    name: 'محمد الدسوقي (مالك عقار)',
-    email: 'owner@example.com',
+    name: 'عمرو محمود (مالك عقار)',
+    email: 'owner.demo@rawabet.test',
     mobile: '01012345678',
+    password: 'OwnerDemo@2026',
     email_verified_at: '2026-02-01T12:00:00Z',
     account_status: 'ACTIVE',
     role: 'CUSTOMER',
+    avatar_path: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=256&q=80',
+    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=256&q=80',
     seller_profile: {
       id: 'seller-own-1',
       user_id: 'user-owner-1',
@@ -169,7 +121,7 @@ export const INITIAL_USERS: User[] = [
       verification_status: 'VERIFIED',
       verification_requested_at: '2026-02-01T12:10:00Z',
       verified_at: '2026-02-02T09:00:00Z',
-      verified_by: 'user-admin-1',
+      verified_by: 'system-verified',
       verification_note: 'تم التحقق من صفة المالك وسند الملكية بنجاح'
     },
     user_profile: {
@@ -182,24 +134,40 @@ export const INITIAL_USERS: User[] = [
       created_at: '2026-02-01T12:00:00Z',
       updated_at: '2026-02-01T12:00:00Z'
     },
+    custom_permissions: [
+      'property.create',
+      'property.edit_own',
+      'property.view_own_status',
+      'property.browse',
+      'property.favorite'
+    ],
     last_login_at: '2026-09-01T05:00:00Z',
     created_at: '2026-02-01T12:00:00Z',
     updated_at: '2026-02-02T09:00:00Z'
   },
   {
     id: 'user-broker-1',
-    name: 'مكتب النخبة للتسويق العقاري (وسيط)',
-    email: 'broker@example.com',
+    name: 'أحمد إبراهيم (وسيط عقاري معتمد)',
+    email: 'broker.demo@rawabet.test',
     mobile: '01098765432',
+    password: 'BrokerDemo@2026',
     email_verified_at: '2026-03-01T14:00:00Z',
     account_status: 'ACTIVE',
     role: 'CUSTOMER',
+    avatar_path: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=256&q=80',
+    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=256&q=80',
     seller_profile: {
       id: 'seller-brk-1',
       user_id: 'user-broker-1',
       seller_type: 'BROKER',
-      verification_status: 'PENDING',
-      verification_requested_at: '2026-08-25T11:00:00Z'
+      agency_name: 'مكتب النخبة للتسويق والوساطة العقارية',
+      tax_number: '748-291-502',
+      commercial_registration: 'CR-KFS-99120',
+      verification_status: 'VERIFIED',
+      verification_requested_at: '2026-03-01T14:00:00Z',
+      verified_at: '2026-03-02T10:00:00Z',
+      verified_by: 'system-verified',
+      verification_note: 'تم فحص السجل التجاري والبطاقة الضريبية وتوثيق المكتب رسمياً'
     },
     user_profile: {
       id: 'prof-brk-1',
@@ -211,18 +179,28 @@ export const INITIAL_USERS: User[] = [
       created_at: '2026-03-01T14:00:00Z',
       updated_at: '2026-03-01T14:00:00Z'
     },
+    custom_permissions: [
+      'property.create',
+      'property.edit_own',
+      'property.view_own',
+      'property.browse',
+      'property.favorite'
+    ],
     last_login_at: '2026-08-30T10:00:00Z',
     created_at: '2026-03-01T14:00:00Z',
     updated_at: '2026-08-25T11:00:00Z'
   },
   {
     id: 'user-cust-1',
-    name: 'أحمد مصطفى (مشتري / عميل)',
-    email: 'customer@example.com',
+    name: 'علي حسن (مشتري / باحث)',
+    email: 'customer.demo@rawabet.test',
     mobile: '01123456789',
+    password: 'CustomerDemo@2026',
     email_verified_at: '2026-04-10T16:00:00Z',
     account_status: 'ACTIVE',
     role: 'CUSTOMER',
+    avatar_path: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80',
+    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80',
     user_profile: {
       id: 'prof-cust-1',
       user_id: 'user-cust-1',
@@ -233,6 +211,11 @@ export const INITIAL_USERS: User[] = [
       created_at: '2026-04-10T16:00:00Z',
       updated_at: '2026-04-10T16:00:00Z'
     },
+    custom_permissions: [
+      'property.browse',
+      'property.favorite',
+      'lead.submit'
+    ],
     last_login_at: '2026-09-01T04:20:00Z',
     created_at: '2026-04-10T16:00:00Z',
     updated_at: '2026-04-10T16:00:00Z'
@@ -1535,6 +1518,418 @@ export const INITIAL_PROPERTIES: Property[] = [
         created_at: '2026-09-01T23:00:00Z'
       }
     ]
+  },
+  {
+    id: 'prop-117',
+    reference_number: 'RAW-KFS-000017',
+    seller_id: 'user-owner-1',
+    property_type_id: 'type-apt',
+    transaction_type_id: 'tx-sale',
+    current_status: 'PUBLISHED',
+    current_published_version_id: 'ver-117-1',
+    created_at: '2026-09-02T10:00:00Z',
+    updated_at: '2026-09-02T11:00:00Z',
+    versions: [
+      {
+        id: 'ver-117-1',
+        property_id: 'prop-117',
+        version_number: 1,
+        title: 'شقة سكنية واسعة للبيع بالتسهيلات في قلب شارع الجيش الرئيسي بكفر الشيخ بالقرب من مجمع المستشفيات والخدمات العامة',
+        description: 'شقة عائلية فاخرة بمساحة 215م² تشطيب ألترا سوبر لوكس على شارعين رئيسيين، تتكون من 4 غرف نوم واسعة وريسبشن كبير 4 قطع و3 حمامات ومطبخ واسع مجهز، واجهة بحرية صريحة غير مجروحة تماماً، عدادات رسمية، حصة كاملة بالأرض، جاهزة للسكن والتسليم الفوري مع إمكانية التقسيط على سنة.',
+        governorate_id: 'gov-kfs',
+        city_id: 'city-kfs-1',
+        area_id: 'area-102',
+        public_location_text: 'كفر الشيخ - شارع الجيش العمومي بالقرب من ميدان النصر ومستشفى العبور المركزي',
+        private_address: 'برج الأطباء شارع الجيش الدور الخامس شقة 9',
+        price: 3250000,
+        area_sqm: 215,
+        bedrooms: 4,
+        bathrooms: 3,
+        floor: 'الدور الخامس',
+        finishing: 'ألترا سوبر لوكس',
+        features: ['مصعدان إيطاليان', 'واجهة بحرية غير مجروحة', 'عداد غاز وكهرباء رسمي', 'حصة بالأرض', 'شرفة بانورامية', 'أمن وحراسة 24 ساعة', 'جاهز للاستلام الفوري'],
+        version_status: 'APPROVED',
+        submitted_by: 'user-owner-1',
+        submitted_at: '2026-09-02T10:15:00Z',
+        reviewed_by: 'user-reviewer-1',
+        reviewed_at: '2026-09-02T11:00:00Z',
+        review_decision: 'APPROVED',
+        created_at: '2026-09-02T10:00:00Z',
+        updated_at: '2026-09-02T11:00:00Z',
+        media: [
+          {
+            id: 'med-117-1',
+            property_version_id: 'ver-117-1',
+            media_type: 'IMAGE',
+            path: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80',
+            mime_type: 'image/jpeg',
+            file_size: 1048576,
+            sort_order: 1,
+            is_cover: true,
+            created_at: '2026-09-02T10:10:00Z'
+          },
+          {
+            id: 'med-117-2',
+            property_version_id: 'ver-117-1',
+            media_type: 'IMAGE',
+            path: 'https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?auto=format&fit=crop&w=1200&q=80',
+            mime_type: 'image/jpeg',
+            file_size: 1048576,
+            sort_order: 2,
+            is_cover: false,
+            created_at: '2026-09-02T10:10:00Z'
+          }
+        ]
+      }
+    ],
+    reviews: [
+      {
+        id: 'rev-117-1',
+        property_id: 'prop-117',
+        property_version_id: 'ver-117-1',
+        reviewer_id: 'user-reviewer-1',
+        reviewer_name: 'م. كريم عادل (مراجع عقارات)',
+        decision: 'APPROVED',
+        internal_note: 'تمت مراجعة العقود وتصاريح البناء ومطابقة المساحة على أرض الواقع.',
+        created_at: '2026-09-02T11:00:00Z'
+      }
+    ]
+  },
+  {
+    id: 'prop-118',
+    reference_number: 'RAW-KFS-000018',
+    seller_id: 'user-broker-1',
+    property_type_id: 'type-apt',
+    transaction_type_id: 'tx-rent',
+    current_status: 'PUBLISHED',
+    current_published_version_id: 'ver-118-1',
+    created_at: '2026-09-02T12:00:00Z',
+    updated_at: '2026-09-02T13:00:00Z',
+    versions: [
+      {
+        id: 'ver-118-1',
+        property_id: 'prop-118',
+        version_number: 1,
+        title: 'شقة سكنية مفروشة ومكيفة بالكامل للإيجار الشهري بالقرب من جامعة كفر الشيخ ومجمع الكليات',
+        description: 'شقة مفروشة بفرش فندقي راقٍ ومكيفات سبليت حديثة، تتكون من غرفتين نوم واسعتين وصالة معيشة وحمام ومطبخ مجهز بكافة الأجهزة الكهربائية (ثلاجة، غسالة، بوتاجاز، شاشة ذكية). مناسبة للأسر وأعضاء هيئة التدريس والمهندسين.',
+        governorate_id: 'gov-kfs',
+        city_id: 'city-kfs-1',
+        area_id: 'area-104',
+        public_location_text: 'حي الجامعة والقنطرة البيضاء - كفر الشيخ بجوار البوابة الرئيسية',
+        private_address: 'عمارة النور شارع كلية التربية الدور الثاني',
+        price: 8500,
+        area_sqm: 110,
+        bedrooms: 2,
+        bathrooms: 1,
+        floor: 'الدور الثاني',
+        finishing: 'سوبر لوكس',
+        features: ['فرش فندقي متكامل', 'تكييفات بكل غرفة', 'إنترنت فايبر سريع', 'أجهزة كهربائية كاملة', 'مصعد شغال', 'جاهز للاستلام الفوري'],
+        version_status: 'APPROVED',
+        submitted_by: 'user-broker-1',
+        submitted_at: '2026-09-02T12:15:00Z',
+        reviewed_by: 'user-reviewer-1',
+        reviewed_at: '2026-09-02T13:00:00Z',
+        review_decision: 'APPROVED',
+        created_at: '2026-09-02T12:00:00Z',
+        updated_at: '2026-09-02T13:00:00Z',
+        media: [
+          {
+            id: 'med-118-1',
+            property_version_id: 'ver-118-1',
+            media_type: 'IMAGE',
+            path: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=1200&q=80',
+            mime_type: 'image/jpeg',
+            file_size: 1048576,
+            sort_order: 1,
+            is_cover: true,
+            created_at: '2026-09-02T12:10:00Z'
+          }
+        ]
+      }
+    ],
+    reviews: [
+      {
+        id: 'rev-118-1',
+        property_id: 'prop-118',
+        property_version_id: 'ver-118-1',
+        reviewer_id: 'user-reviewer-1',
+        reviewer_name: 'م. كريم عادل (مراجع عقارات)',
+        decision: 'APPROVED',
+        internal_note: 'حالة الفرش والأجهزة ممتازة ومطابقة للصور المرفقة.',
+        created_at: '2026-09-02T13:00:00Z'
+      }
+    ]
+  },
+  {
+    id: 'prop-119',
+    reference_number: 'RAW-KFS-000019',
+    seller_id: 'user-owner-1',
+    property_type_id: 'type-shop',
+    transaction_type_id: 'tx-sale',
+    current_status: 'PUBLISHED',
+    current_published_version_id: 'ver-119-1',
+    created_at: '2026-09-02T14:00:00Z',
+    updated_at: '2026-09-02T15:00:00Z',
+    versions: [
+      {
+        id: 'ver-119-1',
+        property_id: 'prop-119',
+        version_number: 1,
+        title: 'محل تجاري ناصية واجهة 7م في أكثر شوارع دسوق التجارية حيوية وازدحاماً مع صندرة مرخصة',
+        description: 'محل تجاري استثماري استثنائي بموقع استراتيجي وسط أشهر التوكيلات والماركات التجارية بمدينة دسوق، واجهة زجاجية سيكوريت عريضة 7 أمتار وارتفاع سقف 5.2م مع صندرة داخلية مرخصة مساحة 30م²، مناسب لكبرى الصيدليات، معارض الذهب، الأجهزة الكهربائية، أو التوكيلات والبراندات العالمية.',
+        governorate_id: 'gov-kfs',
+        city_id: 'city-kfs-2',
+        area_id: 'area-201',
+        public_location_text: 'دسوق - شارع الجيش وسعد زغلول التجاري بالقرب من ميدان سيدي إبراهيم الدسوقي',
+        private_address: 'شارع الجيش ناصية شارع البنوك محل رقم 3',
+        price: 4800000,
+        area_sqm: 75,
+        bedrooms: 0,
+        bathrooms: 1,
+        floor: 'الدور الأرضي',
+        finishing: 'سوبر لوكس',
+        features: ['واجهة سيكوريت 7 أمتار', 'صندرة تخزين مرخصة', 'عداد كهرباء 3 فاز تجاري', 'رخصة تجارية سارية', 'حصة بالأرض', 'موقع تجاري نشط جداً'],
+        version_status: 'APPROVED',
+        submitted_by: 'user-owner-1',
+        submitted_at: '2026-09-02T14:15:00Z',
+        reviewed_by: 'user-reviewer-1',
+        reviewed_at: '2026-09-02T15:00:00Z',
+        review_decision: 'APPROVED',
+        created_at: '2026-09-02T14:00:00Z',
+        updated_at: '2026-09-02T15:00:00Z',
+        media: [
+          {
+            id: 'med-119-1',
+            property_version_id: 'ver-119-1',
+            media_type: 'IMAGE',
+            path: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1200&q=80',
+            mime_type: 'image/jpeg',
+            file_size: 1048576,
+            sort_order: 1,
+            is_cover: true,
+            created_at: '2026-09-02T14:10:00Z'
+          },
+          {
+            id: 'med-119-2',
+            property_version_id: 'ver-119-1',
+            media_type: 'IMAGE',
+            path: 'https://images.unsplash.com/photo-1513151233558-d860c5398176?auto=format&fit=crop&w=1200&q=80',
+            mime_type: 'image/jpeg',
+            file_size: 1048576,
+            sort_order: 2,
+            is_cover: false,
+            created_at: '2026-09-02T14:10:00Z'
+          }
+        ]
+      }
+    ],
+    reviews: [
+      {
+        id: 'rev-119-1',
+        property_id: 'prop-119',
+        property_version_id: 'ver-119-1',
+        reviewer_id: 'user-reviewer-1',
+        reviewer_name: 'م. كريم عادل (مراجع عقارات)',
+        decision: 'APPROVED',
+        internal_note: 'موقع حيوي من الدرجة الأولى والأوراق والرخصة التجارية سليمة 100%.',
+        created_at: '2026-09-02T15:00:00Z'
+      }
+    ]
+  },
+  {
+    id: 'prop-120',
+    reference_number: 'RAW-KFS-000020',
+    seller_id: 'user-broker-1',
+    property_type_id: 'type-shop',
+    transaction_type_id: 'tx-rent',
+    current_status: 'PUBLISHED',
+    current_published_version_id: 'ver-120-1',
+    created_at: '2026-09-02T16:00:00Z',
+    updated_at: '2026-09-02T17:00:00Z',
+    versions: [
+      {
+        id: 'ver-120-1',
+        property_id: 'prop-120',
+        version_number: 1,
+        title: 'محل ومقر تجاري للإيجار بشارع الخليفة المأمون كفر الشيخ مجهز بكافة المرافق',
+        description: 'محل تجاري مساحة 50م² بموقع ممتاز بشارع الخليفة المأمون، تشطيب حديث مع دورة مياه خاصة ورخصة تجارية، واجهة مميزة، جاهز للتشغيل الفوري لأي نشاط تجاري أو خدمي أو عيادة أو معرض مصغر.',
+        governorate_id: 'gov-kfs',
+        city_id: 'city-kfs-1',
+        area_id: 'area-105',
+        public_location_text: 'كفر الشيخ - شارع الخليفة المأمون بالقرب من مجمع المحاكم والخدمات',
+        private_address: 'شارع الخليفة المأمون عمارة الصفوة محل 2',
+        price: 15000,
+        area_sqm: 50,
+        bedrooms: 0,
+        bathrooms: 1,
+        floor: 'الدور الأرضي',
+        finishing: 'سوبر لوكس',
+        features: ['عداد كهرباء كارت', 'دورة مياه مستقلة', 'رخصة تجارية', 'واجهة زجاجية', 'جاهز للاستلام الفوري'],
+        version_status: 'APPROVED',
+        submitted_by: 'user-broker-1',
+        submitted_at: '2026-09-02T16:15:00Z',
+        reviewed_by: 'user-reviewer-1',
+        reviewed_at: '2026-09-02T17:00:00Z',
+        review_decision: 'APPROVED',
+        created_at: '2026-09-02T16:00:00Z',
+        updated_at: '2026-09-02T17:00:00Z',
+        media: [
+          {
+            id: 'med-120-1',
+            property_version_id: 'ver-120-1',
+            media_type: 'IMAGE',
+            path: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1200&q=80',
+            mime_type: 'image/jpeg',
+            file_size: 1048576,
+            sort_order: 1,
+            is_cover: true,
+            created_at: '2026-09-02T16:10:00Z'
+          }
+        ]
+      }
+    ],
+    reviews: [
+      {
+        id: 'rev-120-1',
+        property_id: 'prop-120',
+        property_version_id: 'ver-120-1',
+        reviewer_id: 'user-reviewer-1',
+        reviewer_name: 'م. كريم عادل (مراجع عقارات)',
+        decision: 'APPROVED',
+        internal_note: 'جاهز للإيجار المباشر وسند الملكية معتمد.',
+        created_at: '2026-09-02T17:00:00Z'
+      }
+    ]
+  },
+  {
+    id: 'prop-121',
+    reference_number: 'RAW-KFS-000021',
+    seller_id: 'user-owner-1',
+    property_type_id: 'type-land',
+    transaction_type_id: 'tx-sale',
+    current_status: 'PUBLISHED',
+    current_published_version_id: 'ver-121-1',
+    created_at: '2026-09-02T18:00:00Z',
+    updated_at: '2026-09-02T19:00:00Z',
+    versions: [
+      {
+        id: 'ver-121-1',
+        property_id: 'prop-121',
+        version_number: 1,
+        title: 'قطعة أرض مباني مرخصة واجهة 15م على شارع رئيسي 16م بمنطقة الأبراج الجديدة حي المهندسين',
+        description: 'قطعة أرض فضاء سكنية واستثمارية فريدة داخل الحيز العمراني المعتمد، مساحة 250م² بواجهة عريضة 15 متراً وعمق مناسب، تقع على شارع رئيسي بعرض 16 متراً بمنطقة الأبراج الجديدة بكفر الشيخ، مسجلة شهر عقاري وخالصة كافة الرسوم والمرافق وجاهزة لاستخراج تراخيص البناء الفورية لبناء برج سكني أو مقر إداري.',
+        governorate_id: 'gov-kfs',
+        city_id: 'city-kfs-1',
+        area_id: 'area-101',
+        public_location_text: 'حي المهندسين ومنطقة الأبراج الجديدة - كفر الشيخ بالقرب من الحديقة المركزية',
+        private_address: 'منطقة تقسيم الأبراج الجديدة قطعة رقم 48',
+        price: 7500000,
+        area_sqm: 250,
+        bedrooms: 0,
+        bathrooms: 0,
+        floor: 'أرض فضاء',
+        finishing: 'بدون تشطيب',
+        features: ['داخل الحيز العمراني المعتمد', 'واجهة 15م على شارع 16م', 'مسجلة شهر عقاري', 'جاهزة لاستخراج تراخيص البناء', 'شبكة مياه وكهرباء وصرف واصلة'],
+        version_status: 'APPROVED',
+        submitted_by: 'user-owner-1',
+        submitted_at: '2026-09-02T18:15:00Z',
+        reviewed_by: 'user-reviewer-1',
+        reviewed_at: '2026-09-02T19:00:00Z',
+        review_decision: 'APPROVED',
+        created_at: '2026-09-02T18:00:00Z',
+        updated_at: '2026-09-02T19:00:00Z',
+        media: [
+          {
+            id: 'med-121-1',
+            property_version_id: 'ver-121-1',
+            media_type: 'IMAGE',
+            path: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1200&q=80',
+            mime_type: 'image/jpeg',
+            file_size: 1048576,
+            sort_order: 1,
+            is_cover: true,
+            created_at: '2026-09-02T18:10:00Z'
+          }
+        ]
+      }
+    ],
+    reviews: [
+      {
+        id: 'rev-121-1',
+        property_id: 'prop-121',
+        property_version_id: 'ver-121-1',
+        reviewer_id: 'user-reviewer-1',
+        reviewer_name: 'م. كريم عادل (مراجع عقارات)',
+        decision: 'APPROVED',
+        internal_note: 'الأرض مطابقة لمخطط الحيز العمراني والتراخيص سارية.',
+        created_at: '2026-09-02T19:00:00Z'
+      }
+    ]
+  },
+  {
+    id: 'prop-122',
+    reference_number: 'RAW-KFS-000022',
+    seller_id: 'user-broker-1',
+    property_type_id: 'type-land',
+    transaction_type_id: 'tx-sale',
+    current_status: 'PUBLISHED',
+    current_published_version_id: 'ver-122-1',
+    created_at: '2026-09-02T20:00:00Z',
+    updated_at: '2026-09-02T21:00:00Z',
+    versions: [
+      {
+        id: 'ver-122-1',
+        property_id: 'prop-122',
+        version_number: 1,
+        title: 'أرض فضاء تجارية ومخازن بموقع استراتيجي على الطريق الدولي الساحلي مباشرة ببلطيم',
+        description: 'مساحة أرض تجارية واستثمارية واسعة تبلغ 1500م² بواجهة مباشرة 35 متراً على رافد الطريق الدولي الساحلي ببلطيم، مثالية لإنشاء مراكز لوجستية، محطة خدمات سيارات، معارض تجارية، مخازن تبريد أو مصانع تعبئة وتغليف. مسجلة ومحاطة بسور خرساني كامل.',
+        governorate_id: 'gov-kfs',
+        city_id: 'city-kfs-5',
+        area_id: 'area-303',
+        public_location_text: 'بلطيم - مباشرة على الطريق الدولي الساحلي بالقرب من مدخل المصيف',
+        private_address: 'رافد الطريق الدولي الساحلي كم 18 بلطيم',
+        price: 9750000,
+        area_sqm: 1500,
+        bedrooms: 0,
+        bathrooms: 0,
+        floor: 'أرض فضاء تجارية',
+        finishing: 'بدون تشطيب',
+        features: ['واجهة مباشرة 35م على الدولي الساحلي', 'محاطة بسور خرساني كامل', 'رخصة تجارية واستثمارية', 'حيازة مسجلة وخالصة الضرائب', 'مدخل شاحنات وتريلات واسع'],
+        version_status: 'APPROVED',
+        submitted_by: 'user-broker-1',
+        submitted_at: '2026-09-02T20:15:00Z',
+        reviewed_by: 'user-reviewer-1',
+        reviewed_at: '2026-09-02T21:00:00Z',
+        review_decision: 'APPROVED',
+        created_at: '2026-09-02T20:00:00Z',
+        updated_at: '2026-09-02T21:00:00Z',
+        media: [
+          {
+            id: 'med-122-1',
+            property_version_id: 'ver-122-1',
+            media_type: 'IMAGE',
+            path: 'https://images.unsplash.com/photo-1516156008625-3a9d6067fab5?auto=format&fit=crop&w=1200&q=80',
+            mime_type: 'image/jpeg',
+            file_size: 1048576,
+            sort_order: 1,
+            is_cover: true,
+            created_at: '2026-09-02T20:10:00Z'
+          }
+        ]
+      }
+    ],
+    reviews: [
+      {
+        id: 'rev-122-1',
+        property_id: 'prop-122',
+        property_version_id: 'ver-122-1',
+        reviewer_id: 'user-reviewer-1',
+        reviewer_name: 'م. كريم عادل (مراجع عقارات)',
+        decision: 'APPROVED',
+        internal_note: 'موقع استراتيجي رائع والواجهة والتسجيل سليمين.',
+        created_at: '2026-09-02T21:00:00Z'
+      }
+    ]
   }
 ];
 
@@ -1651,18 +2046,19 @@ export const INITIAL_SETTINGS: SystemSetting = {
   whatsapp_phone: '01000920759',
   official_address: 'كفر الشيخ، حي المحافظة، أمام ديوان عام المحافظة',
   support_email: 'contact@rawabet-eg.com',
-  home_headline_ar: 'عقارك المناسب في كفر الشيخ أقرب مما تتخيل',
-  home_description_ar: 'منصة رقمية موثوقة للوساطة العقارية. جميع العقارات يتم مراجعتها وتوثيقها من فريق روابط لضمان أفضل تجربة بيع وشراء وإيجار بأمان تام.',
-  privacy_policy_ar: `نحن في منصة "روابط" نلتزم بحماية خصوصية جميع المستخدمين سواء كانوا ملاكاً، وسطاء، أو باحثين عن عقارات.
-1. سرية بيانات البائعين: لا يتم نشر أرقام هواتف الملاك أو الوسطاء أو عناوينهم التفصيلية إطلاقاً على الواجهات العامة.
-2. دور روابط كوسيط معتمد: تتم كافة المعاينات والتواصل عبر فريق مبيعات روابط لحماية الطرفين وضمان الجدية.
-3. معالجة البيانات: تُستخدم بيانات الاتصال المسجلة فقط لتوثيق الحسابات ومتابعة الطلبات ولن يتم بيعها أو مشاركتها مع أي طرف خارجي.`,
+  home_headline_ar: 'اعثر على عقارك المناسب بثقة',
+  home_description_ar: 'روابط وسيط رقمي موثوق ينظم رحلة البحث والبيع والإيجار من خلال عقارات مؤكدة وبيانات واضحة وتجربة رقمية بسيطة ومنظمة.',
+  privacy_policy_ar: `نلتزم في روابط بحماية خصوصية الملاك والعملاء، ونضمن عدم نشر أرقام الهواتف أو العناوين الدقيقة للعامة، وتتم المعاينات بإشراف فريق روابط الرسمي.
+
+1. سرية بيانات البائعين والعملاء: لا يتم نشر أرقام الهواتف أو العناوين التفصيلية إطلاقاً على الواجهات العامة لحماية الخصوصية.
+2. دور روابط كوسيط رقمي موثوق: تتم كافة المعاينات والتواصل عبر فريق مبيعات روابط الرسمي لحماية الطرفين وضمان الجدية.
+3. معالجة البيانات بأمان: تُستخدم البيانات فقط لتقديم الخدمة وتسهيل التواصل ولن يتم مشاركتها مع أي طرف غير مصرح له.`,
   terms_ar: `شروط الاستخدام لمنصة روابط للوساطة العقارية:
 1. يلتزم المالك والوسيط بتقديم بيانات صحيحة ودقيقة وصور حقيقية ومحدثة للعقار.
-2. يمنع منعاً باتاً إدراج أرقام تليفونات أو روابط خارجية أو وسائل تواصل في نص الوصف أو العنوان.
-3. يخضع كل عقار للمراجعة والتدقيق الإداري من قبل فريق روابط قبل اعتماده للنشر للجمهور.
-4. تحتفظ إدارة روابط بحق رفض أو طلب تعديل أي عقار لا يستوفي معايير الجودة ومحددات الموقع.`,
-  about_ar: `منصة "روابط" هي المنصة الرقمية الأولى المتخصصة في الوساطة العقارية الموثوقة بمحافظة كفر الشيخ. تأسست لتقديم تجربة عقارية احترافية وسلسة تربط بين العرض والطلب بأعلى معايير الشفافية والأمان والسرعة.`,
+2. يمنع منعاً باتاً إدراج أرقام تليفونات أو وسائل تواصل خارجية في نص الوصف أو الصور.
+3. يخضع كل عقار للمراجعة والتدقيق من قبل فريق روابط قبل اعتماده للنشر للجمهور.
+4. تحتفظ إدارة روابط بحق مراجعة ورفض أو طلب تعديل أي عقار لا يستوفي معايير الجودة والشفافية.`,
+  about_ar: `تأسست روابط لتجمع عروض البيع والإيجار وتنظيم البيانات وتحسين جودة الإعلانات، بهدف توفير تجربة رقمية بسيطة ومنظمة تساعد العملاء على البحث واكتشاف ومقارنة الخيارات والتواصل لإتمام خطواتهم بشكل أكثر احترافية.`,
   updated_at: '2026-01-01T00:00:00Z'
 };
 
@@ -1696,20 +2092,20 @@ export const INITIAL_HELP_RESOURCES: HelpResource[] = [
 export const INITIAL_AUDIT_LOGS: AuditLog[] = [
   {
     id: 'aud-001',
-    actor_id: 'user-admin-1',
+    actor_id: 'system',
     actor_name: 'إدارة روابط',
     actor_role: 'SUPER_ADMIN',
     action: 'SYSTEM_INITIALIZATION',
     entity_type: 'SYSTEM',
     entity_id: 'SYSTEM_SETTINGS',
     old_value: null,
-    new_value: 'تهيئة النظام وتعيين أرقام التواصل 01000920759 / 01000920749 وتفعيل كفر الشيخ',
+    new_value: 'تهيئة النظام وتعيين أرقام التواصل 01000920759 وتفعيل كفر الشيخ',
     created_at: '2026-01-01T00:00:00Z'
   },
   {
     id: 'aud-002',
-    actor_id: 'user-reviewer-1',
-    actor_name: 'م. كريم عادل',
+    actor_id: 'system',
+    actor_name: 'فريق الفحص الفني',
     actor_role: 'PROPERTY_REVIEWER',
     action: 'PROPERTY_APPROVED',
     entity_type: 'PROPERTY',
@@ -1721,8 +2117,8 @@ export const INITIAL_AUDIT_LOGS: AuditLog[] = [
   },
   {
     id: 'aud-003',
-    actor_id: 'user-reviewer-1',
-    actor_name: 'م. كريم عادل',
+    actor_id: 'system',
+    actor_name: 'فريق الفحص الفني',
     actor_role: 'PROPERTY_REVIEWER',
     action: 'PROPERTY_REJECTED',
     entity_type: 'PROPERTY',
@@ -1757,16 +2153,5 @@ export const INITIAL_NOTIFICATIONS: AppNotification[] = [
     related_id: 'prop-105',
     read_at: null,
     created_at: '2026-08-21T11:00:00Z'
-  },
-  {
-    id: 'notif-3',
-    user_id: 'user-reviewer-1',
-    type: 'PROPERTY_SUBMITTED',
-    title: 'عقار جديد قيد المراجعة',
-    body: 'تم إرسال العقار رقم RAW-KFS-000004 للمراجعة من قبل الوسيط.',
-    related_type: 'PROPERTY',
-    related_id: 'prop-104',
-    read_at: null,
-    created_at: '2026-08-31T14:30:00Z'
   }
 ];

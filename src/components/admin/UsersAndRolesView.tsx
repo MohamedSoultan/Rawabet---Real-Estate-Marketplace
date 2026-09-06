@@ -23,7 +23,7 @@ export const UsersAndRolesView: React.FC = () => {
   const { currentUser, users, toggleUserStatus, updateUserPermissions, createInternalUser, hasPermission } = useApp();
 
   const isSuperAdmin = currentUser?.role === 'SUPER_ADMIN';
-  const canManageUsers = true;
+  const canManageUsers = isSuperAdmin || hasPermission('PERM_MANAGE_USERS');
 
   // Filter accessible users based on hierarchy
   const visibleUsers = useMemo(() => {
@@ -97,8 +97,8 @@ export const UsersAndRolesView: React.FC = () => {
   // Security barrier if unpermitted
   if (!canManageUsers) {
     return (
-      <div className="bg-white rounded-3xl p-8 sm:p-12 border border-slate-200 shadow-sm text-center max-w-xl mx-auto space-y-4">
-        <div className="w-14 h-14 rounded-2xl bg-rose-50 text-rose-600 border border-rose-200 flex items-center justify-center mx-auto">
+      <div className="bg-white rounded-xl p-8 sm:p-12 border border-slate-200 shadow-sm text-center max-w-xl mx-auto space-y-4">
+        <div className="w-14 h-14 rounded-xl bg-rose-50 text-rose-600 border border-rose-200 flex items-center justify-center mx-auto">
           <ShieldAlert className="w-7 h-7" />
         </div>
         <h3 className="text-lg sm:text-xl font-black text-slate-900">
@@ -179,7 +179,7 @@ export const UsersAndRolesView: React.FC = () => {
     <div className="space-y-6 text-right font-sans">
       
       {/* Top Controls Header */}
-      <div className="bg-white rounded-3xl p-5 sm:p-6 border border-slate-200 shadow-2xs space-y-4">
+      <div className="bg-white rounded-xl p-5 sm:p-6 border border-slate-200 shadow-2xs space-y-4">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
@@ -269,7 +269,7 @@ export const UsersAndRolesView: React.FC = () => {
       </div>
 
       {toastMsg && (
-        <div className="p-3.5 bg-emerald-700 text-white text-xs sm:text-sm font-bold rounded-2xl flex items-center justify-center animate-in slide-in-from-top-1 shadow-md">
+        <div className="p-3.5 bg-emerald-700 text-white text-xs sm:text-sm font-bold rounded-xl flex items-center justify-center animate-in slide-in-from-top-1 shadow-md">
           <span>{toastMsg}</span>
         </div>
       )}
@@ -286,7 +286,7 @@ export const UsersAndRolesView: React.FC = () => {
 
           <div className="space-y-2 max-h-[620px] overflow-y-auto pr-1">
             {filteredUsers.length === 0 ? (
-              <div className="bg-white rounded-2xl p-8 text-center border border-dashed border-slate-200 text-slate-500 text-xs font-bold">
+              <div className="bg-white rounded-xl p-8 text-center border border-dashed border-slate-200 text-slate-500 text-xs font-bold">
                 لا يوجد مستخدمين مطابقين لمعايير البحث
               </div>
             ) : (
@@ -299,7 +299,7 @@ export const UsersAndRolesView: React.FC = () => {
                   <div
                     key={u.id}
                     onClick={() => setSelectedUser(u)}
-                    className={`p-3.5 sm:p-4 rounded-2xl border transition-all cursor-pointer flex items-center justify-between gap-3 ${
+                    className={`p-3.5 sm:p-4 rounded-xl border transition-all cursor-pointer flex items-center justify-between gap-3 ${
                       isSelected 
                         ? 'border-[#128c46] bg-emerald-50/80 shadow-xs ring-1 ring-[#128c46]' 
                         : 'border-slate-200 bg-white hover:bg-slate-50'
@@ -342,7 +342,7 @@ export const UsersAndRolesView: React.FC = () => {
         {/* Roles & Permissions Inspector / Editor (Right / Col 7) */}
         <div className="lg:col-span-7">
           {selectedUser ? (
-            <div className="bg-white rounded-3xl p-5 sm:p-6 border border-slate-200 shadow-2xs space-y-6 animate-in fade-in">
+            <div className="bg-white rounded-xl p-5 sm:p-6 border border-slate-200 shadow-2xs space-y-6 animate-in fade-in">
               
               {/* User Header Info Card */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-100">
@@ -405,7 +405,7 @@ export const UsersAndRolesView: React.FC = () => {
                     return (
                       <label 
                         key={p.key}
-                        className={`p-3 rounded-2xl border flex items-center justify-between gap-3 text-xs sm:text-sm transition select-none ${
+                        className={`p-3 rounded-xl border flex items-center justify-between gap-3 text-xs sm:text-sm transition select-none ${
                           isSuper 
                             ? 'bg-purple-50/70 border-purple-200 text-purple-950 font-bold opacity-90 cursor-default' 
                             : hasPerm 
@@ -442,7 +442,7 @@ export const UsersAndRolesView: React.FC = () => {
 
               {/* Seller / Profile specific attributes (if any) */}
               {selectedUser.seller_profile && (
-                <div className="p-4 bg-teal-50/70 border border-teal-200 rounded-2xl space-y-2">
+                <div className="p-4 bg-teal-50/70 border border-teal-200 rounded-xl space-y-2">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-black text-teal-950">بيانات التوثيق والملف التجاري:</span>
                     <span className="text-[11px] font-bold text-teal-800">
@@ -458,7 +458,7 @@ export const UsersAndRolesView: React.FC = () => {
 
             </div>
           ) : (
-            <div className="bg-slate-50 rounded-3xl p-12 text-center border border-dashed border-slate-200 text-slate-500 text-xs sm:text-sm font-bold">
+            <div className="bg-slate-50 rounded-xl p-12 text-center border border-dashed border-slate-200 text-slate-500 text-xs sm:text-sm font-bold">
               اختر مستخدماً من القائمة لتعديل صلاحياته وأدواره.
             </div>
           )}
@@ -469,7 +469,7 @@ export const UsersAndRolesView: React.FC = () => {
       {/* Create Employee / Custom Role Modal */}
       {showCreateModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs animate-in fade-in">
-          <div className="bg-white rounded-3xl shadow-2xl max-w-lg w-full p-6 text-right space-y-4 border border-slate-200 max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded-xl shadow-2xl max-w-lg w-full p-6 text-right space-y-4 border border-slate-200 max-h-[90vh] overflow-y-auto">
             
             <div className="pb-3 border-b border-slate-100">
               <h3 className="text-base sm:text-lg font-black text-slate-900">إضافة مستخدم جديد وتخصيص الصلاحيات</h3>
@@ -521,7 +521,7 @@ export const UsersAndRolesView: React.FC = () => {
                 <label className="block text-xs sm:text-sm font-black text-slate-800 mb-1">نوع الدور الوظيفي</label>
                 <select
                   value={newRole}
-                  onChange={e => setNewRole(e.target.value as any)}
+                  onChange={e => setNewRole(e.target.value as UserRole | 'CUSTOM_ROLE')}
                   className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm font-bold focus:border-[#25d366] focus:outline-hidden cursor-pointer"
                 >
                   <option value="PROPERTY_REVIEWER">مراجع عقارات (Property Reviewer)</option>
@@ -536,7 +536,7 @@ export const UsersAndRolesView: React.FC = () => {
               </div>
 
               {newRole === 'CUSTOM_ROLE' && (
-                <div className="p-3 bg-emerald-50/80 border border-emerald-200 rounded-2xl space-y-2">
+                <div className="p-3 bg-emerald-50/80 border border-emerald-200 rounded-xl space-y-2">
                   <label className="block text-xs font-black text-emerald-950">مسمى الدور المخصص</label>
                   <input
                     type="text"

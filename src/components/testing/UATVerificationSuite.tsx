@@ -237,9 +237,10 @@ export const UATVerificationSuite: React.FC<UATVerificationSuiteProps> = ({ isOp
           logs.push('✅ اجتاز الفحص البرمجي ومطابقة القواعد المنطقية بنجاح.');
           passed = true;
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
         passed = false;
-        logs.push(`❌ خطأ أثناء الفحص: ${err?.message || 'Unknown error'}`);
+        const errObj = err as { message?: string } | undefined;
+        logs.push(`❌ خطأ أثناء الفحص: ${errObj?.message || 'Unknown error'}`);
       }
 
       setTestCases(prev => prev.map(tc => tc.id === caseId ? {
@@ -270,7 +271,7 @@ export const UATVerificationSuite: React.FC<UATVerificationSuiteProps> = ({ isOp
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-slate-950/80 backdrop-blur-sm overflow-y-auto animate-in fade-in text-right">
-      <div className="bg-white rounded-3xl shadow-2xl max-w-4xl w-full max-h-[92vh] flex flex-col overflow-hidden border border-slate-200 my-auto">
+      <div className="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[92vh] flex flex-col overflow-hidden border border-slate-200 my-auto">
         
         {/* Top Header */}
         <div className="px-4 sm:px-6 py-3.5 sm:py-4 bg-slate-900 text-white flex items-center justify-between border-b border-slate-800 gap-3">
@@ -330,7 +331,7 @@ export const UATVerificationSuite: React.FC<UATVerificationSuiteProps> = ({ isOp
             return (
               <div
                 key={tc.id}
-                className={`p-3.5 sm:p-4 rounded-2xl border transition ${
+                className={`p-3.5 sm:p-4 rounded-xl border transition ${
                   tc.status === 'PASS' 
                     ? 'border-emerald-200 bg-emerald-50/40' 
                     : tc.status === 'FAIL' 

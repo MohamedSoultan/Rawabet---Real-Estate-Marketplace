@@ -114,7 +114,7 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-[#e4ebe4]">
         <div>
           <div className="flex items-center gap-2.5">
-            <h1 className="text-2xl sm:text-3xl font-black text-[#001e00]">لوحة تحكم أصحاب العقارات والوسطاء</h1>
+            <h1 className="text-2xl sm:text-3xl font-black text-[#001e00] font-display">لوحة تحكم أصحاب العقارات والوسطاء</h1>
             {isVerified && (
               <span className="text-xs font-bold px-3 py-1 rounded-full bg-[#f2f7f2] text-[#14a800] border border-[#14a800]/30 flex items-center gap-1">
                 <CheckCircle2 className="w-3.5 h-3.5 text-[#14a800]" /> حساب موثق
@@ -139,7 +139,7 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({
 
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="p-3.5 bg-[#14a800] text-white text-xs font-bold rounded-2xl flex items-center justify-center gap-2 animate-soft-fade shadow-md">
+        <div className="p-3.5 bg-[#14a800] text-white text-xs font-bold rounded-xl flex items-center justify-center gap-2 animate-soft-fade shadow-md">
           <CheckCircle2 className="w-4 h-4" />
           <span>{toastMessage}</span>
         </div>
@@ -147,7 +147,7 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({
 
       {/* Verification Promotion Banner for Unverified Sellers (Upwork Green Style) */}
       {!isVerified && (
-        <div className="bg-[#001e00] text-white rounded-3xl p-6 sm:p-7 border border-[#14a800]/30 shadow-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="bg-[#001e00] text-white rounded-xl p-6 sm:p-7 border border-[#14a800]/30 shadow-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="space-y-1.5">
             <div className="flex items-center gap-2">
               <Sparkles className="w-5 h-5 text-[#14a800]" />
@@ -178,29 +178,29 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({
 
       {/* KPI Stats Strip */}
       <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-        <div className="bg-white rounded-2xl p-4 border border-[#e4ebe4] shadow-xs">
+        <div className="bg-white rounded-xl p-4 border border-[#e4ebe4] shadow-xs">
           <div className="text-xs font-bold text-slate-500">إجمالي العقارات</div>
-          <div className="text-2xl font-black text-[#001e00] mt-1">{totalCount}</div>
+          <div className="text-2xl font-black text-[#001e00] mt-1 font-display tabular-nums">{totalCount}</div>
         </div>
 
-        <div className="bg-white rounded-2xl p-4 border border-[#e4ebe4] shadow-xs">
+        <div className="bg-white rounded-xl p-4 border border-[#e4ebe4] shadow-xs">
           <div className="text-xs font-bold text-[#14a800]">منشورة ومتاحة للجمهور</div>
-          <div className="text-2xl font-black text-[#14a800] mt-1">{publishedCount}</div>
+          <div className="text-2xl font-black text-[#14a800] mt-1 font-display tabular-nums">{publishedCount}</div>
         </div>
 
-        <div className="bg-white rounded-2xl p-4 border border-[#e4ebe4] shadow-xs">
+        <div className="bg-white rounded-xl p-4 border border-[#e4ebe4] shadow-xs">
           <div className="text-xs font-bold text-amber-600">قيد المراجعة والفحص</div>
-          <div className="text-2xl font-black text-amber-700 mt-1">{pendingCount}</div>
+          <div className="text-2xl font-black text-amber-700 mt-1 font-display tabular-nums">{pendingCount}</div>
         </div>
 
-        <div className="bg-white rounded-2xl p-4 border border-[#e4ebe4] shadow-xs">
+        <div className="bg-white rounded-xl p-4 border border-[#e4ebe4] shadow-xs">
           <div className="text-xs font-bold text-rose-600">مرفوضة وتحتاج تعديل</div>
-          <div className="text-2xl font-black text-rose-700 mt-1">{rejectedCount}</div>
+          <div className="text-2xl font-black text-rose-700 mt-1 font-display tabular-nums">{rejectedCount}</div>
         </div>
 
-        <div className="bg-white rounded-2xl p-4 border border-[#e4ebe4] shadow-xs col-span-2 sm:col-span-1">
+        <div className="bg-white rounded-xl p-4 border border-[#e4ebe4] shadow-xs col-span-2 sm:col-span-1">
           <div className="text-xs font-bold text-slate-600">المسودات المحفوظة</div>
-          <div className="text-2xl font-black text-slate-800 mt-1">{draftCount}</div>
+          <div className="text-2xl font-black text-slate-800 mt-1 font-display tabular-nums">{draftCount}</div>
         </div>
       </div>
 
@@ -255,7 +255,7 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({
       {/* Properties List */}
       <div className="space-y-4 w-full">
         {filteredProperties.length === 0 ? (
-          <div className="bg-white rounded-3xl p-8 sm:p-12 text-center border border-[#e4ebe4] shadow-xs space-y-4">
+          <div className="bg-white rounded-xl p-8 sm:p-12 text-center border border-[#e4ebe4] shadow-xs space-y-4">
             <div className="w-12 h-12 rounded-full bg-[#f2f7f2] text-[#14a800] flex items-center justify-center mx-auto">
               <Building2 className="w-6 h-6" />
             </div>
@@ -284,7 +284,7 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({
             return (
               <div 
                 key={property.id}
-                className="bg-white rounded-2xl p-4 sm:p-5 border border-[#e4ebe4] hover:border-[#14a800]/50 shadow-xs hover:shadow-md transition flex flex-col space-y-3.5 overflow-hidden w-full"
+                className="bg-white rounded-xl p-4 sm:p-5 border border-[#e4ebe4] hover:border-[#14a800]/50 shadow-xs hover:shadow-md transition flex flex-col space-y-3.5 overflow-hidden w-full"
               >
                 {/* 1. TOP BAR: Reference Code + Status Badges + Interactive Filter Tags directly above Image */}
                 <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-slate-100">
@@ -393,7 +393,7 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({
                       src={coverImage}
                       alt={latestVer.title}
                       referrerPolicy="no-referrer"
-                      className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl object-cover border border-[#e4ebe4] shrink-0 shadow-2xs"
+                      className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl object-cover border border-[#e4ebe4] shrink-0 shadow-2xs"
                     />
 
                     <div className="space-y-1.5 flex-1 min-w-0">
@@ -505,7 +505,7 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({
           property={statusPropertyToChange}
           onClose={() => setStatusPropertyToChange(null)}
           onStatusChanged={(status) => {
-            markPropertyStatus(statusPropertyToChange.id, status as any);
+            markPropertyStatus(statusPropertyToChange.id, status);
             setStatusPropertyToChange(null);
             setToastMessage('تم تحديث حالة العقار بنجاح!');
             setTimeout(() => setToastMessage(null), 3000);
@@ -532,7 +532,7 @@ export const SellerDashboard: React.FC<SellerDashboardProps> = ({
       {/* Revision Notice Modal */}
       {showRevisionNoticeModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-soft-fade">
-          <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full p-6 text-right space-y-4 border border-[#e4ebe4]">
+          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full p-6 text-right space-y-4 border border-[#e4ebe4]">
             <div className="w-10 h-10 rounded-full bg-[#f2f7f2] text-[#14a800] flex items-center justify-center">
               <GitCompare className="w-5 h-5" />
             </div>

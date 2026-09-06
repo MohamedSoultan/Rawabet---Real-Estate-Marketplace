@@ -29,7 +29,7 @@ export const RejectedPropertyModal: React.FC<RejectedPropertyModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in text-right">
-      <div className="bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden border border-slate-200">
+      <div className="bg-white rounded-xl shadow-2xl max-w-lg w-full overflow-hidden border border-slate-200">
         
         {/* Header */}
         <div className="px-6 py-4 bg-rose-900 text-white flex items-center justify-between">
@@ -50,7 +50,7 @@ export const RejectedPropertyModal: React.FC<RejectedPropertyModalProps> = ({
 
         {/* Content */}
         <div className="p-6 space-y-4">
-          <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-900 space-y-2">
+          <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-900 space-y-2">
             <div className="text-xs font-bold flex items-center gap-1.5 text-rose-800">
               <ShieldAlert className="w-4 h-4 text-rose-600" />
               <span>سبب الرفض المسجل من المراجع:</span>

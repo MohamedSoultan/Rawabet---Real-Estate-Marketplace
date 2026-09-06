@@ -38,8 +38,9 @@ export const ReviewQueueView: React.FC = () => {
   // All pending review properties
   const pendingProperties = properties.filter(p => p.current_status === 'PENDING_REVIEW' || p.current_status === 'PENDING_REVISION');
 
-  const canApprove = true; // Enabled across testing dashboards
-  const canViewPrivate = true; // Reviewer preview enabled
+  // Dynamic permission checks using Spatie/Gate permission system
+  const canApprove = hasPermission('property.approve') || hasPermission('PERM_APPROVE_PROPERTIES');
+  const canViewPrivate = hasPermission('property.view_private_source') || hasPermission('PERM_VIEW_PRIVATE_SELLER_INFO');
 
   const handleApprove = (propertyId: string, versionId: string) => {
     const res = approvePropertyVersion(propertyId, versionId, internalNote);
@@ -91,13 +92,13 @@ export const ReviewQueueView: React.FC = () => {
 
       {/* Toast Alerts */}
       {successToast && (
-        <div className="p-3 bg-emerald-600 text-white text-xs font-bold rounded-2xl flex items-center justify-center gap-2 animate-in slide-in-from-top-1">
+        <div className="p-3 bg-emerald-600 text-white text-xs font-bold rounded-xl flex items-center justify-center gap-2 animate-in slide-in-from-top-1">
           <CheckCircle2 className="w-4 h-4" />
           <span>{successToast}</span>
         </div>
       )}
       {errorToast && (
-        <div className="p-3 bg-rose-600 text-white text-xs font-bold rounded-2xl flex items-center justify-center gap-2 animate-in slide-in-from-top-1">
+        <div className="p-3 bg-rose-600 text-white text-xs font-bold rounded-xl flex items-center justify-center gap-2 animate-in slide-in-from-top-1">
           <AlertTriangle className="w-4 h-4" />
           <span>{errorToast}</span>
         </div>
@@ -105,8 +106,8 @@ export const ReviewQueueView: React.FC = () => {
 
       {/* Main Review Layout: Table & Detail Inspector */}
       {pendingProperties.length === 0 ? (
-        <div className="bg-white rounded-3xl p-12 text-center border border-slate-200 shadow-xs space-y-3">
-          <div className="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto">
+        <div className="bg-white rounded-xl p-12 text-center border border-slate-200 shadow-xs space-y-3">
+          <div className="w-14 h-14 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto">
             <CheckCircle2 className="w-7 h-7" />
           </div>
           <h3 className="text-base font-extrabold text-slate-800">طابور المراجعة فارغ تماماً</h3>
@@ -130,7 +131,7 @@ export const ReviewQueueView: React.FC = () => {
                 <div
                   key={property.id}
                   onClick={() => setSelectedProperty(property)}
-                  className={`p-4 rounded-2xl border transition cursor-pointer text-right space-y-2 ${
+                  className={`p-4 rounded-xl border transition cursor-pointer text-right space-y-2 ${
                     isSelected 
                       ? 'border-purple-600 bg-purple-50/70 ring-2 ring-purple-500/20 shadow-md' 
                       : 'border-slate-200 bg-white hover:bg-slate-50'
@@ -190,7 +191,7 @@ export const ReviewQueueView: React.FC = () => {
                 const isRevision = !!prevVer && prevVer.id !== latestVer.id;
 
                 return (
-                  <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-lg space-y-6 animate-in fade-in">
+                  <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-lg space-y-6 animate-in fade-in">
                     
                     {/* Top Inspector Header */}
                     <div className="flex items-center justify-between pb-4 border-b border-slate-100">
@@ -213,7 +214,7 @@ export const ReviewQueueView: React.FC = () => {
 
                     {/* Diff Viewer if Revision (A-04) */}
                     {isRevision && prevVer && (
-                      <div className="p-4 rounded-2xl bg-purple-50 border border-purple-200 space-y-2 text-xs">
+                      <div className="p-4 rounded-xl bg-purple-50 border border-purple-200 space-y-2 text-xs">
                         <div className="font-bold text-purple-950 flex items-center gap-1.5">
                           <GitCompare className="w-4 h-4 text-purple-700" />
                           <span>مقارنة التعديل مع النسخة المنشورة حالياً:</span>
@@ -236,7 +237,7 @@ export const ReviewQueueView: React.FC = () => {
 
                     {/* STRICT PRIVATE SELLER DATA (Reviewer Only) */}
                     {canViewPrivate && (
-                      <div className="p-4 rounded-2xl bg-slate-900 text-white space-y-2.5 text-xs">
+                      <div className="p-4 rounded-xl bg-slate-900 text-white space-y-2.5 text-xs">
                         <div className="flex items-center gap-1.5 text-emerald-400 font-bold">
                           <ShieldAlert className="w-4 h-4" />
                           <span>البيانات السرية للمالك (خاصة بالإدارة والمعاينات فقط):</span>
@@ -320,7 +321,7 @@ export const ReviewQueueView: React.FC = () => {
                 );
               })()
             ) : (
-              <div className="bg-slate-50 rounded-3xl p-12 text-center border border-dashed border-slate-300 text-slate-400 text-xs">
+              <div className="bg-slate-50 rounded-xl p-12 text-center border border-dashed border-slate-300 text-slate-400 text-xs">
                 اختر عقاراً من القائمة الجانبية لمعاينته واتخاذ قرار الاعتماد أو الرفض.
               </div>
             )}
@@ -332,7 +333,7 @@ export const ReviewQueueView: React.FC = () => {
       {/* Reject Reason Dialog */}
       {showRejectDialog && selectedProperty && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in">
-          <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full p-6 text-right space-y-4 border border-slate-200">
+          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full p-6 text-right space-y-4 border border-slate-200">
             <div className="w-10 h-10 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center">
               <XCircle className="w-6 h-6" />
             </div>

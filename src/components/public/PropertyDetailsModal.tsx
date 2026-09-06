@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Property, PropertyVersion } from '../../types';
 import { useApp } from '../../context/AppContext';
+import { RequestViewingModal } from './RequestViewingModal';
 import { 
   X, 
   MapPin, 
@@ -19,7 +20,9 @@ import {
   Lock,
   Sparkles,
   Share2,
-  Check
+  Check,
+  Calendar,
+  Award
 } from 'lucide-react';
 
 interface PropertyDetailsModalProps {
@@ -43,6 +46,7 @@ export const PropertyDetailsModal: React.FC<PropertyDetailsModalProps> = ({ prop
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [copiedLink, setCopiedLink] = useState(false);
   const [leadCreatedToast, setLeadCreatedToast] = useState<string | null>(null);
+  const [isViewingModalOpen, setIsViewingModalOpen] = useState(false);
 
   if (!property) return null;
 
@@ -63,25 +67,38 @@ export const PropertyDetailsModal: React.FC<PropertyDetailsModalProps> = ({ prop
     maximumFractionDigits: 0
   }).format(version?.price || 0);
 
-  // WhatsApp Handler
+  // WhatsApp Handler - Direct and unblocked
   const handleWhatsAppContact = () => {
-    if (!currentUser) {
-      openAuthModal('REGISTER', () => handleWhatsAppContact());
-      return;
+    if (currentUser) {
+      try {
+        createLeadFromInteraction(property.id, 'WHATSAPP');
+      } catch {
+        // Continue opening WhatsApp
+      }
     }
 
-    const res = createLeadFromInteraction(property.id, 'WHATSAPP');
-    if (res.success) {
-      setLeadCreatedToast('تم تسجيل اهتمامك بالعقار وتجهيز محادثة واتساب الرسمية مع خدمة عملاء روابط');
-      setTimeout(() => setLeadCreatedToast(null), 5000);
+    setLeadCreatedToast('جارٍ فتح محادثة واتساب المباشرة...');
+    setTimeout(() => setLeadCreatedToast(null), 4000);
 
-      // Construct official template message
-      const templateMsg = encodeURIComponent(
-        `أهلاً، أنا مهتم بالعقار رقم ${property.reference_number} على روابط (${version.title}). محتاج أعرف تفاصيل أكتر وتحديد موعد للمعاينة.`
-      );
-      const waUrl = `https://wa.me/${settings.primary_whatsapp}?text=${templateMsg}`;
-      window.open(waUrl, '_blank');
-    }
+    const propertyUrl = `${window.location.origin}/property/${property.reference_number || property.id}`;
+    const pTypeName = pType?.name_ar || 'عقار';
+    const locationText = version?.public_location_text || 'كفر الشيخ';
+
+    const messageLines = [
+      'مرحباً روابط، أود الاستفسار بخصوص هذا العقار:',
+      `• كود العقار: ${property.reference_number}`,
+      `• عنوان العقار: ${version?.title || ''}`,
+      `• نوع العقار: ${pTypeName}`,
+      `• الموقع: ${locationText}`,
+      `• الرابط: ${propertyUrl}`,
+      '',
+      'أرجو تزويدي بمزيد من التفاصيل وترتيب موعد للمعاينة.'
+    ];
+
+    const templateMsg = encodeURIComponent(messageLines.join('\n'));
+    const waNumber = (settings.primary_whatsapp || settings.whatsapp_phone || '201000920759').replace(/\D/g, '');
+    const waUrl = `https://wa.me/${waNumber}?text=${templateMsg}`;
+    window.open(waUrl, '_blank');
   };
 
   // Phone Call Handler
@@ -107,7 +124,7 @@ export const PropertyDetailsModal: React.FC<PropertyDetailsModalProps> = ({ prop
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-slate-900/60 backdrop-blur-xs overflow-y-auto animate-soft-fade">
-      <div className="bg-white rounded-3xl shadow-2xl max-w-4xl w-full max-h-[92vh] flex flex-col overflow-hidden border border-[#e4ebe4] my-auto text-right">
+      <div className="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[92vh] flex flex-col overflow-hidden border border-[#e4ebe4] my-auto text-right">
         
         {/* Modal Top Header (Upwork Style) */}
         <div className="px-4 sm:px-6 py-3.5 bg-white text-[#001e00] flex items-center justify-between border-b border-[#e4ebe4] shrink-0">
@@ -152,7 +169,7 @@ export const PropertyDetailsModal: React.FC<PropertyDetailsModalProps> = ({ prop
         <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-5">
           
           {leadCreatedToast && (
-            <div className="p-3 bg-[#f2f7f2] border border-[#14a800]/40 text-[#14a800] text-xs sm:text-sm font-bold rounded-2xl flex items-center gap-2 animate-soft-fade">
+            <div className="p-3 bg-[#f2f7f2] border border-[#14a800]/40 text-[#14a800] text-xs sm:text-sm font-bold rounded-xl flex items-center gap-2 animate-soft-fade">
               <CheckCircle2 className="w-4 h-4 text-[#14a800] shrink-0" />
               <span>{leadCreatedToast}</span>
             </div>
@@ -229,7 +246,7 @@ export const PropertyDetailsModal: React.FC<PropertyDetailsModalProps> = ({ prop
 
           {/* Photo Gallery with Thumbnails */}
           <div className="space-y-2.5">
-            <div className="relative aspect-16/9 rounded-2xl overflow-hidden bg-slate-100 border border-[#e4ebe4]">
+            <div className="relative aspect-16/9 rounded-xl overflow-hidden bg-slate-100 border border-[#e4ebe4]">
               <img
                 src={images[activeImageIndex]}
                 alt={version.title}
@@ -287,7 +304,7 @@ export const PropertyDetailsModal: React.FC<PropertyDetailsModalProps> = ({ prop
           {/* Title & Price Section */}
           <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-4 border-b border-[#e4ebe4]">
             <div className="space-y-2">
-              <h2 className="text-xl sm:text-2xl font-black text-[#001e00] leading-snug">
+              <h2 className="text-xl sm:text-2xl font-black text-[#001e00] leading-snug font-display">
                 {version.title}
               </h2>
               
@@ -318,8 +335,8 @@ export const PropertyDetailsModal: React.FC<PropertyDetailsModalProps> = ({ prop
             </div>
 
             <div className="text-right sm:text-left shrink-0">
-              <div className="text-2xl sm:text-3xl font-black text-[#14a800]">
-                {formattedPrice} <span className="text-sm font-bold text-slate-600">جنيه</span>
+              <div className="text-2xl sm:text-3xl font-black text-[#14a800] font-display tabular-nums tracking-tight">
+                {formattedPrice} <span className="text-sm font-bold text-slate-600 inline-block" dir="rtl"><bdi>ج.م</bdi></span>
               </div>
               <span className="text-xs text-slate-400 font-semibold block mt-0.5">
                 {txType?.slug === 'rent' ? 'قيمة الإيجار الشهري' : 'السعر الإجمالي المطلوب'}
@@ -329,8 +346,8 @@ export const PropertyDetailsModal: React.FC<PropertyDetailsModalProps> = ({ prop
 
           {/* Authentication Barrier for Guests */}
           {!currentUser ? (
-            <div className="p-6 bg-[#f2f7f2] border border-[#14a800]/30 rounded-3xl text-center space-y-3">
-              <div className="w-12 h-12 rounded-full bg-[#14a800] text-white flex items-center justify-center mx-auto shadow-xs">
+            <div className="p-6 bg-[#f2f7f2] border border-[#14a800]/30 rounded-xl text-center space-y-3">
+              <div className="w-12 h-12 rounded-xl bg-[#14a800] text-white flex items-center justify-center mx-auto shadow-xs">
                 <Lock className="w-6 h-6" />
               </div>
               <h4 className="text-base font-bold text-[#001e00]">سجل حسابك مجاناً للاطلاع على كامل مواصفات العقار وتحديد موعد المعاينة</h4>
@@ -339,7 +356,7 @@ export const PropertyDetailsModal: React.FC<PropertyDetailsModalProps> = ({ prop
               </p>
               <button
                 onClick={() => openAuthModal('REGISTER')}
-                className="px-8 py-3 bg-[#14a800] hover:bg-[#108a00] text-white font-bold text-sm rounded-full transition shadow-xs inline-flex items-center gap-2 active:scale-95 cursor-pointer"
+                className="px-8 py-3 bg-[#14a800] hover:bg-[#108a00] text-white font-bold text-sm rounded-xl transition shadow-xs inline-flex items-center gap-2 active:scale-95 cursor-pointer"
               >
                 <span>تسجيل مجاني فوري</span>
               </button>
@@ -351,50 +368,50 @@ export const PropertyDetailsModal: React.FC<PropertyDetailsModalProps> = ({ prop
                 <h3 className="text-sm font-bold text-[#001e00]">مواصفات العقار الفنية</h3>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-bold">
                   
-                  <div className="p-3.5 rounded-2xl bg-[#f9f9f9] border border-[#e4ebe4] space-y-1">
+                  <div className="p-3.5 rounded-xl bg-[#f9f9f9] border border-[#e4ebe4] space-y-1">
                     <span className="text-slate-400 text-[10px] block font-semibold">المساحة الإجمالية:</span>
                     <span className="text-[#001e00] text-sm font-black">{version.area_sqm} م²</span>
                   </div>
 
-                  <div className="p-3.5 rounded-2xl bg-[#f9f9f9] border border-[#e4ebe4] space-y-1">
+                  <div className="p-3.5 rounded-xl bg-[#f9f9f9] border border-[#e4ebe4] space-y-1">
                     <span className="text-slate-400 text-[10px] block font-semibold">نوع العقار:</span>
                     <span className="text-[#001e00] text-sm font-black">{pType.name_ar}</span>
                   </div>
 
                   {version.bedrooms !== undefined && (
-                    <div className="p-3.5 rounded-2xl bg-[#f9f9f9] border border-[#e4ebe4] space-y-1">
+                    <div className="p-3.5 rounded-xl bg-[#f9f9f9] border border-[#e4ebe4] space-y-1">
                       <span className="text-slate-400 text-[10px] block font-semibold">عدد الغرف:</span>
                       <span className="text-[#001e00] text-sm font-black">{version.bedrooms} غرف</span>
                     </div>
                   )}
 
                   {version.bathrooms !== undefined && (
-                    <div className="p-3.5 rounded-2xl bg-[#f9f9f9] border border-[#e4ebe4] space-y-1">
+                    <div className="p-3.5 rounded-xl bg-[#f9f9f9] border border-[#e4ebe4] space-y-1">
                       <span className="text-slate-400 text-[10px] block font-semibold">الحمامات:</span>
                       <span className="text-[#001e00] text-sm font-black">{version.bathrooms} حمام</span>
                     </div>
                   )}
 
                   {version.floor && (
-                    <div className="p-3.5 rounded-2xl bg-[#f9f9f9] border border-[#e4ebe4] space-y-1">
+                    <div className="p-3.5 rounded-xl bg-[#f9f9f9] border border-[#e4ebe4] space-y-1">
                       <span className="text-slate-400 text-[10px] block font-semibold">الدور / الطابق:</span>
                       <span className="text-[#001e00] text-sm font-black">{version.floor}</span>
                     </div>
                   )}
 
                   {version.finishing && (
-                    <div className="p-3.5 rounded-2xl bg-[#f9f9f9] border border-[#e4ebe4] space-y-1">
+                    <div className="p-3.5 rounded-xl bg-[#f9f9f9] border border-[#e4ebe4] space-y-1">
                       <span className="text-slate-400 text-[10px] block font-semibold">حالة التشطيب:</span>
                       <span className="text-[#001e00] text-sm font-black">{version.finishing}</span>
                     </div>
                   )}
 
-                  <div className="p-3.5 rounded-2xl bg-[#f9f9f9] border border-[#e4ebe4] space-y-1">
+                  <div className="p-3.5 rounded-xl bg-[#f9f9f9] border border-[#e4ebe4] space-y-1">
                     <span className="text-slate-400 text-[10px] block font-semibold">نوع المعاملة:</span>
                     <span className="text-[#14a800] text-sm font-black">{txType.name_ar}</span>
                   </div>
 
-                  <div className="p-3.5 rounded-2xl bg-[#f9f9f9] border border-[#e4ebe4] space-y-1">
+                  <div className="p-3.5 rounded-xl bg-[#f9f9f9] border border-[#e4ebe4] space-y-1">
                     <span className="text-slate-400 text-[10px] block font-semibold">حالة التدقيق:</span>
                     <span className="text-[#14a800] text-sm font-black flex items-center gap-1">
                       <CheckCircle2 className="w-3.5 h-3.5 text-[#14a800]" /> مفحوص 100%
@@ -407,7 +424,7 @@ export const PropertyDetailsModal: React.FC<PropertyDetailsModalProps> = ({ prop
               {/* Description */}
               <div className="space-y-2">
                 <h3 className="text-sm font-bold text-[#001e00]">الوصف والتفاصيل العامة</h3>
-                <div className="p-4 rounded-2xl bg-[#f9f9f9] border border-[#e4ebe4] text-slate-700 text-xs sm:text-sm leading-relaxed whitespace-pre-line font-medium">
+                <div className="p-4 rounded-xl bg-[#f9f9f9] border border-[#e4ebe4] text-slate-700 text-xs sm:text-sm leading-relaxed whitespace-pre-line font-medium">
                   {version.description}
                 </div>
               </div>
@@ -420,7 +437,7 @@ export const PropertyDetailsModal: React.FC<PropertyDetailsModalProps> = ({ prop
                     {version.features.map((feat, idx) => (
                       <span
                         key={idx}
-                        className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#f2f7f2] border border-[#e4ebe4] text-[#001e00] text-xs font-bold"
+                        className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-[#f2f7f2] border border-[#e4ebe4] text-[#001e00] text-xs font-bold"
                       >
                         <CheckCircle2 className="w-3.5 h-3.5 text-[#14a800] shrink-0" />
                         <span>{feat}</span>
@@ -431,15 +448,29 @@ export const PropertyDetailsModal: React.FC<PropertyDetailsModalProps> = ({ prop
               )}
 
               {/* Trust & Guarantee Box */}
-              <div className="p-4 rounded-2xl bg-[#001e00] text-white flex items-center gap-3">
-                <div className="p-2.5 rounded-full bg-[#14a800] text-white shrink-0">
-                  <ShieldCheck className="w-5 h-5" />
-                </div>
-                <div className="space-y-0.5 text-right">
-                  <h4 className="text-xs font-bold text-white">ضمان وموثوقية منصة روابط</h4>
-                  <p className="text-[11px] text-slate-300 leading-relaxed font-normal">
-                    تمت مراجعة هذا العقار ومطابقة بياناته وأوراقه. المعاينة الرسمية تتم بمرافقة وتنسيق فريق روابط.
-                  </p>
+              <div className="p-4 sm:p-5 rounded-xl bg-[#001e00] text-white space-y-3">
+                <div className="flex items-start gap-3">
+                  <div className="p-2.5 rounded-xl bg-[#14a800] text-white shrink-0 shadow-sm">
+                    <ShieldCheck className="w-5 h-5" />
+                  </div>
+                  <div className="space-y-1 text-right flex-1">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <h4 className="text-xs sm:text-sm font-black text-white flex items-center gap-1.5">
+                        <CheckCircle2 className="w-4 h-4 text-[#14a800]" />
+                        <span>عقار موثق ومعتمد من روابط</span>
+                      </h4>
+                      <span className="text-[11px] font-mono text-[#14a800] bg-[#002b00] px-2.5 py-0.5 rounded-full border border-[#14a800]/30 font-bold">
+                        كود: {property.reference_number}
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-300 leading-relaxed font-semibold">
+                      تمت المراجعة والتدقيق بواسطة فريق روابط الهندسي والقانوني. تم التحقق من المعاينة ومطابقة المواصفات.
+                    </p>
+                    <div className="flex flex-wrap items-center gap-3 pt-1 text-[11px] text-slate-400 font-medium">
+                      <span>• تاريخ المراجعة والاعتماد: {new Date(property.updated_at).toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                      <span>• حماية وسرية: لا يتم إظهار بيانات المالك للعامة إطلاقاً</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </>
@@ -452,30 +483,48 @@ export const PropertyDetailsModal: React.FC<PropertyDetailsModalProps> = ({ prop
           
           <div className="text-xs text-slate-500 font-semibold hidden sm:flex items-center gap-1.5">
             <Clock className="w-4 h-4 text-[#14a800]" />
-            <span>معاينة وتنسيق مباشر مع ممثلي روابط</span>
+            <span>معاينة وتنسيق مباشر مع فريق مبيعات روابط</span>
           </div>
 
           {/* Contact & Booking Actions */}
           <div className="flex items-center gap-2.5 w-full sm:w-auto">
             
-            {/* WhatsApp CTA */}
+            {/* Secondary CTA: Request Viewing */}
+            <button
+              type="button"
+              onClick={() => {
+                if (!currentUser) {
+                  openAuthModal('REGISTER', () => setIsViewingModalOpen(true));
+                  return;
+                }
+                setIsViewingModalOpen(true);
+              }}
+              className="flex-1 sm:flex-initial px-4 sm:px-5 py-2.5 sm:py-3 bg-slate-100 hover:bg-slate-200 text-[#001e00] text-xs sm:text-sm font-black rounded-full transition border border-slate-300 flex items-center justify-center gap-2 active:scale-95 cursor-pointer whitespace-nowrap"
+            >
+              <Calendar className="w-4 h-4 text-[#14a800]" />
+              <span>طلب حجز معاينة</span>
+            </button>
+
+            {/* Primary CTA: WhatsApp Rawabet Team */}
             <button
               type="button"
               onClick={handleWhatsAppContact}
-              className="flex-1 sm:flex-initial min-w-0 px-4 sm:px-6 py-2.5 sm:py-3 bg-[#14a800] hover:bg-[#108a00] text-white text-xs sm:text-sm font-bold rounded-full transition shadow-xs flex items-center justify-center gap-2 active:scale-95 cursor-pointer shrink-0"
+              className="flex-1 sm:flex-initial min-w-0 px-4 sm:px-6 py-2.5 sm:py-3 bg-[#14a800] hover:bg-[#108a00] text-white text-xs sm:text-sm font-black rounded-full transition shadow-md shadow-[#14a800]/20 flex items-center justify-center gap-2 active:scale-95 cursor-pointer shrink-0"
+              title="تواصل مع فريق روابط عبر الواتساب"
             >
               <MessageSquare className="w-4 h-4 text-white shrink-0" />
-              <span className="truncate font-bold">واتساب روابط</span>
+              <span className="truncate">واتساب روابط</span>
             </button>
 
-            {/* Direct Call CTA */}
+            {/* Direct Sales Call */}
             <button
               type="button"
               onClick={handlePhoneCall}
-              className="flex-1 sm:flex-initial min-w-0 px-4 sm:px-5 py-2.5 sm:py-3 border border-[#001e00] text-[#001e00] hover:bg-[#f2f7f2] text-xs sm:text-sm font-bold rounded-full transition flex items-center justify-center gap-2 active:scale-95 cursor-pointer shrink-0"
+              className="flex-1 sm:flex-initial min-w-0 px-3.5 sm:px-4 py-2.5 sm:py-3 border border-[#001e00] text-[#001e00] hover:bg-[#f2f7f2] text-xs sm:text-sm font-bold rounded-full transition flex items-center justify-center gap-1.5 active:scale-95 cursor-pointer shrink-0"
+              title="اتصال بمبيعات روابط"
             >
               <Phone className="w-4 h-4 text-[#14a800] shrink-0" />
-              <span className="truncate font-bold">اتصال مبيعات</span>
+              <span className="truncate font-bold">اتصال</span>
             </button>
 
           </div>
@@ -483,6 +532,14 @@ export const PropertyDetailsModal: React.FC<PropertyDetailsModalProps> = ({ prop
         </div>
 
       </div>
+
+      {/* Viewing Request Modal */}
+      {isViewingModalOpen && (
+        <RequestViewingModal
+          property={property}
+          onClose={() => setIsViewingModalOpen(false)}
+        />
+      )}
     </div>
   );
 };

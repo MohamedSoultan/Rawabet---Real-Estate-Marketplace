@@ -31,7 +31,7 @@ export const PropertyStatusModal: React.FC<PropertyStatusModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in text-right">
-      <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full overflow-hidden border border-slate-200">
+      <div className="bg-white rounded-xl shadow-2xl max-w-md w-full overflow-hidden border border-slate-200">
         
         {/* Header */}
         <div className="px-6 py-4 bg-slate-900 text-white flex items-center justify-between">
@@ -57,7 +57,7 @@ export const PropertyStatusModal: React.FC<PropertyStatusModalProps> = ({
             <button
               type="button"
               onClick={() => setSelectedStatus('SOLD')}
-              className={`w-full p-3 rounded-2xl border text-right transition flex items-center justify-between ${
+              className={`w-full p-3 rounded-xl border text-right transition flex items-center justify-between ${
                 selectedStatus === 'SOLD' ? 'border-blue-600 bg-blue-50 text-blue-950 font-bold' : 'border-slate-200 hover:bg-slate-50'
               }`}
             >
@@ -71,7 +71,7 @@ export const PropertyStatusModal: React.FC<PropertyStatusModalProps> = ({
             <button
               type="button"
               onClick={() => setSelectedStatus('RENTED')}
-              className={`w-full p-3 rounded-2xl border text-right transition flex items-center justify-between ${
+              className={`w-full p-3 rounded-xl border text-right transition flex items-center justify-between ${
                 selectedStatus === 'RENTED' ? 'border-emerald-600 bg-emerald-50 text-emerald-950 font-bold' : 'border-slate-200 hover:bg-slate-50'
               }`}
             >
@@ -85,7 +85,7 @@ export const PropertyStatusModal: React.FC<PropertyStatusModalProps> = ({
             <button
               type="button"
               onClick={() => setSelectedStatus('ARCHIVED')}
-              className={`w-full p-3 rounded-2xl border text-right transition flex items-center justify-between ${
+              className={`w-full p-3 rounded-xl border text-right transition flex items-center justify-between ${
                 selectedStatus === 'ARCHIVED' ? 'border-slate-600 bg-slate-100 text-slate-900 font-bold' : 'border-slate-200 hover:bg-slate-50'
               }`}
             >

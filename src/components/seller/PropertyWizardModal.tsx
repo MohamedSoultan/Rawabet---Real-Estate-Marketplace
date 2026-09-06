@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useApp } from '../../context/AppContext';
+import { useModalA11y } from '../../utils/useModalA11y';
 import { Property, PropertyVersion } from '../../types';
 import { 
   X, 
@@ -23,6 +24,8 @@ interface PropertyWizardModalProps {
   isOpen: boolean;
   onClose: () => void;
   initialProperty?: Property | null;
+  existingProperty?: Property | null;
+  isRevision?: boolean;
   onPropertySaved?: (propertyId: string) => void;
 }
 
@@ -30,8 +33,11 @@ export const PropertyWizardModal: React.FC<PropertyWizardModalProps> = ({
   isOpen,
   onClose,
   initialProperty,
+  existingProperty,
+  isRevision,
   onPropertySaved
 }) => {
+  const targetProperty = initialProperty || existingProperty;
   const { 
     currentUser, 
     governorates, 
@@ -44,17 +50,25 @@ export const PropertyWizardModal: React.FC<PropertyWizardModalProps> = ({
     validateForbiddenContact 
   } = useApp();
 
+  const closeBtnRef = useRef<HTMLButtonElement | null>(null);
+
+  const { containerRef } = useModalA11y({
+    isOpen,
+    onClose,
+    initialFocusRef: closeBtnRef
+  });
+
   const [step, setStep] = useState<number>(1);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [forbiddenWarning, setForbiddenWarning] = useState<string | null>(null);
 
   // Form states initialized
   const [propertyTypeId, setPropertyTypeId] = useState<string>(() => {
-    return initialProperty?.property_type_id || propertyTypes[0]?.id || 'pt-apartment';
+    return targetProperty?.property_type_id || propertyTypes[0]?.id || 'pt-apartment';
   });
 
   const [transactionTypeId, setTransactionTypeId] = useState<string>(() => {
-    return initialProperty?.transaction_type_id || transactionTypes[0]?.id || 'tx-sale';
+    return targetProperty?.transaction_type_id || transactionTypes[0]?.id || 'tx-sale';
   });
 
   const [governorateId, setGovernorateId] = useState<string>(() => {
@@ -242,10 +256,7 @@ export const PropertyWizardModal: React.FC<PropertyWizardModalProps> = ({
     };
 
     if (submitForReview) {
-      const draftRes = savePropertyDraft({
-        ...payload,
-        property_id: initialProperty?.id
-      }, initialProperty?.id);
+      const draftRes = savePropertyDraft(payload, initialProperty?.id);
 
       if (draftRes.success && draftRes.propertyId) {
         const subRes = submitPropertyForReview(draftRes.propertyId, payload);
@@ -277,17 +288,30 @@ export const PropertyWizardModal: React.FC<PropertyWizardModalProps> = ({
   ];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-[#001e00]/60 backdrop-blur-xs overflow-y-auto font-sans text-right animate-soft-fade">
-      <div className="bg-white rounded-2xl sm:rounded-3xl shadow-2xl max-w-3xl w-full max-h-[94vh] sm:max-h-[92vh] flex flex-col overflow-hidden border border-[#e4ebe4] my-auto">
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-[#001e00]/60 backdrop-blur-xs overflow-y-auto font-sans text-right animate-soft-fade"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      <div 
+        ref={containerRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="property-wizard-title"
+        tabIndex={-1}
+        className="bg-white rounded-xl shadow-2xl max-w-3xl w-full max-h-[94vh] sm:max-h-[92vh] flex flex-col overflow-hidden border border-[#e4ebe4] my-auto outline-none"
+        onClick={(e) => e.stopPropagation()}
+      >
         
         {/* Modal Header */}
         <div className="px-3.5 sm:px-6 py-3 sm:py-4 bg-[#001e00] text-white flex items-center justify-between border-b border-[#003a00] shrink-0 gap-2">
           <div className="flex items-center gap-2.5 min-w-0 flex-1">
             <div className="w-8 h-8 rounded-full bg-[#14a800] text-white flex items-center justify-center font-black shrink-0">
-              <Building2 className="w-4 h-4" />
+              <Building2 className="w-4 h-4" aria-hidden="true" />
             </div>
             <div className="min-w-0 flex-1">
-              <h3 className="text-xs sm:text-base font-black text-white truncate">
+              <h3 id="property-wizard-title" className="text-xs sm:text-base font-black text-white truncate">
                 {initialProperty ? 'تعديل بيانات الإعلان العقاري' : 'إضافة عقار جديد للنشر'}
               </h3>
               <p className="text-[10px] sm:text-[11px] text-slate-300 font-medium truncate">
@@ -297,12 +321,13 @@ export const PropertyWizardModal: React.FC<PropertyWizardModalProps> = ({
           </div>
 
           <button
+            ref={closeBtnRef}
             type="button"
             onClick={onClose}
-            className="p-1.5 sm:p-2 rounded-full hover:bg-white/10 text-slate-300 hover:text-white transition cursor-pointer shrink-0"
-            title="إغلاق النافذة"
+            className="p-1.5 sm:p-2 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-full hover:bg-white/10 text-slate-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-white transition cursor-pointer shrink-0"
+            aria-label="إغلاق النافذة"
           >
-            <X className="w-5 h-5" />
+            <X className="w-5 h-5" aria-hidden="true" />
           </button>
         </div>
 
@@ -407,14 +432,14 @@ export const PropertyWizardModal: React.FC<PropertyWizardModalProps> = ({
           
           {/* Error & Warning Banners */}
           {errorMessage && (
-            <div className="p-3.5 bg-rose-50 border border-rose-200 text-rose-800 text-xs font-bold rounded-2xl flex items-center gap-2 animate-soft-fade">
+            <div className="p-3.5 bg-rose-50 border border-rose-200 text-rose-800 text-xs font-bold rounded-xl flex items-center gap-2 animate-soft-fade">
               <ShieldAlert className="w-5 h-5 text-rose-600 shrink-0" />
               <span>{errorMessage}</span>
             </div>
           )}
 
           {forbiddenWarning && (
-            <div className="p-3.5 bg-amber-50 border border-amber-200 text-amber-900 text-xs font-bold rounded-2xl flex items-center gap-2 animate-soft-fade">
+            <div className="p-3.5 bg-amber-50 border border-amber-200 text-amber-900 text-xs font-bold rounded-xl flex items-center gap-2 animate-soft-fade">
               <ShieldAlert className="w-5 h-5 text-amber-600 shrink-0" />
               <span>{forbiddenWarning}</span>
             </div>
@@ -697,7 +722,7 @@ export const PropertyWizardModal: React.FC<PropertyWizardModalProps> = ({
               </div>
 
               {/* Add image URL bar */}
-              <div className="flex items-center gap-2 p-3 bg-[#f2f7f2] rounded-2xl border border-[#e4ebe4]">
+              <div className="flex items-center gap-2 p-3 bg-[#f2f7f2] rounded-xl border border-[#e4ebe4]">
                 <input
                   type="url"
                   placeholder="ضع رابط الصورة (URL) هنا..."
@@ -718,7 +743,7 @@ export const PropertyWizardModal: React.FC<PropertyWizardModalProps> = ({
               {/* Media Grid */}
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                 {mediaList.map((media) => (
-                  <div key={media.id} className="relative group rounded-2xl overflow-hidden border border-[#e4ebe4] bg-slate-100 aspect-video">
+                  <div key={media.id} className="relative group rounded-xl overflow-hidden border border-[#e4ebe4] bg-slate-100 aspect-video">
                     <img
                       src={media.path}
                       alt=""
@@ -763,7 +788,7 @@ export const PropertyWizardModal: React.FC<PropertyWizardModalProps> = ({
           {/* STEP 4: Private Seller Info (Strictly Internal) */}
           {step === 4 && (
             <div className="space-y-4 animate-soft-fade">
-              <div className="p-4 rounded-2xl bg-[#001e00] text-white flex items-start gap-3 border border-[#003a00]">
+              <div className="p-4 rounded-xl bg-[#001e00] text-white flex items-start gap-3 border border-[#003a00]">
                 <ShieldAlert className="w-6 h-6 text-[#14a800] shrink-0 mt-0.5" />
                 <div className="text-xs space-y-1">
                   <h4 className="font-black text-[#14a800]">السرية التامة للبيانات الخاصة</h4>
@@ -819,9 +844,9 @@ export const PropertyWizardModal: React.FC<PropertyWizardModalProps> = ({
               <button
                 type="button"
                 onClick={() => setStep(s => s - 1)}
-                className="w-full sm:w-auto px-4 py-2.5 bg-white border border-slate-300 text-slate-700 text-xs font-bold rounded-xl hover:bg-slate-100 transition flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap"
+                className="w-full sm:w-auto px-4 py-2.5 min-h-[44px] bg-white border border-slate-300 text-slate-700 text-xs font-bold rounded-xl hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-slate-400 transition flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap"
               >
-                <ChevronRight className="w-4 h-4" />
+                <ChevronRight className="w-4 h-4" aria-hidden="true" />
                 <span>الخطوة السابقة</span>
               </button>
             )}
@@ -832,17 +857,17 @@ export const PropertyWizardModal: React.FC<PropertyWizardModalProps> = ({
               <button
                 type="button"
                 onClick={nextStep}
-                className="w-full sm:w-auto px-6 py-2.5 bg-[#14a800] hover:bg-[#108a00] text-white text-xs sm:text-sm font-black rounded-xl transition flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer whitespace-nowrap"
+                className="w-full sm:w-auto px-6 py-2.5 min-h-[44px] bg-[#14a800] hover:bg-[#108a00] text-white text-xs sm:text-sm font-black rounded-xl transition flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-[#14a800] focus:ring-offset-2"
               >
                 <span>متابعة للخطوة التالية</span>
-                <ChevronLeft className="w-4 h-4" />
+                <ChevronLeft className="w-4 h-4" aria-hidden="true" />
               </button>
             ) : (
               <>
                 <button
                   type="button"
                   onClick={() => handleSave(false)}
-                  className="w-full sm:w-auto px-4 py-2.5 bg-white hover:bg-slate-100 text-slate-800 border border-slate-300 text-xs font-bold rounded-xl transition text-center cursor-pointer whitespace-nowrap"
+                  className="w-full sm:w-auto px-4 py-2.5 min-h-[44px] bg-white hover:bg-slate-100 text-slate-800 border border-slate-300 text-xs font-bold rounded-xl transition text-center cursor-pointer whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-slate-400"
                 >
                   حفظ كمسودة
                 </button>
@@ -850,9 +875,9 @@ export const PropertyWizardModal: React.FC<PropertyWizardModalProps> = ({
                 <button
                   type="button"
                   onClick={() => handleSave(true)}
-                  className="w-full sm:w-auto px-6 py-2.5 bg-[#14a800] hover:bg-[#108a00] text-white text-xs sm:text-sm font-black rounded-xl transition shadow-2xs flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap"
+                  className="w-full sm:w-auto px-6 py-2.5 min-h-[44px] bg-[#14a800] hover:bg-[#108a00] text-white text-xs sm:text-sm font-black rounded-xl transition shadow-2xs flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-[#14a800] focus:ring-offset-2"
                 >
-                  <CheckCircle2 className="w-4 h-4" />
+                  <CheckCircle2 className="w-4 h-4" aria-hidden="true" />
                   <span>إرسال للمراجعة والاعتماد</span>
                 </button>
               </>

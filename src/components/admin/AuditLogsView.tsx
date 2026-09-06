@@ -45,7 +45,7 @@ export const AuditLogsView: React.FC = () => {
             placeholder="بحث بالمستخدم، نوع العملية، أو الرقم التعريفي..."
             value={searchTerm}
             onChange={e => setSearchTerm(e.target.value)}
-            className="w-full pl-4 pr-10 py-2.5 bg-white border border-slate-200 rounded-2xl text-xs font-semibold text-right"
+            className="w-full pl-4 pr-10 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-semibold text-right"
           />
           <Search className="w-4 h-4 text-slate-400 absolute right-3.5 top-3" />
         </div>
@@ -53,7 +53,7 @@ export const AuditLogsView: React.FC = () => {
         <select
           value={actionFilter}
           onChange={e => setActionFilter(e.target.value)}
-          className="w-full sm:w-56 px-3 py-2.5 bg-white border border-slate-200 rounded-2xl text-xs font-bold text-slate-700"
+          className="w-full sm:w-56 px-3 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-700"
         >
           <option value="ALL">كافة العمليات الحساسة</option>
           <option value="APPROVE">اعتماد ونشر عقارات</option>
@@ -65,7 +65,7 @@ export const AuditLogsView: React.FC = () => {
       </div>
 
       {/* Logs Table */}
-      <div className="bg-white rounded-3xl border border-slate-200 shadow-xs overflow-hidden">
+      <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-right text-xs">
             <thead className="bg-slate-50 text-slate-700 font-bold border-b border-slate-200">
@@ -108,7 +108,7 @@ export const AuditLogsView: React.FC = () => {
                       {log.entity_type} #{log.entity_id}
                     </td>
                     <td className="p-4 text-slate-600 max-w-xs truncate">
-                      {log.new_value || log.notes || '-'}
+                      {log.new_value || '-'}
                     </td>
                   </tr>
                 ))

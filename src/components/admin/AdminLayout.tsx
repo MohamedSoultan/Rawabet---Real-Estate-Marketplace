@@ -52,7 +52,6 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
     leads, 
     users, 
     hasPermission, 
-    switchPersona,
     favorites
   } = useApp();
 
@@ -95,17 +94,24 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
     const canAccessLocations = isSuperAdmin || 
       currentUser?.role === 'CONTENT_MANAGER' || 
       currentUser?.role === 'OPERATIONS_MANAGER' || 
-      hasPermission('PERM_MANAGE_TAXONOMY');
+      hasPermission('PERM_MANAGE_LOCATIONS') ||
+      hasPermission('PERM_MANAGE_TAXONOMY') ||
+      hasPermission('locations.manage');
 
     const canAccessUsers = isSuperAdmin || 
-      hasPermission('PERM_MANAGE_USERS');
+      hasPermission('PERM_MANAGE_USERS') ||
+      hasPermission('users.manage');
 
     const canAccessAudit = isSuperAdmin || 
       currentUser?.role === 'OPERATIONS_MANAGER' || 
-      hasPermission('PERM_VIEW_AUDIT_LOGS');
+      hasPermission('PERM_VIEW_AUDIT_LOGS') ||
+      hasPermission('audit.view');
 
     const canAccessSettings = isSuperAdmin || 
-      hasPermission('PERM_MANAGE_SETTINGS');
+      currentUser?.role === 'CONTENT_MANAGER' ||
+      hasPermission('PERM_MANAGE_SYSTEM_SETTINGS') ||
+      hasPermission('PERM_MANAGE_SETTINGS') ||
+      hasPermission('settings.manage');
 
     const canAccessSellerView = isSuperAdmin || (currentUser?.role === 'CUSTOMER' && !!currentUser?.seller_profile);
     const canAccessCustomerView = isSuperAdmin || currentUser?.role === 'CUSTOMER' || !isInternalStaff;
@@ -233,21 +239,11 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
 
   const roleBadge = currentUser ? (roleNameMap[currentUser.role] || currentUser.role) : 'زائر عام';
 
-  // Demo Persona Quick Selector inside Dashboard
-  const demoRoles = [
-    { role: 'SUPER_ADMIN' as UserRole, userId: 'user-admin-1', label: 'مدير النظام الأعلى', desc: 'كامل الصلاحيات (7 أقسام)', color: 'bg-purple-600' },
-    { role: 'PROPERTY_REVIEWER' as UserRole, userId: 'user-reviewer-1', label: 'مراجع هندسي', desc: 'مراجعة وتدقيق العقارات والتوثيق', color: 'bg-blue-600' },
-    { role: 'SALES_USER' as UserRole, userId: 'user-sales-1', label: 'مبيعات CRM', desc: 'متابعة المعاينات والتواصل', color: 'bg-amber-600' },
-    { role: 'CUSTOMER' as UserRole, userId: 'user-owner-1', label: 'مالك عقارات موثق', desc: 'إدارة وتنزيل العقارات', color: 'bg-emerald-600' },
-    { role: 'CUSTOMER' as UserRole, userId: 'user-broker-1', label: 'مكتب وسيط عقاري', desc: 'لوحة الوسيط العقاري', color: 'bg-teal-600' },
-    { role: 'CUSTOMER' as UserRole, userId: 'user-cust-1', label: 'عميل مشتري', desc: 'طلبات المعاينة والمفضلة', color: 'bg-slate-700' },
-  ];
-
   return (
     <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-5 sm:py-8 space-y-6 text-right font-sans">
       
       {/* Top Header Card with Smart Role Context (Upwork Style) */}
-      <div className="bg-[#001e00] text-white rounded-3xl p-5 sm:p-7 border border-[#003a00] shadow-xl relative overflow-hidden">
+      <div className="bg-[#001e00] text-white rounded-xl p-5 sm:p-7 border border-[#003a00] shadow-xl relative overflow-hidden">
         {/* Subtle decorative glow */}
         <div className="absolute top-0 left-0 w-72 h-72 bg-[#14a800]/10 rounded-full blur-3xl pointer-events-none -translate-x-1/2 -translate-y-1/2" />
         
@@ -255,7 +251,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
           <div className="space-y-1.5">
             <div className="flex items-center gap-2.5">
               <span className="w-2.5 h-2.5 rounded-full bg-[#14a800] animate-pulse"></span>
-              <h1 className="text-lg sm:text-2xl font-black text-white tracking-tight">
+              <h1 className="text-lg sm:text-2xl font-black text-white tracking-tight font-display">
                 {isInternalStaff ? 'لوحة الإدارة والعمليات المركزية' : 'لوحة التحكم وإدارة الحساب'}
               </h1>
               <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-[#002f00] text-[#14a800] border border-[#14a800]/30 hidden sm:inline-block">
@@ -311,36 +307,11 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
             )}
           </div>
         </div>
-
-        {/* Quick Role Switcher Bar right inside Dashboard for instant testing */}
-        <div className="mt-4 pt-3 border-t border-white/10 flex flex-wrap items-center gap-2 text-xs">
-          <span className="text-slate-400 font-bold text-[11px] shrink-0">تبديل دور تجريبي سريع:</span>
-          <div className="flex flex-wrap items-center gap-1.5 overflow-x-auto no-scrollbar">
-            {demoRoles.map((dr, idx) => {
-              const isCurrent = currentUser?.id === dr.userId || (!currentUser && dr.role === 'CUSTOMER' && idx === 5);
-              return (
-                <button
-                  key={idx}
-                  onClick={() => switchPersona(dr.role, dr.userId)}
-                  className={`px-2.5 py-1 rounded-full text-[11px] font-bold transition flex items-center gap-1.5 cursor-pointer ${
-                    isCurrent 
-                      ? 'bg-[#14a800] text-white shadow-xs' 
-                      : 'bg-white/10 hover:bg-white/20 text-slate-200'
-                  }`}
-                  title={dr.desc}
-                >
-                  <span className={`w-1.5 h-1.5 rounded-full ${isCurrent ? 'bg-white' : 'bg-[#14a800]'}`}></span>
-                  <span>{dr.label}</span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
       </div>
 
       {/* Navigation Sub-tabs */}
       <div className="space-y-2">
-        <div className="bg-white rounded-2xl p-1.5 border border-[#e4ebe4] shadow-2xs flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+        <div className="bg-white rounded-xl p-1.5 border border-[#e4ebe4] shadow-2xs flex items-center gap-1.5 overflow-x-auto no-scrollbar">
           {authorizedTabs.map(tab => {
             const isActive = activeTab === tab.id;
             return (
@@ -402,7 +373,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
 
         {activeTab === 'CUSTOMER_VIEW' && (
           <div className="space-y-6">
-            <div className="bg-white rounded-3xl p-6 border border-[#e4ebe4] shadow-xs space-y-4">
+            <div className="bg-white rounded-xl p-6 border border-[#e4ebe4] shadow-xs space-y-4">
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="text-lg font-black text-[#001e00]">طلبات المعاينة والمحادثات المفتوحة</h3>
@@ -411,18 +382,18 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
                   </p>
                 </div>
                 <span className="px-3 py-1 bg-[#f2f7f2] text-[#14a800] text-xs font-bold rounded-full border border-[#14a800]/20">
-                  {leads.filter(l => l.user_id === currentUser?.id).length} طلبات
+                  {leads.filter(l => l.customer_id === currentUser?.id).length} طلبات
                 </span>
               </div>
 
               <div className="divide-y divide-slate-100">
-                {leads.filter(l => l.user_id === currentUser?.id).length === 0 ? (
+                {leads.filter(l => l.customer_id === currentUser?.id).length === 0 ? (
                   <div className="py-8 text-center text-xs text-slate-500 font-semibold space-y-2">
                     <p>لم تقم بإرسال أي طلبات معاينة حتى الآن.</p>
                     <p className="text-slate-400">تصفح العقارات واضغط "حجز معاينة" لبدء التنسيق المباشر.</p>
                   </div>
                 ) : (
-                  leads.filter(l => l.user_id === currentUser?.id).map(lead => {
+                  leads.filter(l => l.customer_id === currentUser?.id).map(lead => {
                     const prop = properties.find(p => p.id === lead.property_id);
                     const ver = prop?.versions[0];
                     return (
@@ -446,7 +417,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
             </div>
 
             {/* Favorite Properties Box */}
-            <div className="bg-white rounded-3xl p-6 border border-[#e4ebe4] shadow-xs space-y-4">
+            <div className="bg-white rounded-xl p-6 border border-[#e4ebe4] shadow-xs space-y-4">
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="text-lg font-black text-[#001e00]">العقارات المحفوظة في المفضلة</h3>
@@ -454,7 +425,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
                     الوصول السريع للعقارات التي أضفتها لقائمة اهتماماتك
                   </p>
                 </div>
-                <span className="px-3 py-1 bg-slate-100 text-slate-700 text-xs font-bold rounded-full">
+                <span className="px-3 py-1 bg-slate-100 text-slate-700 text-xs font-bold rounded-lg">
                   {favorites.length} عقارات
                 </span>
               </div>
@@ -473,7 +444,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
                       <div 
                         key={fav.id} 
                         onClick={() => onSelectProperty?.(prop)}
-                        className="p-3.5 rounded-2xl bg-[#f9f9f9] border border-[#e4ebe4] hover:border-[#14a800] transition cursor-pointer space-y-1.5"
+                        className="p-3.5 rounded-lg bg-[#f9f9f9] border border-[#e4ebe4] hover:border-[#14a800] transition cursor-pointer space-y-1.5"
                       >
                         <h5 className="text-xs font-bold text-[#001e00] line-clamp-1">{ver.title}</h5>
                         <div className="text-[11px] text-[#14a800] font-black">{ver.price.toLocaleString('ar-EG')} جنيه</div>

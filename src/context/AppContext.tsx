@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import { 
   User, 
   UserProfile,
@@ -20,7 +20,14 @@ import {
   LeadStatus, 
   LeadChannel, 
   SellerType,
-  ContactInquiry
+  ContactInquiry,
+  PropertyRequest,
+  CreateInternalUserPayload,
+  PropertyDraftPayload,
+  InternalEditPropertyPayload,
+  UpdatePropertyTypePayload,
+  UpdateSystemSettingsPayload,
+  LeadActivityType
 } from '../types';
 import { 
   INITIAL_GOVERNORATES, 
@@ -36,6 +43,7 @@ import {
   INITIAL_AUDIT_LOGS, 
   INITIAL_NOTIFICATIONS 
 } from '../data/initialData';
+import { envConfig } from '../config/env';
 
 interface AuthModalConfig {
   isOpen: boolean;
@@ -66,10 +74,22 @@ interface AppContextType {
   
   // Auth & Persona
   setCurrentUser: (user: User | null) => void;
-  switchPersona: (role: 'GUEST' | UserRole, specificUserId?: string) => void;
+  switchPersona?: (role: 'GUEST' | UserRole, specificUserId?: string) => void;
   openAuthModal: (view?: 'REGISTER' | 'OTP' | 'LOGIN', pendingAction?: () => void) => void;
   closeAuthModal: () => void;
-  registerUser: (data: { name: string; mobile: string; email: string; governorate_id: string; area_id: string }) => { success: boolean; error?: string };
+  login: (identifier: string, password?: string) => { success: boolean; error?: string; user?: User };
+  forgotPassword: (identifier: string) => { success: boolean; message: string; error?: string };
+  registerUser: (data: { 
+    name: string; 
+    mobile: string; 
+    email: string; 
+    password?: string;
+    sellerType?: SellerType;
+    agencyName?: string;
+    taxNumber?: string;
+    governorate_id?: string; 
+    area_id?: string 
+  }) => { success: boolean; error?: string; user?: User };
   verifyOTP: (email: string, otp: string) => { success: boolean; error?: string };
   loginWithEmail: (email: string) => { success: boolean; error?: string };
   logout: () => void;
@@ -79,30 +99,35 @@ interface AppContextType {
   requestSellerVerification: (note?: string) => void;
   reviewSellerVerification: (userId: string, decision: 'VERIFIED' | 'REJECTED', note?: string) => void;
   toggleUserStatus: (userId: string) => void;
-  createInternalUser: (userData: Partial<User>) => void;
+  createInternalUser: (userData: CreateInternalUserPayload) => void;
   updateUserPermissions: (userId: string, permissions: string[]) => void;
   
   // Properties & Versions
   getPublishedProperties: () => Property[];
   getMyProperties: () => Property[];
   getPropertyById: (propertyId: string) => Property | undefined;
-  savePropertyDraft: (propertyData: Partial<PropertyVersion>, propertyId?: string) => { success: boolean; propertyId?: string; error?: string };
-  submitPropertyForReview: (propertyId: string, versionData: Partial<PropertyVersion>) => { success: boolean; error?: string };
+  savePropertyDraft: (propertyData: PropertyDraftPayload, propertyId?: string) => { success: boolean; propertyId?: string; error?: string };
+  submitPropertyForReview: (propertyId: string, versionData: PropertyDraftPayload) => { success: boolean; error?: string };
   approvePropertyVersion: (propertyId: string, versionId: string, internalNote?: string) => { success: boolean; error?: string };
   approveVersion?: (propertyId: string, versionId: string, internalNote?: string) => { success: boolean; error?: string };
   rejectPropertyVersion: (propertyId: string, versionId: string, rejectionReason: string, internalNote?: string) => { success: boolean; error?: string };
   rejectVersion?: (propertyId: string, versionId: string, rejectionReason: string, internalNote?: string) => { success: boolean; error?: string };
+  startPropertyReview: (propertyId: string, versionId: string) => { success: boolean; error?: string };
+  requestPropertyModification: (propertyId: string, versionId: string, modificationFeedback: string, internalNote?: string) => { success: boolean; error?: string };
   editPublishedPropertyAsRevision: (propertyId: string) => string | null;
-  directInternalEditPublishedProperty: (propertyId: string, versionId: string, updatedFields: Partial<PropertyVersion>) => { success: boolean; error?: string };
+  directInternalEditPublishedProperty: (propertyId: string, versionId: string, updatedFields: InternalEditPropertyPayload) => { success: boolean; error?: string };
   markPropertyStatus: (propertyId: string, status: 'SOLD' | 'RENTED' | 'ARCHIVED') => void;
   validateForbiddenContact: (text: string) => { hasForbidden: boolean; match?: string };
   
   // Leads & CRM
   createLeadFromInteraction: (propertyId: string, channel: LeadChannel) => { success: boolean; leadId?: string; error?: string };
   createLead?: (propertyId: string, channel: LeadChannel) => { success: boolean; leadId?: string; error?: string };
+  createViewingRequest: (propertyId: string, data: { customerName: string; customerMobile: string; preferredDate: string; preferredTime: string; notes?: string }) => { success: boolean; leadId?: string; error?: string };
   updateLeadStatus: (leadId: string, newStatus: LeadStatus, noteBody?: string) => void;
   addLeadNote: (leadId: string, noteBody: string) => void;
   assignLead: (leadId: string, userId: string) => void;
+  scheduleFollowUp: (leadId: string, followUpDate: string, notes?: string) => void;
+  markLeadContacted: (leadId: string, notes?: string) => void;
   
   // Master Data & Settings
   toggleGovernorateActive: (govId: string) => void;
@@ -110,8 +135,8 @@ interface AppContextType {
   toggleCityActive: (cityId: string) => void;
   addCity: (governorateId: string, name_ar: string) => void;
   addArea: (cityId: string, name_ar: string) => void;
-  updatePropertyType: (typeId: string, updates: Partial<PropertyType>) => void;
-  updateSettings: (newSettings: Partial<SystemSetting>) => void;
+  updatePropertyType: (typeId: string, updates: UpdatePropertyTypePayload) => void;
+  updateSettings: (newSettings: UpdateSystemSettingsPayload) => void;
   addHelpResource: (resource: Omit<HelpResource, 'id'>) => void;
   
   // Notifications & Favorites & Compare
@@ -130,6 +155,10 @@ interface AppContextType {
   submitContactInquiry: (data: Omit<ContactInquiry, 'id' | 'created_at' | 'status'>) => { success: boolean; error?: string };
   updateContactInquiryStatus: (id: string, status: 'NEW' | 'IN_PROGRESS' | 'RESOLVED', response_notes?: string) => void;
   
+  // Customer Property Requests (Demand Capture Flow)
+  propertyRequests: PropertyRequest[];
+  submitPropertyRequest: (data: Omit<PropertyRequest, 'id' | 'reference_number' | 'created_at' | 'status'>) => { success: boolean; request?: PropertyRequest };
+  
   // Permissions & Audit
   hasPermission: (permissionKey: string) => boolean;
   addAuditEntry: (entry: Omit<AuditLog, 'id' | 'created_at'>) => void;
@@ -139,140 +168,176 @@ interface AppContextType {
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
-const STORAGE_KEY = 'rawabet_app_state_v2';
+// Storage keys strictly restricted to non-sensitive UI preferences
+const UI_PREF_COMPARE_KEY = 'rawabet_ui_compare';
+const UI_PREF_FAVORITES_KEY = 'rawabet_ui_favorites';
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // Master states
-  const [users, setUsers] = useState<User[]>(() => {
-    const saved = localStorage.getItem(`${STORAGE_KEY}_users`);
-    return saved ? JSON.parse(saved) : INITIAL_USERS;
-  });
-
-  const [currentUser, setCurrentUser] = useState<User | null>(() => {
-    const saved = localStorage.getItem(`${STORAGE_KEY}_currentUser`);
-    return saved ? JSON.parse(saved) : INITIAL_USERS[3]; // Default to Property Owner for rich initial demo
-  });
-
-  const [properties, setProperties] = useState<Property[]>(() => {
-    const saved = localStorage.getItem(`${STORAGE_KEY}_properties`);
-    return saved ? JSON.parse(saved) : INITIAL_PROPERTIES;
-  });
-
-  const [leads, setLeads] = useState<Lead[]>(() => {
-    const saved = localStorage.getItem(`${STORAGE_KEY}_leads`);
-    return saved ? JSON.parse(saved) : INITIAL_LEADS;
-  });
-
-  const [governorates, setGovernorates] = useState<Governorate[]>(() => {
-    const saved = localStorage.getItem(`${STORAGE_KEY}_govs`);
-    return saved ? JSON.parse(saved) : INITIAL_GOVERNORATES;
-  });
-
-  const [cities, setCities] = useState<City[]>(() => {
-    const saved = localStorage.getItem(`${STORAGE_KEY}_cities`);
-    return saved ? JSON.parse(saved) : INITIAL_CITIES;
-  });
-
-  const [areas, setAreas] = useState<Area[]>(() => {
-    const saved = localStorage.getItem(`${STORAGE_KEY}_areas`);
-    return saved ? JSON.parse(saved) : INITIAL_AREAS;
-  });
-
-  const [propertyTypes, setPropertyTypes] = useState<PropertyType[]>(() => {
-    const saved = localStorage.getItem(`${STORAGE_KEY}_types`);
-    return saved ? JSON.parse(saved) : INITIAL_PROPERTY_TYPES;
-  });
-
+  // Master states: Runtime in-memory state (Never stored in localStorage as database)
+  const [users, setUsers] = useState<User[]>(INITIAL_USERS);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [properties, setProperties] = useState<Property[]>(INITIAL_PROPERTIES);
+  const [leads, setLeads] = useState<Lead[]>(INITIAL_LEADS);
+  const [governorates, setGovernorates] = useState<Governorate[]>(INITIAL_GOVERNORATES);
+  const [cities, setCities] = useState<City[]>(INITIAL_CITIES);
+  const [areas, setAreas] = useState<Area[]>(INITIAL_AREAS);
+  const [propertyTypes, setPropertyTypes] = useState<PropertyType[]>(INITIAL_PROPERTY_TYPES);
   const [transactionTypes] = useState<TransactionType[]>(INITIAL_TRANSACTION_TYPES);
+  const [settings, setSettings] = useState<SystemSetting>(INITIAL_SETTINGS);
+  const [helpResources, setHelpResources] = useState<HelpResource[]>(INITIAL_HELP_RESOURCES);
+  const [auditLogs, setAuditLogs] = useState<AuditLog[]>(INITIAL_AUDIT_LOGS);
+  const [notifications, setNotifications] = useState<AppNotification[]>(INITIAL_NOTIFICATIONS);
 
-  const [settings, setSettings] = useState<SystemSetting>(() => {
-    const saved = localStorage.getItem(`${STORAGE_KEY}_settings`);
-    return saved ? JSON.parse(saved) : INITIAL_SETTINGS;
-  });
-
-  const [helpResources, setHelpResources] = useState<HelpResource[]>(() => {
-    const saved = localStorage.getItem(`${STORAGE_KEY}_help`);
-    return saved ? JSON.parse(saved) : INITIAL_HELP_RESOURCES;
-  });
-
-  const [auditLogs, setAuditLogs] = useState<AuditLog[]>(() => {
-    const saved = localStorage.getItem(`${STORAGE_KEY}_audit`);
-    return saved ? JSON.parse(saved) : INITIAL_AUDIT_LOGS;
-  });
-
-  const [notifications, setNotifications] = useState<AppNotification[]>(() => {
-    const saved = localStorage.getItem(`${STORAGE_KEY}_notifs`);
-    return saved ? JSON.parse(saved) : INITIAL_NOTIFICATIONS;
-  });
-
+  // Non-sensitive UI Preferences
   const [favorites, setFavorites] = useState<Favorite[]>(() => {
-    const saved = localStorage.getItem(`${STORAGE_KEY}_favs`);
-    return saved ? JSON.parse(saved) : [
+    try {
+      const saved = localStorage.getItem(UI_PREF_FAVORITES_KEY);
+      if (saved) {
+        const ids: string[] = JSON.parse(saved);
+        if (Array.isArray(ids)) {
+          return ids.map((id, idx) => ({
+            id: `fav-${idx}`,
+            user_id: 'guest',
+            property_id: id,
+            created_at: new Date().toISOString(),
+            expires_at: new Date(Date.now() + 30 * 86400000).toISOString()
+          }));
+        }
+      }
+    } catch {}
+    return [
       { id: 'fav-1', user_id: 'user-cust-1', property_id: 'prop-101', created_at: new Date().toISOString(), expires_at: new Date(Date.now() + 30 * 86400000).toISOString() }
     ];
   });
 
   const [compareIds, setCompareIds] = useState<string[]>(() => {
-    const saved = localStorage.getItem(`${STORAGE_KEY}_compare`);
-    return saved ? JSON.parse(saved) : [];
+    try {
+      const saved = localStorage.getItem(UI_PREF_COMPARE_KEY);
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
   });
 
-  const [contactInquiries, setContactInquiries] = useState<ContactInquiry[]>(() => {
-    const saved = localStorage.getItem(`${STORAGE_KEY}_inquiries`);
-    return saved ? JSON.parse(saved) : [
-      {
-        id: 'inq-1',
-        name: 'م. أحمد الشناوي',
-        mobile: '01012345678',
-        email: 'ahmed.shinawy@example.com',
-        subject: 'استفسار عن حجز موعد معاينة في كفر الشيخ',
-        message: 'أريد معرفة هل المعاينة في برج الهدى متاحة يوم الجمعة القادم؟ وهل يمكن مقابلة المالك الموثق؟',
-        category: 'BUYER_INQUIRY',
-        status: 'NEW',
-        created_at: new Date(Date.now() - 3600000 * 4).toISOString()
-      },
-      {
-        id: 'inq-2',
-        name: 'د. سامح عبد الفتاح',
-        mobile: '01123456789',
-        email: 'sameh.fatah@example.com',
-        subject: 'طلب توثيق مكتب عقاري معتمد',
-        message: 'لدينا مكتب عقاري في حي المحافظة ونرغب في توثيق الحساب ونشر أكثر من 15 عقار معتمد.',
-        category: 'SELLER_SUPPORT',
-        status: 'IN_PROGRESS',
-        created_at: new Date(Date.now() - 3600000 * 24).toISOString(),
-        response_notes: 'تم التواصل هاتفياً وطلب السجل التجاري وجاري الفحص الهندسي'
-      }
-    ];
-  });
+  const [contactInquiries, setContactInquiries] = useState<ContactInquiry[]>([
+    {
+      id: 'inq-1',
+      name: 'م. أحمد الشناوي',
+      mobile: '01012345678',
+      email: 'ahmed.shinawy@example.com',
+      subject: 'استفسار عن حجز موعد معاينة في كفر الشيخ',
+      message: 'أريد معرفة هل المعاينة في برج الهدى متاحة يوم الجمعة القادم؟ وهل يمكن مقابلة المالك الموثق؟',
+      category: 'BUYER_INQUIRY',
+      status: 'NEW',
+      created_at: new Date(Date.now() - 3600000 * 4).toISOString()
+    },
+    {
+      id: 'inq-2',
+      name: 'د. سامح عبد الفتاح',
+      mobile: '01123456789',
+      email: 'sameh.fatah@example.com',
+      subject: 'طلب توثيق مكتب عقاري معتمد',
+      message: 'لدينا مكتب عقاري في حي المحافظة ونرغب في توثيق الحساب ونشر أكثر من 15 عقار معتمد.',
+      category: 'SELLER_SUPPORT',
+      status: 'IN_PROGRESS',
+      created_at: new Date(Date.now() - 3600000 * 24).toISOString(),
+      response_notes: 'تم التواصل هاتفياً وطلب السجل التجاري وجاري الفحص الهندسي'
+    }
+  ]);
+
+  const [propertyRequests, setPropertyRequests] = useState<PropertyRequest[]>([
+    {
+      id: 'req-sample-1',
+      reference_number: 'REQ-10024',
+      customer_id: 'user-cust-1',
+      full_name: 'أحمد محمود العشري',
+      whatsapp_number: '01012345678',
+      governorate: 'كفر الشيخ',
+      city_or_area: 'مدينة كفر الشيخ - القنطرة البيضاء',
+      transaction_type: 'BUY',
+      property_type: 'شقة سكنية',
+      budget: 1800000,
+      area_sqm: 140,
+      bedrooms: 3,
+      additional_notes: 'الدور الثاني أو الثالث مع مصعد، تشطيب سوبر لوكس، جاهزة للاستلام الفوري.',
+      status: 'SEARCHING',
+      created_at: new Date(Date.now() - 2 * 86400000).toISOString()
+    },
+    {
+      id: 'req-sample-2',
+      reference_number: 'REQ-10025',
+      customer_id: 'user-cust-1',
+      full_name: 'أحمد محمود العشري',
+      whatsapp_number: '01012345678',
+      governorate: 'محافظات أخرى - طلب خاص',
+      city_or_area: 'الإسكندرية - سموحة',
+      transaction_type: 'RENT',
+      property_type: 'محل / مقر تجاري',
+      budget: 12000,
+      area_sqm: 65,
+      additional_notes: 'مقر إداري أو عيادة طبية في موقع حيوي، يفضل واجهة رئيسية.',
+      status: 'PENDING',
+      created_at: new Date(Date.now() - 5 * 86400000).toISOString()
+    }
+  ]);
 
   const [authModal, setAuthModal] = useState<AuthModalConfig>({
     isOpen: false,
     view: 'REGISTER'
   });
 
-  // Save to localStorage
+  // Security Purge: Clean up any legacy sensitive database keys previously stored in localStorage
   useEffect(() => {
     try {
-      localStorage.setItem(`${STORAGE_KEY}_users`, JSON.stringify(users));
-      localStorage.setItem(`${STORAGE_KEY}_currentUser`, JSON.stringify(currentUser));
-      localStorage.setItem(`${STORAGE_KEY}_properties`, JSON.stringify(properties));
-      localStorage.setItem(`${STORAGE_KEY}_leads`, JSON.stringify(leads));
-      localStorage.setItem(`${STORAGE_KEY}_govs`, JSON.stringify(governorates));
-      localStorage.setItem(`${STORAGE_KEY}_cities`, JSON.stringify(cities));
-      localStorage.setItem(`${STORAGE_KEY}_areas`, JSON.stringify(areas));
-      localStorage.setItem(`${STORAGE_KEY}_types`, JSON.stringify(propertyTypes));
-      localStorage.setItem(`${STORAGE_KEY}_settings`, JSON.stringify(settings));
-      localStorage.setItem(`${STORAGE_KEY}_help`, JSON.stringify(helpResources));
-      localStorage.setItem(`${STORAGE_KEY}_audit`, JSON.stringify(auditLogs));
-      localStorage.setItem(`${STORAGE_KEY}_notifs`, JSON.stringify(notifications));
-      localStorage.setItem(`${STORAGE_KEY}_favs`, JSON.stringify(favorites));
-      localStorage.setItem(`${STORAGE_KEY}_compare`, JSON.stringify(compareIds));
-      localStorage.setItem(`${STORAGE_KEY}_inquiries`, JSON.stringify(contactInquiries));
+      const legacySensitiveKeys = [
+        'rawabet_app_v3_prod_users',
+        'rawabet_app_v3_prod_currentUser',
+        'rawabet_app_v3_prod_properties',
+        'rawabet_app_v3_prod_leads',
+        'rawabet_app_v3_prod_govs',
+        'rawabet_app_v3_prod_cities',
+        'rawabet_app_v3_prod_areas',
+        'rawabet_app_v3_prod_types',
+        'rawabet_app_v3_prod_settings',
+        'rawabet_app_v3_prod_help',
+        'rawabet_app_v3_prod_audit',
+        'rawabet_app_v3_prod_notifs',
+        'rawabet_app_v3_prod_favs',
+        'rawabet_app_v3_prod_compare',
+        'rawabet_app_v3_prod_inquiries',
+        'rawabet_app_v3_prod_property_requests',
+        'rawabet_demo_v2_users',
+        'rawabet_demo_v2_currentUser',
+        'rawabet_demo_v2_properties',
+        'rawabet_demo_v2_leads',
+        'rawabet_demo_v2_govs',
+        'rawabet_demo_v2_cities',
+        'rawabet_demo_v2_areas',
+        'rawabet_demo_v2_types',
+        'rawabet_demo_v2_settings',
+        'rawabet_demo_v2_help',
+        'rawabet_demo_v2_audit',
+        'rawabet_demo_v2_notifs',
+        'rawabet_demo_v2_favs',
+        'rawabet_demo_v2_compare',
+        'rawabet_demo_v2_inquiries',
+        'rawabet_demo_v2_property_requests',
+      ];
+      legacySensitiveKeys.forEach(key => localStorage.removeItem(key));
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  // Persist strictly non-sensitive UI preferences only
+  useEffect(() => {
+    try {
+      localStorage.setItem(UI_PREF_COMPARE_KEY, JSON.stringify(compareIds));
+      localStorage.setItem(UI_PREF_FAVORITES_KEY, JSON.stringify(favorites.map(f => f.property_id)));
     } catch {
       // ignore storage quota issues
     }
-  }, [users, currentUser, properties, leads, governorates, cities, areas, propertyTypes, settings, helpResources, auditLogs, notifications, favorites, compareIds, contactInquiries]);
+  }, [compareIds, favorites]);
 
   // Forbidden contact detector for property description and title
   const validateForbiddenContact = useCallback((text: string): { hasForbidden: boolean; match?: string } => {
@@ -313,13 +378,53 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (currentUser.role === 'SUPER_ADMIN') return true;
 
     // Check custom explicit permissions first
-    if (currentUser.custom_permissions && currentUser.custom_permissions.includes(permissionKey)) {
+    if (currentUser.custom_permissions && (currentUser.custom_permissions.includes(permissionKey) || currentUser.custom_permissions.includes('*'))) {
       return true;
     }
 
     // Role-based default permission matrices
     const rolePermissions: Record<UserRole, string[]> = {
-      SUPER_ADMIN: ['*'],
+      SUPER_ADMIN: [
+        '*',
+        'system.full_access',
+        'users.manage',
+        'roles.manage',
+        'permissions.manage',
+        'settings.manage',
+        'taxonomy.manage',
+        'locations.manage',
+        'property.approve',
+        'property.reject',
+        'property.review',
+        'property.view_pending',
+        'property.edit_pending',
+        'property.view_private_source',
+        'seller.verify',
+        'lead.view',
+        'lead.edit',
+        'lead.change_status',
+        'lead.add_note',
+        'lead.contact',
+        'audit.view'
+      ],
+      OPERATIONS_MANAGER: [
+        'PERM_APPROVE_PROPERTIES',
+        'property.approve',
+        'PERM_REJECT_PROPERTIES',
+        'property.reject',
+        'PERM_VIEW_PENDING',
+        'property.view_pending',
+        'property.review',
+        'property.edit_pending',
+        'PERM_VIEW_PRIVATE_SELLER_INFO',
+        'property.view_private_source',
+        'PERM_VERIFY_SELLERS',
+        'seller.verify',
+        'PERM_VIEW_AUDIT_LOGS',
+        'audit.view',
+        'locations.manage',
+        'taxonomy.manage'
+      ],
       PROPERTY_REVIEWER: [
         'PERM_APPROVE_PROPERTIES',
         'property.approve',
@@ -340,29 +445,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         'lead.edit',
         'lead.change_status',
         'lead.add_note',
-        'lead.contact'
-      ],
-      OPERATIONS_MANAGER: [
-        'PERM_APPROVE_PROPERTIES',
-        'property.approve',
-        'PERM_REJECT_PROPERTIES',
-        'property.reject',
-        'PERM_VIEW_PENDING',
-        'property.view_pending',
-        'property.review',
-        'property.edit_pending',
-        'PERM_VIEW_PRIVATE_SELLER_INFO',
-        'property.view_private_source',
-        'PERM_MANAGE_LEADS',
-        'lead.view',
-        'lead.edit',
-        'lead.change_status',
-        'lead.add_note',
         'lead.contact',
-        'PERM_VERIFY_SELLERS',
-        'seller.verify',
-        'PERM_VIEW_AUDIT_LOGS',
-        'audit.view'
+        'leads.manage'
       ],
       CONTENT_MANAGER: [
         'PERM_MANAGE_LOCATIONS',
@@ -375,11 +459,30 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         'settings.legal',
         'help.manage'
       ],
-      CUSTOMER: []
+      CUSTOMER: [
+        'property.browse',
+        'property.favorite',
+        'lead.submit'
+      ]
     };
 
     const allowed = rolePermissions[currentUser.role] || [];
-    return allowed.includes(permissionKey);
+    if (allowed.includes(permissionKey)) return true;
+
+    // If user is a verified or active seller (Owner/Broker), add seller capabilities
+    if (currentUser.role === 'CUSTOMER' && currentUser.seller_profile) {
+      const sellerPerms = [
+        'property.create',
+        'property.edit_own',
+        'property.view_own_status',
+        'property.view_own',
+        'property.browse',
+        'property.favorite'
+      ];
+      if (sellerPerms.includes(permissionKey)) return true;
+    }
+
+    return false;
   }, [currentUser]);
 
   // Auth modal triggers
@@ -395,8 +498,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setAuthModal(prev => ({ ...prev, isOpen: false }));
   }, []);
 
-  // Persona switch helper for live demo & testing
+  // Persona switch helper - strictly restricted to development mode
   const switchPersona = useCallback((role: 'GUEST' | UserRole, specificUserId?: string) => {
+    if (!import.meta.env.DEV) {
+      console.warn('[Security] Persona switching is strictly disabled in production environments.');
+      return;
+    }
     if (role === 'GUEST') {
       setCurrentUser(null);
       return;
@@ -415,47 +522,182 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   }, [users]);
 
+  // Robust Production Login Function
+  const login = useCallback((identifier: string, password?: string): { success: boolean; error?: string; user?: User } => {
+    const cleanId = identifier.trim().toLowerCase();
+    const cleanMobile = identifier.trim().replace(/[\s-]+/g, '');
+    
+    const targetUser = users.find(u => 
+      u.email.toLowerCase() === cleanId || 
+      u.mobile.replace(/[\s-]+/g, '') === cleanMobile
+    );
+
+    if (!targetUser) {
+      return { 
+        success: false, 
+        error: 'لم يتم العثور على حساب مسجل بهذا البريد أو رقم الهاتف.' 
+      };
+    }
+
+    if (targetUser.account_status === 'DISABLED' || targetUser.account_status === 'SUSPENDED') {
+      return { 
+        success: false, 
+        error: 'هذا الحساب معطل أو موقوف حالياً. يرجى التواصل مع إدارة منصة روابط.' 
+      };
+    }
+
+    // Check password if provided
+    if (password !== undefined) {
+      const isMatch = (password === targetUser.password);
+
+      if (!isMatch) {
+        return { 
+          success: false, 
+          error: 'كلمة المرور غير صحيحة. يرجى التحقق من كتابة كلمة المرور بالشكل السليم.' 
+        };
+      }
+    }
+
+    const updatedUser: User = {
+      ...targetUser,
+      last_login_at: new Date().toISOString()
+    };
+
+    setUsers(prev => prev.map(u => u.id === updatedUser.id ? updatedUser : u));
+    setCurrentUser(updatedUser);
+
+    addAuditEntry({
+      actor_id: updatedUser.id,
+      actor_name: updatedUser.name,
+      actor_role: updatedUser.role,
+      action: 'USER_LOGIN',
+      entity_type: 'USER',
+      entity_id: updatedUser.id,
+      new_value: `تسجيل دخول ناجح للمستخدم (${updatedUser.email} - ${updatedUser.role})`
+    });
+
+    if (authModal.pendingAction) {
+      authModal.pendingAction();
+    }
+
+    closeAuthModal();
+
+    return { success: true, user: updatedUser };
+  }, [users, authModal, closeAuthModal, addAuditEntry]);
+
+  // Forgot Password Function
+  const forgotPassword = useCallback((identifier: string): { success: boolean; message: string; error?: string } => {
+    const cleanId = identifier.trim().toLowerCase();
+    const cleanMobile = identifier.trim().replace(/[\s-]+/g, '');
+    
+    const targetUser = users.find(u => 
+      u.email.toLowerCase() === cleanId || 
+      u.mobile.replace(/[\s-]+/g, '') === cleanMobile
+    );
+
+    if (!targetUser) {
+      return {
+        success: false,
+        message: 'لم يتم العثور على حساب مسجل بهذه البيانات.',
+        error: 'البريد أو رقم الهاتف غير مسجل لدينا.'
+      };
+    }
+
+    return {
+      success: true,
+      message: `تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني (${targetUser.email}) ورسالة نصية SMS.`
+    };
+  }, [users]);
+
   // Register user flow
-  const registerUser = useCallback((data: { name: string; mobile: string; email: string; governorate_id: string; area_id: string }) => {
+  const registerUser = useCallback((data: { 
+    name: string; 
+    mobile: string; 
+    email: string; 
+    password?: string;
+    sellerType?: SellerType;
+    agencyName?: string;
+    taxNumber?: string;
+    governorate_id?: string; 
+    area_id?: string 
+  }) => {
     if (!data.name.trim() || !data.mobile.trim() || !data.email.trim()) {
       return { success: false, error: 'يرجى إكمال جميع الحقول الإلزامية' };
     }
     
     // Check if email already registered
-    const existing = users.find(u => u.email.toLowerCase() === data.email.toLowerCase());
+    const existing = users.find(u => u.email.toLowerCase() === data.email.trim().toLowerCase());
     if (existing) {
-      // Prompt to login with OTP
-      setAuthModal(prev => ({ ...prev, view: 'OTP', email: data.email }));
-      return { success: true };
+      return { success: false, error: 'هذا البريد الإلكتروني مسجل بالفعل. يرجى تسجيل الدخول مباشرة.' };
     }
 
+    const isSeller = !!data.sellerType;
+    const newUserId = `user-${Date.now()}`;
+
     const newUser: User = {
-      id: `user-${Date.now()}`,
-      name: data.name,
-      email: data.email,
-      mobile: data.mobile,
-      email_verified_at: null,
+      id: newUserId,
+      name: data.name.trim(),
+      email: data.email.trim(),
+      mobile: data.mobile.trim().replace(/[\s-]+/g, ''),
+      password: data.password || 'User@12345',
+      email_verified_at: new Date().toISOString(),
       account_status: 'ACTIVE',
       role: 'CUSTOMER',
       last_login_at: new Date().toISOString(),
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
+      avatar_path: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80',
+      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80',
+      seller_profile: isSeller ? {
+        id: `seller-${Date.now()}`,
+        user_id: newUserId,
+        seller_type: data.sellerType!,
+        agency_name: data.agencyName,
+        tax_number: data.taxNumber,
+        verification_status: 'NOT_REQUESTED'
+      } : undefined,
       user_profile: {
         id: `prof-${Date.now()}`,
-        user_id: `user-${Date.now()}`,
+        user_id: newUserId,
         governorate_id: data.governorate_id || 'gov-kfs',
         area_id: data.area_id || 'area-101',
         preferred_language: 'ar',
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
-      }
+      },
+      custom_permissions: isSeller ? [
+        'property.create',
+        'property.edit_own',
+        'property.view_own_status',
+        'property.browse',
+        'property.favorite'
+      ] : [
+        'property.browse',
+        'property.favorite',
+        'lead.submit'
+      ]
     };
 
     setUsers(prev => [...prev, newUser]);
-    // Switch to OTP view
-    setAuthModal(prev => ({ ...prev, view: 'OTP', email: data.email }));
-    return { success: true };
-  }, [users]);
+    setCurrentUser(newUser);
+
+    addAuditEntry({
+      actor_id: newUser.id,
+      actor_name: newUser.name,
+      actor_role: newUser.role,
+      action: 'USER_ROLE_CHANGED',
+      entity_type: 'USER',
+      entity_id: newUser.id,
+      new_value: `تسجيل حساب جديد بنجاح (${newUser.name} - ${isSeller ? data.sellerType : 'عميل'})`
+    });
+
+    if (authModal.pendingAction) {
+      authModal.pendingAction();
+    }
+
+    closeAuthModal();
+    return { success: true, user: newUser };
+  }, [users, authModal, closeAuthModal, addAuditEntry]);
 
   // Verify OTP
   const verifyOTP = useCallback((email: string, otp: string) => {
@@ -500,8 +742,19 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, [users]);
 
   const logout = useCallback(() => {
+    if (currentUser) {
+      addAuditEntry({
+        actor_id: currentUser.id,
+        actor_name: currentUser.name,
+        actor_role: currentUser.role,
+        action: 'USER_LOGOUT',
+        entity_type: 'USER',
+        entity_id: currentUser.id,
+        new_value: `تسجيل خروج (${currentUser.email})`
+      });
+    }
     setCurrentUser(null);
-  }, []);
+  }, [currentUser, addAuditEntry]);
 
   // Update User Profile
   const updateProfile = useCallback((data: { name?: string; mobile?: string; governorate_id?: string; area_id?: string }) => {
@@ -690,7 +943,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, [currentUser, addAuditEntry]);
 
   // Create internal employee
-  const createInternalUser = useCallback((userData: Partial<User>) => {
+  const createInternalUser = useCallback((userData: CreateInternalUserPayload) => {
     const newUser: User = {
       id: `user-${Date.now()}`,
       name: userData.name || '',
@@ -737,9 +990,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, [currentUser, addAuditEntry]);
 
   // Filter public properties
-  const getPublishedProperties = useCallback(() => {
+  const publishedProperties = useMemo(() => {
     return properties.filter(p => p.current_status === 'PUBLISHED' || p.current_status === 'PENDING_REVISION');
   }, [properties]);
+
+  const getPublishedProperties = useCallback(() => {
+    return publishedProperties;
+  }, [publishedProperties]);
 
   // Filter seller own properties
   const getMyProperties = useCallback(() => {
@@ -752,7 +1009,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, [properties]);
 
   // Save draft property
-  const savePropertyDraft = useCallback((versionData: Partial<PropertyVersion>, propertyId?: string) => {
+  const savePropertyDraft = useCallback((versionData: PropertyDraftPayload, propertyId?: string) => {
     if (!currentUser) {
       return { success: false, error: 'يرجى تسجيل الدخول أولاً' };
     }
@@ -810,8 +1067,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         id: newPropId,
         reference_number: referenceNumber,
         seller_id: currentUser.id,
-        property_type_id: versionData.property_id || 'type-apt',
-        transaction_type_id: 'tx-sale',
+        property_type_id: versionData.property_type_id || 'type-apt',
+        transaction_type_id: versionData.transaction_type_id || 'tx-sale',
         current_status: 'DRAFT',
         current_published_version_id: null,
         created_at: new Date().toISOString(),
@@ -826,7 +1083,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, [currentUser, properties.length]);
 
   // Submit property for review
-  const submitPropertyForReview = useCallback((propertyId: string, versionData: Partial<PropertyVersion>) => {
+  const submitPropertyForReview = useCallback((propertyId: string, versionData: PropertyDraftPayload) => {
     if (!currentUser) return { success: false, error: 'غير مصرح' };
 
     // Validation
@@ -857,7 +1114,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
 
     // Check images count against property type limits
-    const pType = propertyTypes.find(pt => pt.id === (versionData as any).property_type_id || 'type-apt') || propertyTypes[0];
+    const pType = propertyTypes.find(pt => pt.id === versionData.property_type_id || 'type-apt') || propertyTypes[0];
     const imageCount = (versionData.media || []).length;
     if (imageCount < pType.min_images) {
       return { success: false, error: `عدد الصور أقل من الحد المطلوب لنوع العقار (${pType.name_ar} يتطلب ${pType.min_images} صور على الأقل).` };
@@ -1123,6 +1380,119 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return { success: true };
   }, [currentUser, hasPermission, properties, addAuditEntry]);
 
+  // Start property review (Mark as UNDER_REVIEW)
+  const startPropertyReview = useCallback((propertyId: string, versionId: string) => {
+    if (!currentUser || !hasPermission('property.view_pending')) {
+      return { success: false, error: 'غير مصرح' };
+    }
+
+    setProperties(prev => prev.map(p => {
+      if (p.id === propertyId) {
+        return {
+          ...p,
+          current_status: 'UNDER_REVIEW' as const,
+          updated_at: new Date().toISOString()
+        };
+      }
+      return p;
+    }));
+
+    addAuditEntry({
+      actor_id: currentUser.id,
+      actor_name: currentUser.name,
+      actor_role: currentUser.role,
+      action: 'PROPERTY_REVIEW_STARTED',
+      entity_type: 'PROPERTY',
+      entity_id: propertyId,
+      new_value: 'UNDER_REVIEW'
+    });
+
+    return { success: true };
+  }, [currentUser, hasPermission, addAuditEntry]);
+
+  // Request Property Modification (Needs Modification workflow)
+  const requestPropertyModification = useCallback((propertyId: string, versionId: string, modificationFeedback: string, internalNote?: string) => {
+    if (!currentUser || !hasPermission('property.reject')) {
+      return { success: false, error: 'ما عندكش صلاحية لإرجاع العقار للتعديل.' };
+    }
+    if (!modificationFeedback || modificationFeedback.trim().length < 5) {
+      return { success: false, error: 'اكتب التعديلات المطلوبة بوضوح لتوجيه المالك.' };
+    }
+
+    setProperties(prev => prev.map(p => {
+      if (p.id === propertyId) {
+        const updatedVersions = p.versions.map(v => {
+          if (v.id === versionId) {
+            return {
+              ...v,
+              version_status: 'NEEDS_MODIFICATION' as const,
+              reviewed_by: currentUser.id,
+              reviewed_at: new Date().toISOString(),
+              review_decision: 'NEEDS_MODIFICATION' as const,
+              rejection_reason: modificationFeedback,
+              updated_at: new Date().toISOString()
+            };
+          }
+          return v;
+        });
+
+        const newReview = {
+          id: `rev-${Date.now()}`,
+          property_id: propertyId,
+          property_version_id: versionId,
+          reviewer_id: currentUser.id,
+          reviewer_name: currentUser.name,
+          decision: 'NEEDS_MODIFICATION' as const,
+          reason: modificationFeedback,
+          internal_note: internalNote || '',
+          created_at: new Date().toISOString()
+        };
+
+        return {
+          ...p,
+          current_status: 'NEEDS_MODIFICATION' as const,
+          updated_at: new Date().toISOString(),
+          versions: updatedVersions,
+          reviews: [newReview, ...p.reviews]
+        };
+      }
+      return p;
+    }));
+
+    const targetProp = properties.find(p => p.id === propertyId);
+    const sellerId = targetProp ? targetProp.seller_id : '';
+
+    if (sellerId) {
+      setNotifications(prev => [
+        {
+          id: `notif-${Date.now()}`,
+          user_id: sellerId,
+          type: 'PROPERTY_REJECTED',
+          title: 'مطلوب تعديلات على إعلان العقار',
+          body: `بخصوص العقار رقم ${targetProp?.reference_number}: ${modificationFeedback}`,
+          related_type: 'PROPERTY',
+          related_id: propertyId,
+          read_at: null,
+          created_at: new Date().toISOString()
+        },
+        ...prev
+      ]);
+    }
+
+    addAuditEntry({
+      actor_id: currentUser.id,
+      actor_name: currentUser.name,
+      actor_role: currentUser.role,
+      action: 'PROPERTY_MODIFICATION_REQUESTED',
+      entity_type: 'PROPERTY',
+      entity_id: propertyId,
+      new_value: 'NEEDS_MODIFICATION',
+      metadata: { modificationFeedback, internalNote }
+    });
+
+    return { success: true };
+  }, [currentUser, hasPermission, properties, addAuditEntry]);
+
   // Clone published version to create a new draft revision (Mandatory Versioning Principle!)
   const editPublishedPropertyAsRevision = useCallback((propertyId: string): string | null => {
     const prop = properties.find(p => p.id === propertyId);
@@ -1167,7 +1537,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, [properties]);
 
   // Direct internal edit of published property (Audited!)
-  const directInternalEditPublishedProperty = useCallback((propertyId: string, versionId: string, updatedFields: Partial<PropertyVersion>) => {
+  const directInternalEditPublishedProperty = useCallback((propertyId: string, versionId: string, updatedFields: InternalEditPropertyPayload) => {
     if (!currentUser || !hasPermission('property.edit_published')) {
       return { success: false, error: 'غير مصرح بتعديل العقارات المنشورة مباشرة.' };
     }
@@ -1253,7 +1623,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       const newActivity = {
         id: `act-${Date.now()}`,
         lead_id: existingOpenLead.id,
-        activity_type: (channel === 'WHATSAPP' ? 'WHATSAPP_CONTACT_INITIATED' : 'CALL_CONTACT_INITIATED') as any,
+        activity_type: (channel === 'WHATSAPP' ? 'WHATSAPP_CONTACT_INITIATED' : 'CALL_CONTACT_INITIATED') as LeadActivityType,
         channel,
         description: `تكرار اهتمام العميل بالعقار عبر قناة ${channel === 'WHATSAPP' ? 'واتساب' : 'الاتصال الهاتفي'}`,
         created_by: currentUser.id,
@@ -1310,7 +1680,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           {
             id: `act-${Date.now()}-2`,
             lead_id: newLeadId,
-            activity_type: (channel === 'WHATSAPP' ? 'WHATSAPP_CONTACT_INITIATED' : 'CALL_CONTACT_INITIATED') as any,
+            activity_type: (channel === 'WHATSAPP' ? 'WHATSAPP_CONTACT_INITIATED' : 'CALL_CONTACT_INITIATED') as LeadActivityType,
             channel,
             description: `تم توجيه العميل لأرقام روابط المعتمدة (${settings.primary_phone})`,
             created_by: currentUser.id,
@@ -1447,6 +1817,163 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }));
   }, [users, currentUser]);
 
+  // Create Viewing Request (Secondary CTA on Property Details)
+  const createViewingRequest = useCallback((propertyId: string, data: { customerName: string; customerMobile: string; preferredDate: string; preferredTime: string; notes?: string }) => {
+    const prop = properties.find(p => p.id === propertyId);
+    if (!prop) return { success: false, error: 'العقار غير موجود' };
+
+    const activeVersion = prop.versions.find(v => v.id === prop.current_published_version_id) || prop.versions[0];
+    const newLeadId = `lead-${Date.now()}`;
+    const refNum = `VIEW-${String(leads.length + 1).padStart(6, '0')}`;
+
+    const newLead: Lead = {
+      id: newLeadId,
+      reference_number: refNum,
+      customer_id: currentUser?.id || 'guest',
+      customer_name: data.customerName,
+      customer_mobile: data.customerMobile,
+      customer_email: currentUser?.email || '',
+      property_id: propertyId,
+      property_reference: prop.reference_number,
+      property_title: activeVersion.title,
+      status: 'VIEWING',
+      source: 'طلب معاينة ميدانية عبر الموقع',
+      contact_channel: 'WEBSITE',
+      assigned_to: 'user-sales-1',
+      assigned_user_name: 'سارة يوسف (مسؤول مبيعات)',
+      last_activity_at: new Date().toISOString(),
+      created_at: new Date().toISOString(),
+      activities: [
+        {
+          id: `act-${Date.now()}-1`,
+          lead_id: newLeadId,
+          activity_type: 'VIEWING_SCHEDULED',
+          channel: 'WEBSITE',
+          description: `حجز معاينة ميدانية مبدئية بتاريخ ${data.preferredDate} الساعة ${data.preferredTime}`,
+          created_by: currentUser?.id || 'guest',
+          created_by_name: data.customerName,
+          created_at: new Date().toISOString()
+        }
+      ],
+      notes: data.notes ? [
+        {
+          id: `note-${Date.now()}`,
+          lead_id: newLeadId,
+          user_id: currentUser?.id || 'customer',
+          user_name: data.customerName,
+          body: `ملاحظات المعاينة من العميل: ${data.notes}`,
+          created_at: new Date().toISOString()
+        }
+      ] : []
+    };
+
+    setLeads(prev => [newLead, ...prev]);
+
+    // Send Sales notification
+    setNotifications(prev => [
+      {
+        id: `notif-${Date.now()}`,
+        user_id: 'user-sales-1',
+        type: 'NEW_LEAD',
+        title: 'طلب معاينة ميدانية جديد',
+        body: `طلب العميل ${data.customerName} معاينة العقار ${prop.reference_number} بتاريخ ${data.preferredDate} الساعة ${data.preferredTime}`,
+        related_type: 'LEAD',
+        related_id: newLeadId,
+        read_at: null,
+        created_at: new Date().toISOString()
+      },
+      ...prev
+    ]);
+
+    addAuditEntry({
+      actor_id: currentUser?.id || 'guest',
+      actor_name: data.customerName,
+      actor_role: currentUser?.role || 'CUSTOMER',
+      action: 'VIEWING_REQUEST_CREATED',
+      entity_type: 'LEAD',
+      entity_id: newLeadId,
+      metadata: { propertyId, preferredDate: data.preferredDate, preferredTime: data.preferredTime }
+    });
+
+    return { success: true, leadId: newLeadId };
+  }, [currentUser, properties, leads.length, addAuditEntry]);
+
+  // Schedule follow up
+  const scheduleFollowUp = useCallback((leadId: string, followUpDate: string, notes?: string) => {
+    setLeads(prev => prev.map(l => {
+      if (l.id === leadId) {
+        const newAct = {
+          id: `act-${Date.now()}`,
+          lead_id: leadId,
+          activity_type: 'FOLLOW_UP_SCHEDULED' as const,
+          description: `تم جدولة متابعة لاحقة مع العميل بتاريخ: ${followUpDate}`,
+          created_by: currentUser?.id || 'sales',
+          created_by_name: currentUser?.name || 'مسؤول مبيعات',
+          created_at: new Date().toISOString()
+        };
+
+        const newNotes = notes && notes.trim() ? [
+          {
+            id: `note-${Date.now()}`,
+            lead_id: leadId,
+            user_id: currentUser?.id || 'sales',
+            user_name: currentUser?.name || 'مسؤول مبيعات',
+            body: `جدولة متابعة: ${notes.trim()}`,
+            created_at: new Date().toISOString()
+          },
+          ...l.notes
+        ] : l.notes;
+
+        return {
+          ...l,
+          status: 'FOLLOW_UP' as const,
+          last_activity_at: new Date().toISOString(),
+          activities: [newAct, ...l.activities],
+          notes: newNotes
+        };
+      }
+      return l;
+    }));
+  }, [currentUser]);
+
+  // Mark lead contacted
+  const markLeadContacted = useCallback((leadId: string, notes?: string) => {
+    setLeads(prev => prev.map(l => {
+      if (l.id === leadId) {
+        const newAct = {
+          id: `act-${Date.now()}`,
+          lead_id: leadId,
+          activity_type: 'CALL_COMPLETED' as const,
+          description: `تم التواصل هاتفياً مع العميل والتحقق من الجدية والطلب`,
+          created_by: currentUser?.id || 'sales',
+          created_by_name: currentUser?.name || 'مسؤول مبيعات',
+          created_at: new Date().toISOString()
+        };
+
+        const newNotes = notes && notes.trim() ? [
+          {
+            id: `note-${Date.now()}`,
+            lead_id: leadId,
+            user_id: currentUser?.id || 'sales',
+            user_name: currentUser?.name || 'مسؤول مبيعات',
+            body: notes.trim(),
+            created_at: new Date().toISOString()
+          },
+          ...l.notes
+        ] : l.notes;
+
+        return {
+          ...l,
+          status: 'CONTACTED' as const,
+          last_activity_at: new Date().toISOString(),
+          activities: [newAct, ...l.activities],
+          notes: newNotes
+        };
+      }
+      return l;
+    }));
+  }, [currentUser]);
+
   // Master Data modifications
   const toggleGovernorateActive = useCallback((govId: string) => {
     setGovernorates(prev => prev.map(g => {
@@ -1519,11 +2046,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setAreas(prev => [...prev, newArea]);
   }, []);
 
-  const updatePropertyType = useCallback((typeId: string, updates: Partial<PropertyType>) => {
+  const updatePropertyType = useCallback((typeId: string, updates: UpdatePropertyTypePayload) => {
     setPropertyTypes(prev => prev.map(pt => pt.id === typeId ? { ...pt, ...updates, updated_at: new Date().toISOString() } : pt));
   }, []);
 
-  const updateSettings = useCallback((newSettings: Partial<SystemSetting>) => {
+  const updateSettings = useCallback((newSettings: UpdateSystemSettingsPayload) => {
     setSettings(prev => {
       const updated = { ...prev, ...newSettings, updated_at: new Date().toISOString() };
       addAuditEntry({
@@ -1556,31 +2083,117 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, []);
 
   const toggleFavorite = useCallback((propertyId: string) => {
-    if (!currentUser) {
-      openAuthModal('REGISTER');
-      return;
-    }
+    const effectiveUserId = currentUser?.id || 'guest';
     setFavorites(prev => {
-      const exists = prev.some(f => f.user_id === currentUser.id && f.property_id === propertyId);
+      // Filter out already expired favorites on each action
+      const validFavs = prev.filter(f => !f.expires_at || new Date(f.expires_at).getTime() > Date.now());
+      const exists = validFavs.some(f => f.user_id === effectiveUserId && f.property_id === propertyId);
       if (exists) {
-        return prev.filter(f => !(f.user_id === currentUser.id && f.property_id === propertyId));
+        return validFavs.filter(f => !(f.user_id === effectiveUserId && f.property_id === propertyId));
       } else {
         const newFav: Favorite = {
           id: `fav-${Date.now()}`,
-          user_id: currentUser.id,
+          user_id: effectiveUserId,
           property_id: propertyId,
           created_at: new Date().toISOString(),
           expires_at: new Date(Date.now() + 30 * 86400000).toISOString() // 30-day expiration
         };
-        return [...prev, newFav];
+        return [...validFavs, newFav];
       }
     });
-  }, [currentUser, openAuthModal]);
+  }, [currentUser]);
 
   const isFavorite = useCallback((propertyId: string) => {
-    if (!currentUser) return false;
-    return favorites.some(f => f.user_id === currentUser.id && f.property_id === propertyId);
+    const effectiveUserId = currentUser?.id || 'guest';
+    return favorites.some(f => 
+      f.user_id === effectiveUserId && 
+      f.property_id === propertyId && 
+      (!f.expires_at || new Date(f.expires_at).getTime() > Date.now())
+    );
   }, [currentUser, favorites]);
+
+  // Submit Customer Property Request (Demand capture when no matching inventory is found)
+  const submitPropertyRequest = useCallback((data: Omit<PropertyRequest, 'id' | 'reference_number' | 'created_at' | 'status'>) => {
+    const newId = `req-${Date.now()}`;
+    const refNum = `REQ-${String(propertyRequests.length + 101).padStart(5, '0')}`;
+    const newReq: PropertyRequest = {
+      ...data,
+      id: newId,
+      reference_number: refNum,
+      customer_id: currentUser?.id,
+      source: data.source || 'طلب عقار بمواصفات خاصة (Demand Capture)',
+      status: 'PENDING',
+      created_at: new Date().toISOString()
+    };
+
+    setPropertyRequests(prev => [newReq, ...prev]);
+
+    // Phase 5 & 6 requirement: The customer request immediately creates a Lead for Rawabet team
+    const newLeadId = `lead-${Date.now()}`;
+    const leadRef = `LEAD-${String(leads.length + 1).padStart(6, '0')}`;
+    const formattedBudget = new Intl.NumberFormat('ar-EG').format(data.budget);
+
+    const newLead: Lead = {
+      id: newLeadId,
+      reference_number: leadRef,
+      customer_id: currentUser?.id || `cust-req-${Date.now()}`,
+      customer_name: data.full_name,
+      customer_mobile: data.whatsapp_number,
+      customer_email: currentUser?.email || '',
+      property_id: 'SPECIAL_REQUEST',
+      property_reference: refNum,
+      property_title: `طلب عقار بمواصفات خاصة: ${data.property_type} (${data.transaction_type === 'BUY' ? 'شراء' : 'إيجار'}) - ميزانية ${formattedBudget} ج.م`,
+      status: 'NEW',
+      source: data.source || 'طلب عقار بمواصفات خاصة (Demand Capture)',
+      contact_channel: 'WHATSAPP',
+      assigned_to: 'user-sales-1',
+      assigned_user_name: 'سارة يوسف (مسؤول مبيعات)',
+      last_activity_at: new Date().toISOString(),
+      created_at: new Date().toISOString(),
+      activities: [
+        {
+          id: `act-${Date.now()}-1`,
+          lead_id: newLeadId,
+          activity_type: 'CREATED',
+          channel: 'WHATSAPP',
+          description: `تسجيل طلب عقار بمواصفات خاصة: ${data.property_type} في ${data.city_or_area} (${data.governorate})، ميزانية: ${formattedBudget} جنيه`,
+          created_by: currentUser?.id || 'customer',
+          created_by_name: data.full_name,
+          created_at: new Date().toISOString()
+        }
+      ],
+      notes: [
+        {
+          id: `note-${Date.now()}-1`,
+          lead_id: newLeadId,
+          user_id: 'system',
+          user_name: 'نظام إدارة الطلبات',
+          body: `المحافظة: ${data.governorate} | المنطقة/المدينة: ${data.city_or_area} | المساحة: ${data.area_sqm || 'غير محدد'} م² | الغرف: ${data.bedrooms || 'غير محدد'} | ملاحظات العميل: ${data.additional_notes || 'لا توجد'}`,
+          created_at: new Date().toISOString()
+        }
+      ]
+    };
+
+    setLeads(prev => [newLead, ...prev]);
+
+    // Notify Sales team
+    setNotifications(prev => [
+      {
+        id: `notif-${Date.now()}`,
+        user_id: 'user-sales-1',
+        type: 'NEW_LEAD',
+        title: 'طلب عقار جديد بمواصفات خاصة',
+        body: `سجل العميل ${data.full_name} طلباً لـ (${data.property_type}) بميزانية ${formattedBudget} ج.م في ${data.city_or_area}.`,
+        related_type: 'LEAD',
+        related_id: newLeadId,
+        read_at: null,
+        created_at: new Date().toISOString()
+      },
+      ...prev
+    ]);
+
+    return { success: true, request: newReq };
+  }, [currentUser, propertyRequests.length, leads.length]);
 
   const unreadNotificationsCount = notifications.filter(n => {
     if (!currentUser) return false;
@@ -1666,90 +2279,182 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       { id: 'fav-1', user_id: 'user-cust-1', property_id: 'prop-101', created_at: new Date().toISOString(), expires_at: new Date(Date.now() + 30 * 86400000).toISOString() }
     ]);
     setCompareIds([]);
-    localStorage.clear();
+    try {
+      localStorage.removeItem(UI_PREF_COMPARE_KEY);
+      localStorage.removeItem(UI_PREF_FAVORITES_KEY);
+    } catch {}
   }, []);
 
+  const contextValue: AppContextType = useMemo(() => ({
+    currentUser,
+    users,
+    properties,
+    leads,
+    governorates,
+    cities,
+    areas,
+    propertyTypes,
+    transactionTypes,
+    settings,
+    helpResources,
+    auditLogs,
+    notifications,
+    favorites,
+    compareIds,
+    addToCompare,
+    removeFromCompare,
+    clearCompare,
+    isInCompare,
+    contactInquiries,
+    submitContactInquiry,
+    updateContactInquiryStatus,
+    authModal,
+    unreadNotificationsCount,
+    userProfile: currentUser?.user_profile,
+    sellerProfile: currentUser?.seller_profile,
+    setCurrentUser,
+    switchPersona,
+    openAuthModal,
+    closeAuthModal,
+    login,
+    forgotPassword,
+    registerUser,
+    verifyOTP,
+    loginWithEmail,
+    logout,
+    updateProfile,
+    activateSellerCapability,
+    enableSellerRole,
+    requestSellerVerification,
+    reviewSellerVerification,
+    toggleUserStatus,
+    createInternalUser,
+    updateUserPermissions,
+    getPublishedProperties,
+    getMyProperties,
+    getPropertyById,
+    savePropertyDraft,
+    submitPropertyForReview,
+    approvePropertyVersion,
+    approveVersion: approvePropertyVersion,
+    rejectPropertyVersion,
+    rejectVersion: rejectPropertyVersion,
+    startPropertyReview,
+    requestPropertyModification,
+    editPublishedPropertyAsRevision,
+    directInternalEditPublishedProperty,
+    markPropertyStatus,
+    validateForbiddenContact,
+    createLeadFromInteraction,
+    createLead: createLeadFromInteraction,
+    createViewingRequest,
+    updateLeadStatus,
+    addLeadNote,
+    assignLead,
+    scheduleFollowUp,
+    markLeadContacted,
+    toggleGovernorateActive,
+    addGovernorate,
+    toggleCityActive,
+    addCity,
+    addArea,
+    updatePropertyType,
+    updateSettings,
+    addHelpResource,
+    markNotificationAsRead,
+    markAllNotificationsAsRead,
+    toggleFavorite,
+    isFavorite,
+    propertyRequests,
+    submitPropertyRequest,
+    hasPermission,
+    addAuditEntry,
+    resetToDefaultData,
+    resetToDefault: resetToDefaultData
+  }), [
+    currentUser,
+    users,
+    properties,
+    leads,
+    governorates,
+    cities,
+    areas,
+    propertyTypes,
+    transactionTypes,
+    settings,
+    helpResources,
+    auditLogs,
+    notifications,
+    favorites,
+    compareIds,
+    addToCompare,
+    removeFromCompare,
+    clearCompare,
+    isInCompare,
+    contactInquiries,
+    submitContactInquiry,
+    updateContactInquiryStatus,
+    authModal,
+    unreadNotificationsCount,
+    setCurrentUser,
+    switchPersona,
+    openAuthModal,
+    closeAuthModal,
+    login,
+    forgotPassword,
+    registerUser,
+    verifyOTP,
+    loginWithEmail,
+    logout,
+    updateProfile,
+    activateSellerCapability,
+    enableSellerRole,
+    requestSellerVerification,
+    reviewSellerVerification,
+    toggleUserStatus,
+    createInternalUser,
+    updateUserPermissions,
+    getPublishedProperties,
+    getMyProperties,
+    getPropertyById,
+    savePropertyDraft,
+    submitPropertyForReview,
+    approvePropertyVersion,
+    rejectPropertyVersion,
+    startPropertyReview,
+    requestPropertyModification,
+    editPublishedPropertyAsRevision,
+    directInternalEditPublishedProperty,
+    markPropertyStatus,
+    validateForbiddenContact,
+    createLeadFromInteraction,
+    createViewingRequest,
+    updateLeadStatus,
+    addLeadNote,
+    assignLead,
+    scheduleFollowUp,
+    markLeadContacted,
+    toggleGovernorateActive,
+    addGovernorate,
+    toggleCityActive,
+    addCity,
+    addArea,
+    updatePropertyType,
+    updateSettings,
+    addHelpResource,
+    markNotificationAsRead,
+    markAllNotificationsAsRead,
+    toggleFavorite,
+    isFavorite,
+    propertyRequests,
+    submitPropertyRequest,
+    hasPermission,
+    addAuditEntry,
+    resetToDefaultData
+  ]);
+
   return (
-    <AppContext.Provider
-      value={{
-        currentUser,
-        users,
-        properties,
-        leads,
-        governorates,
-        cities,
-        areas,
-        propertyTypes,
-        transactionTypes,
-        settings,
-        helpResources,
-        auditLogs,
-        notifications,
-        favorites,
-        compareIds,
-        addToCompare,
-        removeFromCompare,
-        clearCompare,
-        isInCompare,
-        contactInquiries,
-        submitContactInquiry,
-        updateContactInquiryStatus,
-        authModal,
-        unreadNotificationsCount,
-        userProfile: currentUser?.user_profile,
-        sellerProfile: currentUser?.seller_profile,
-        setCurrentUser,
-        switchPersona,
-        openAuthModal,
-        closeAuthModal,
-        registerUser,
-        verifyOTP,
-        loginWithEmail,
-        logout,
-        updateProfile,
-        activateSellerCapability,
-        enableSellerRole,
-        requestSellerVerification,
-        reviewSellerVerification,
-        toggleUserStatus,
-        createInternalUser,
-        updateUserPermissions,
-        getPublishedProperties,
-        getMyProperties,
-        getPropertyById,
-        savePropertyDraft,
-        submitPropertyForReview,
-        approvePropertyVersion,
-        approveVersion: approvePropertyVersion,
-        rejectPropertyVersion,
-        rejectVersion: rejectPropertyVersion,
-        editPublishedPropertyAsRevision,
-        directInternalEditPublishedProperty,
-        markPropertyStatus,
-        validateForbiddenContact,
-        createLeadFromInteraction,
-        createLead: createLeadFromInteraction,
-        updateLeadStatus,
-        addLeadNote,
-        assignLead,
-        toggleGovernorateActive,
-        addGovernorate,
-        toggleCityActive,
-        addCity,
-        addArea,
-        updatePropertyType,
-        updateSettings,
-        addHelpResource,
-        markNotificationAsRead,
-        markAllNotificationsAsRead,
-        toggleFavorite,
-        isFavorite,
-        hasPermission,
-        addAuditEntry,
-        resetToDefaultData,
-        resetToDefault: resetToDefaultData
-      }}
-    >
+    <AppContext.Provider value={contextValue}>
       {children}
     </AppContext.Provider>
   );

@@ -51,8 +51,8 @@ export const HelpGuideView: React.FC<HelpGuideViewProps> = ({ onOpenAddProperty 
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12 text-right">
       
       {/* Hero Guide Banner */}
-      <div className="bg-gradient-to-r from-emerald-900 via-slate-900 to-slate-900 text-white rounded-3xl p-8 sm:p-10 border border-emerald-800/40 shadow-xl space-y-4">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-bold">
+      <div className="bg-gradient-to-r from-emerald-900 via-slate-900 to-slate-900 text-white rounded-xl p-8 sm:p-10 border border-emerald-800/40 shadow-xl space-y-4">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-bold">
           <HelpCircle className="w-4 h-4" />
           <span>مركز المساعدة وإرشادات النشر في كفر الشيخ</span>
         </div>
@@ -66,14 +66,14 @@ export const HelpGuideView: React.FC<HelpGuideViewProps> = ({ onOpenAddProperty 
         <div className="pt-2 flex flex-wrap items-center gap-3">
           <button
             onClick={onOpenAddProperty}
-            className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-extrabold rounded-2xl transition shadow-lg shadow-emerald-600/30"
+            className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-extrabold rounded-xl transition shadow-lg shadow-emerald-600/30"
           >
             + أضف عقارك الآن
           </button>
 
           <a
             href={`tel:${settings.primary_phone}`}
-            className="px-5 py-3 bg-white/10 hover:bg-white/20 text-white text-xs sm:text-sm font-bold rounded-2xl transition border border-white/20 flex items-center gap-2"
+            className="px-5 py-3 bg-white/10 hover:bg-white/20 text-white text-xs sm:text-sm font-bold rounded-xl transition border border-white/20 flex items-center gap-2"
           >
             <PhoneCall className="w-4 h-4 text-emerald-400" />
             <span>تحدث مع مستشار روابط: {settings.primary_phone}</span>
@@ -81,55 +81,67 @@ export const HelpGuideView: React.FC<HelpGuideViewProps> = ({ onOpenAddProperty 
         </div>
       </div>
 
-      {/* 4-Step Publishing Workflow */}
+      {/* 4-Step How Rawabet Works Workflow */}
       <div className="space-y-6">
-        <div className="text-right">
+        <div className="text-right space-y-1.5">
           <h2 className="text-xl sm:text-2xl font-black text-slate-900">كيف تعمل منصة روابط؟</h2>
-          <p className="text-xs text-slate-500 font-medium mt-1">رحلة العقار من التسجيل وحتى إتمام الصفقة</p>
+          <p className="text-xs sm:text-sm text-slate-600 font-medium max-w-3xl leading-relaxed">
+            يقوم فريق روابط بمراجعة الطلبات وتنظيم المعاينات ومرافقة العميل وتنسيق المواعيد لتوفير الوقت والجهد والوصول إلى القرار المناسب.
+          </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           
-          <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-xs space-y-3 relative overflow-hidden">
-            <div className="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-800 font-black flex items-center justify-center text-sm">
+          <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-xs space-y-3 relative overflow-hidden">
+            <div className="w-8 h-8 rounded-xl bg-[#f2f7f2] text-[#14a800] font-black flex items-center justify-center text-sm">
               1
             </div>
-            <h3 className="text-sm font-extrabold text-slate-900">إدخال بيانات العقار</h3>
+            <h3 className="text-sm font-extrabold text-slate-900">ابحث واكتشف العقارات المناسبة</h3>
             <p className="text-xs text-slate-600 leading-relaxed">
-              قم بملء النموذج السهل في 4 خطوات مع رفع صور واضحة وتحديد العنوان الدقيق سراً.
+              استعراض خيارات متنوعة وموثقة تناسب متطلباتك وميزانيتك بدقة ووضوح.
             </p>
           </div>
 
-          <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-xs space-y-3 relative overflow-hidden">
-            <div className="w-8 h-8 rounded-xl bg-blue-100 text-blue-800 font-black flex items-center justify-center text-sm">
+          <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-xs space-y-3 relative overflow-hidden">
+            <div className="w-8 h-8 rounded-xl bg-[#f2f7f2] text-[#14a800] font-black flex items-center justify-center text-sm">
               2
             </div>
-            <h3 className="text-sm font-extrabold text-slate-900">الفحص الهندسي والمراجعة</h3>
+            <h3 className="text-sm font-extrabold text-slate-900">قارن الخيارات المتاحة</h3>
             <p className="text-xs text-slate-600 leading-relaxed">
-              يقوم مراجع روابط بفحص العقار والتحقق من سلامة الأوراق ومنع أي تضارب سعري.
+              مقارنة الأسعار والمواصفات والمواقع لاختيار الأنسب لك بكل سهولة وشفافية.
             </p>
           </div>
 
-          <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-xs space-y-3 relative overflow-hidden">
-            <div className="w-8 h-8 rounded-xl bg-purple-100 text-purple-800 font-black flex items-center justify-center text-sm">
+          <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-xs space-y-3 relative overflow-hidden">
+            <div className="w-8 h-8 rounded-xl bg-[#f2f7f2] text-[#14a800] font-black flex items-center justify-center text-sm">
               3
             </div>
-            <h3 className="text-sm font-extrabold text-slate-900">النشر والتسويق الآمن</h3>
+            <h3 className="text-sm font-extrabold text-slate-900">تواصل مع فريق روابط</h3>
             <p className="text-xs text-slate-600 leading-relaxed">
-              ينشر العقار برقم مرجعي مميز بدون كشف رقم هاتفك للمحافظة على خصوصيتك.
+              تواصل مباشر مع فريقنا للإجابة على استفساراتك وتوضيح كافة التفاصيل.
             </p>
           </div>
 
-          <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-xs space-y-3 relative overflow-hidden">
-            <div className="w-8 h-8 rounded-xl bg-amber-100 text-amber-800 font-black flex items-center justify-center text-sm">
+          <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-xs space-y-3 relative overflow-hidden">
+            <div className="w-8 h-8 rounded-xl bg-[#14a800] text-white font-black flex items-center justify-center text-sm">
               4
             </div>
-            <h3 className="text-sm font-extrabold text-slate-900">معاينة جادة وإتمام</h3>
+            <h3 className="text-sm font-extrabold text-slate-900">نظم المعاينة واتخذ قرارك بثقة</h3>
             <p className="text-xs text-slate-600 leading-relaxed">
-              يرافق مندوب المبيعات المشتري الجاد للمعاينة الميدانية ومساعدتك في توقيع العقود.
+              تنسيق موعد معاينة ميدانية بمرافقة فريق روابط للتحقق الميداني والاطمئنان.
             </p>
           </div>
 
+        </div>
+
+        {/* Customer Service Message */}
+        <div className="p-4 sm:p-5 rounded-xl bg-[#f2f7f2] border border-[#14a800]/20 flex items-center gap-3">
+          <div className="p-2.5 bg-[#14a800] text-white rounded-xl shrink-0">
+            <PhoneCall className="w-5 h-5" />
+          </div>
+          <p className="text-xs sm:text-sm font-bold text-[#001e00]">
+            يتواصل معك فريق خدمة عملاء روابط لمساعدتك والإجابة على استفساراتك وتنظيم خطواتك القادمة.
+          </p>
         </div>
       </div>
 
@@ -142,8 +154,8 @@ export const HelpGuideView: React.FC<HelpGuideViewProps> = ({ onOpenAddProperty 
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           
-          <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-xs space-y-4">
-            <div className="w-10 h-10 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center">
+          <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-xs space-y-4">
+            <div className="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center">
               <FileText className="w-5 h-5" />
             </div>
             <div>
@@ -161,8 +173,8 @@ export const HelpGuideView: React.FC<HelpGuideViewProps> = ({ onOpenAddProperty 
             </button>
           </div>
 
-          <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-xs space-y-4">
-            <div className="w-10 h-10 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center">
+          <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-xs space-y-4">
+            <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
               <ShieldCheck className="w-5 h-5" />
             </div>
             <div>
@@ -180,8 +192,8 @@ export const HelpGuideView: React.FC<HelpGuideViewProps> = ({ onOpenAddProperty 
             </button>
           </div>
 
-          <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-xs space-y-4">
-            <div className="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+          <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-xs space-y-4">
+            <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
               <Video className="w-5 h-5" />
             </div>
             <div>
@@ -205,7 +217,7 @@ export const HelpGuideView: React.FC<HelpGuideViewProps> = ({ onOpenAddProperty 
       </div>
 
       {/* FAQ Accordion */}
-      <div className="bg-white rounded-3xl p-8 border border-slate-200 shadow-xs space-y-6">
+      <div className="bg-white rounded-xl p-8 border border-slate-200 shadow-xs space-y-6">
         <h2 className="text-xl font-black text-slate-900">الأسئلة الأكثر شيوعاً (FAQ)</h2>
 
         <div className="divide-y divide-slate-100">

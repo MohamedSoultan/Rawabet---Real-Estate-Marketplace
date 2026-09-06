@@ -59,6 +59,7 @@ export const LeadsCRMView: React.FC = () => {
     WHATSAPP_CONTACT_INITIATED: { label: 'تواصل واتساب', color: 'bg-green-100 text-green-900 border-green-300' },
     CALL_CONTACT_INITIATED: { label: 'اتصال هاتفي', color: 'bg-blue-100 text-blue-900 border-blue-300' },
     CONTACTED: { label: 'تم التواصل الأولي', color: 'bg-cyan-100 text-cyan-900 border-cyan-300' },
+    INTERESTED: { label: 'عميل مهتم وجاد', color: 'bg-indigo-100 text-indigo-900 border-indigo-300' },
     FOLLOW_UP: { label: 'متابعة وتجهيز', color: 'bg-amber-100 text-amber-900 border-amber-300' },
     VIEWING: { label: 'معاينة ميدانية', color: 'bg-purple-100 text-purple-900 border-purple-300' },
     WON: { label: 'تمت الصفقة بنجاح 🎉', color: 'bg-emerald-200 text-emerald-950 border-emerald-400 font-bold' },
@@ -128,7 +129,7 @@ export const LeadsCRMView: React.FC = () => {
         {/* Leads Table (Left) */}
         <div className="lg:col-span-7 space-y-3">
           {filteredLeads.length === 0 ? (
-            <div className="bg-white rounded-3xl p-12 text-center border border-slate-200 text-slate-400 text-xs">
+            <div className="bg-white rounded-xl p-12 text-center border border-slate-200 text-slate-400 text-xs">
               لا توجد طلبات في هذا التصنيف حالياً.
             </div>
           ) : (
@@ -144,7 +145,7 @@ export const LeadsCRMView: React.FC = () => {
                     setNewStatus(lead.status);
                     setSelectedAssignee(lead.assigned_to || '');
                   }}
-                  className={`p-4 rounded-2xl border transition cursor-pointer space-y-2 text-right ${
+                  className={`p-4 rounded-xl border transition cursor-pointer space-y-2 text-right ${
                     isSelected
                       ? 'border-emerald-600 bg-emerald-50/70 ring-2 ring-emerald-500/20 shadow-md'
                       : 'border-slate-200 bg-white hover:bg-slate-50'
@@ -186,7 +187,7 @@ export const LeadsCRMView: React.FC = () => {
         {/* Lead Activity Inspector & Status Changer (Right) */}
         <div className="lg:col-span-5">
           {selectedLead ? (
-            <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-lg space-y-6 text-right animate-in fade-in">
+            <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-lg space-y-6 text-right animate-in fade-in">
               
               {/* Lead Top Details */}
               <div className="space-y-2 pb-4 border-b border-slate-100">
@@ -285,7 +286,7 @@ export const LeadsCRMView: React.FC = () => {
                     <label className="block text-[10px] font-bold text-slate-600 mb-1">تحديث الحالة إلى</label>
                     <select
                       value={newStatus}
-                      onChange={e => setNewStatus(e.target.value as any)}
+                      onChange={e => setNewStatus(e.target.value as LeadStatus)}
                       className="w-full px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold"
                     >
                       <option value="NEW">طلب جديد</option>
@@ -334,7 +335,7 @@ export const LeadsCRMView: React.FC = () => {
 
             </div>
           ) : (
-            <div className="bg-slate-50 rounded-3xl p-12 text-center border border-dashed border-slate-300 text-slate-400 text-xs">
+            <div className="bg-slate-50 rounded-xl p-12 text-center border border-dashed border-slate-300 text-slate-400 text-xs">
               اختر طلباً من القائمة للاطلاع على سجله وتسجيل الأنشطة والمعاينات.
             </div>
           )}

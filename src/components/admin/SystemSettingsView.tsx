@@ -16,11 +16,11 @@ import {
 export const SystemSettingsView: React.FC = () => {
   const { settings, updateSettings, helpResources, addHelpResource, hasPermission } = useApp();
 
-  const [primaryPhone, setPrimaryPhone] = useState(settings.primary_phone || '01099887766');
-  const [whatsappNumber, setWhatsappNumber] = useState(settings.whatsapp_number || '01099887766');
-  const [supportEmail, setSupportEmail] = useState(settings.support_email || 'support@rawabet.com');
-  const [reviewHours, setReviewHours] = useState<string>(String(settings.property_review_sla_hours || 24));
-  const [termsArabic, setTermsArabic] = useState(settings.terms_and_conditions_ar || '');
+  const [primaryPhone, setPrimaryPhone] = useState(settings.primary_phone || '01000920759');
+  const [whatsappNumber, setWhatsappNumber] = useState(settings.primary_whatsapp || settings.whatsapp_phone || '201000920759');
+  const [supportEmail, setSupportEmail] = useState(settings.support_email || 'contact@rawabet-eg.com');
+  const [reviewHours, setReviewHours] = useState<string>('24');
+  const [termsArabic, setTermsArabic] = useState(settings.terms_ar || '');
   const [toastMsg, setToastMsg] = useState<string | null>(null);
 
   // New help resource
@@ -28,17 +28,18 @@ export const SystemSettingsView: React.FC = () => {
   const [newHelpUrl, setNewHelpUrl] = useState('');
   const [newHelpType, setNewHelpType] = useState<'PDF' | 'VIDEO' | 'GUIDE'>('GUIDE');
 
-  const canEditSettings = true;
+  // Dynamic permission check
+  const canEditSettings = hasPermission('settings.manage') || hasPermission('PERM_MANAGE_SYSTEM_SETTINGS');
 
   const handleSaveSettings = (e: React.FormEvent) => {
     e.preventDefault();
 
     updateSettings({
       primary_phone: primaryPhone.trim(),
-      whatsapp_number: whatsappNumber.trim(),
+      primary_whatsapp: whatsappNumber.trim(),
+      whatsapp_phone: whatsappNumber.trim(),
       support_email: supportEmail.trim(),
-      property_review_sla_hours: Number(reviewHours) || 24,
-      terms_and_conditions_ar: termsArabic
+      terms_ar: termsArabic
     });
 
     setToastMsg('تم حفظ إعدادات النظام بنجاح!');
@@ -51,9 +52,10 @@ export const SystemSettingsView: React.FC = () => {
 
     addHelpResource({
       title: newHelpTitle.trim(),
-      type: newHelpType,
+      resource_type: newHelpType === 'VIDEO' ? 'YOUTUBE' : newHelpType === 'PDF' ? 'PDF' : 'ARTICLE',
       url: newHelpUrl.trim() || 'https://rawabet.com/guide',
-      category: 'SELLER'
+      is_active: true,
+      sort_order: helpResources.length + 1
     });
 
     setToastMsg('تمت إضافة المورد التعليمي بنجاح!');
@@ -76,14 +78,14 @@ export const SystemSettingsView: React.FC = () => {
       </div>
 
       {toastMsg && (
-        <div className="p-3 bg-emerald-600 text-white text-xs font-bold rounded-2xl flex items-center justify-center gap-2 animate-in slide-in-from-top-1">
+        <div className="p-3 bg-emerald-600 text-white text-xs font-bold rounded-xl flex items-center justify-center gap-2 animate-in slide-in-from-top-1">
           <CheckCircle2 className="w-4 h-4" />
           <span>{toastMsg}</span>
         </div>
       )}
 
       {/* Main Settings Form */}
-      <form onSubmit={handleSaveSettings} className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-xs space-y-6">
+      <form onSubmit={handleSaveSettings} className="bg-white rounded-xl p-6 sm:p-8 border border-slate-200 shadow-xs space-y-6">
         <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
           <Settings className="w-5 h-5 text-emerald-600" />
           <span>قنوات الاتصال الرسمية لمنصة روابط</span>
@@ -172,14 +174,14 @@ export const SystemSettingsView: React.FC = () => {
       </form>
 
       {/* Help Resources Management (A-14) */}
-      <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-xs space-y-6">
+      <div className="bg-white rounded-xl p-6 sm:p-8 border border-slate-200 shadow-xs space-y-6">
         <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
           <HelpCircle className="w-5 h-5 text-purple-600" />
           <span>إدارة دليل المالك والموارد الإرشادية (Help Resources)</span>
         </h3>
 
         {/* Add Help Resource Form */}
-        <form onSubmit={handleAddHelp} className="p-4 bg-slate-50 rounded-2xl border border-slate-200 grid grid-cols-1 sm:grid-cols-4 gap-3">
+        <form onSubmit={handleAddHelp} className="p-4 bg-slate-50 rounded-xl border border-slate-200 grid grid-cols-1 sm:grid-cols-4 gap-3">
           <div className="sm:col-span-2">
             <input
               type="text"
@@ -194,7 +196,7 @@ export const SystemSettingsView: React.FC = () => {
           <div>
             <select
               value={newHelpType}
-              onChange={e => setNewHelpType(e.target.value as any)}
+              onChange={e => setNewHelpType(e.target.value as 'PDF' | 'VIDEO' | 'GUIDE')}
               className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-bold"
             >
               <option value="GUIDE">مقال إرشادي</option>
@@ -220,7 +222,7 @@ export const SystemSettingsView: React.FC = () => {
             <div key={hr.id} className="p-3 rounded-xl border border-slate-200 flex items-center justify-between text-xs">
               <div className="flex items-center gap-2">
                 <span className="px-2 py-0.5 rounded bg-purple-100 text-purple-800 text-[10px] font-bold">
-                  {hr.type}
+                  {hr.resource_type}
                 </span>
                 <span className="font-bold text-slate-800">{hr.title}</span>
               </div>

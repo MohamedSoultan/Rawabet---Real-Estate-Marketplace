@@ -27,7 +27,7 @@ export const ContactUsView: React.FC<ContactUsViewProps> = ({ onExplorePropertie
   const [mobile, setMobile] = useState(currentUser?.mobile || '');
   const [email, setEmail] = useState(currentUser?.email || '');
   const [subject, setSubject] = useState('');
-  const [category, setCategory] = useState<'BUYER_INQUIRY' | 'SELLER_SUPPORT' | 'VERIFICATION_REQUEST' | 'GENERAL'>('BUYER_INQUIRY');
+  const [category, setCategory] = useState<'BUYER_INQUIRY' | 'SELLER_SUPPORT' | 'GENERAL' | 'PARTNERSHIP' | 'COMPLAINT'>('BUYER_INQUIRY');
   const [message, setMessage] = useState('');
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -63,15 +63,15 @@ export const ContactUsView: React.FC<ContactUsViewProps> = ({ onExplorePropertie
       
       {/* Header */}
       <div className="text-center max-w-3xl mx-auto space-y-3">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#f2f7f2] text-[#14a800] border border-[#14a800]/30 text-xs font-black">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-[#f2f7f2] text-[#14a800] border border-[#14a800]/30 text-xs font-black">
           <MessageSquare className="w-3.5 h-3.5" />
           <span>خدمة عملاء ومعاينات روابط</span>
         </div>
         <h1 className="text-2xl sm:text-4xl font-black text-[#001e00]">
           تواصل مع فريق روابط العقاري
         </h1>
-        <p className="text-xs sm:text-sm text-slate-500 font-medium leading-relaxed">
-          يسعدنا الرد على استفساراتكم بشأن حجز مواعيد المعاينات، توثيق العقارات، أو الشراكات العقارية في محافظة كفر الشيخ والدلتا.
+        <p className="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed">
+          يتواصل معك فريق خدمة عملاء روابط لمساعدتك والإجابة على استفساراتك وتنظيم خطواتك القادمة.
         </p>
       </div>
 
@@ -81,7 +81,7 @@ export const ContactUsView: React.FC<ContactUsViewProps> = ({ onExplorePropertie
         <div className="lg:col-span-5 space-y-5">
           
           {/* Main Channels Card */}
-          <div className="bg-[#001e00] text-white p-6 rounded-3xl border border-[#003a00] shadow-xl space-y-5">
+          <div className="bg-[#001e00] text-white p-6 rounded-xl border border-[#003a00] shadow-xl space-y-5">
             <h3 className="text-base font-black text-white flex items-center gap-2">
               <Sparkles className="w-4 h-4 text-[#14a800]" />
               <span>قنوات الاتصال المباشرة</span>
@@ -90,7 +90,7 @@ export const ContactUsView: React.FC<ContactUsViewProps> = ({ onExplorePropertie
             <div className="space-y-4 text-xs">
               <a 
                 href={`tel:${settings?.primary_phone || '01000920759'}`}
-                className="flex items-center gap-3.5 p-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 transition group"
+                className="flex items-center gap-3.5 p-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition group"
               >
                 <div className="w-10 h-10 rounded-xl bg-[#14a800] text-white flex items-center justify-center shrink-0">
                   <Phone className="w-5 h-5" />
@@ -105,7 +105,7 @@ export const ContactUsView: React.FC<ContactUsViewProps> = ({ onExplorePropertie
                 href={`https://wa.me/${(settings?.primary_whatsapp || settings?.whatsapp_phone || '201000920759').replace(/\D/g, '')}`}
                 target="_blank"
                 rel="noreferrer"
-                className="flex items-center gap-3.5 p-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 transition group"
+                className="flex items-center gap-3.5 p-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition group"
               >
                 <div className="w-10 h-10 rounded-xl bg-[#25d366] text-slate-950 flex items-center justify-center shrink-0 font-bold">
                   <MessageSquare className="w-5 h-5" />
@@ -118,7 +118,7 @@ export const ContactUsView: React.FC<ContactUsViewProps> = ({ onExplorePropertie
 
               <a 
                 href={`mailto:${settings?.support_email || 'contact@rawabet-eg.com'}`}
-                className="flex items-center gap-3.5 p-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 transition group"
+                className="flex items-center gap-3.5 p-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition group"
               >
                 <div className="w-10 h-10 rounded-xl bg-white/10 text-white flex items-center justify-center shrink-0">
                   <Mail className="w-5 h-5" />
@@ -143,7 +143,7 @@ export const ContactUsView: React.FC<ContactUsViewProps> = ({ onExplorePropertie
           </div>
 
           {/* Assurance Note */}
-          <div className="p-5 bg-white rounded-3xl border border-[#e4ebe4] shadow-2xs space-y-2 text-xs">
+          <div className="p-5 bg-white rounded-xl border border-[#e4ebe4] shadow-2xs space-y-2 text-xs">
             <div className="flex items-center gap-2 font-black text-[#001e00]">
               <ShieldCheck className="w-4 h-4 text-[#14a800]" />
               <span>ضمان الرد السريع</span>
@@ -156,7 +156,7 @@ export const ContactUsView: React.FC<ContactUsViewProps> = ({ onExplorePropertie
         </div>
 
         {/* Right Side: Interactive Inquiry Form */}
-        <div className="lg:col-span-7 bg-white p-6 sm:p-8 rounded-3xl border border-[#e4ebe4] shadow-2xs space-y-5">
+        <div className="lg:col-span-7 bg-white p-6 sm:p-8 rounded-xl border border-[#e4ebe4] shadow-2xs space-y-5">
           <div className="border-b border-[#e4ebe4] pb-3">
             <h3 className="text-lg font-black text-[#001e00]">أرسل استفسارك مباشرة</h3>
             <p className="text-xs text-slate-500 font-medium mt-0.5">
@@ -165,7 +165,7 @@ export const ContactUsView: React.FC<ContactUsViewProps> = ({ onExplorePropertie
           </div>
 
           {isSubmitted && (
-            <div className="p-4 bg-[#f2f7f2] border border-[#14a800]/30 rounded-2xl text-xs font-bold text-[#001e00] flex items-center gap-3 animate-soft-fade">
+            <div className="p-4 bg-[#f2f7f2] border border-[#14a800]/30 rounded-xl text-xs font-bold text-[#001e00] flex items-center gap-3 animate-soft-fade">
               <CheckCircle2 className="w-5 h-5 text-[#14a800] shrink-0" />
               <div>
                 <div className="font-black text-sm">تم إرسال رسالتك بنجاح!</div>
@@ -191,16 +191,18 @@ export const ContactUsView: React.FC<ContactUsViewProps> = ({ onExplorePropertie
                 نوع الاستفسار أو الطلب <span className="text-rose-500">*</span>
               </label>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                {[
-                  { id: 'BUYER_INQUIRY', label: 'حجز معاينة عقار' },
-                  { id: 'SELLER_SUPPORT', label: 'إضافة ونشر عقار' },
-                  { id: 'VERIFICATION_REQUEST', label: 'توثيق حساب مالك' },
-                  { id: 'GENERAL', label: 'استفسار عام' }
-                ].map(cat => (
+                {(
+                  [
+                    { id: 'BUYER_INQUIRY', label: 'حجز معاينة عقار' },
+                    { id: 'SELLER_SUPPORT', label: 'إضافة ودعم عقار' },
+                    { id: 'PARTNERSHIP', label: 'شراكة ووسطاء' },
+                    { id: 'GENERAL', label: 'استفسار عام' }
+                  ] as const
+                ).map(cat => (
                   <button
                     type="button"
                     key={cat.id}
-                    onClick={() => setCategory(cat.id as any)}
+                    onClick={() => setCategory(cat.id)}
                     className={`py-2 px-2 rounded-xl text-xs font-bold transition text-center cursor-pointer whitespace-nowrap ${
                       category === cat.id
                         ? 'bg-[#14a800] text-white shadow-2xs'

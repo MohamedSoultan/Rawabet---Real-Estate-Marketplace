@@ -1,26 +1,27 @@
-import React, { useState, useMemo } from 'react';
-import { Property } from '../../types';
+import React, { useState, useMemo, useEffect, useCallback, lazy, Suspense } from 'react';
+import { Property, FilterCriteria, PropertySortOption, PropertyFilterState } from '../../types';
 import { useApp } from '../../context/AppContext';
+import { filterProperties, sortProperties, toFilterCriteria } from '../../services/filterEngine';
 import { PropertyCard } from './PropertyCard';
-import { Filter, RotateCcw, ArrowUpDown, ChevronRight, ChevronLeft, Building2, MapPin } from 'lucide-react';
+import { Pagination } from '../common/Pagination';
+import { FloatingFilterButton } from './FloatingFilterButton';
+import { Filter, RotateCcw, ArrowUpDown, ChevronRight, ChevronLeft, Building2, MapPin, Sparkles, LayoutGrid, List, X, SlidersHorizontal, ChevronDown, Search } from 'lucide-react';
+
+// Lazy-load RequestPropertyModal on demand
+const RequestPropertyModal = lazy(() => import('./RequestPropertyModal').then(m => ({ default: m.RequestPropertyModal })));
 
 interface PropertyListingViewProps {
-  initialFilters?: {
-    governorate_id?: string;
-    city_id?: string;
-    area_id?: string;
-    property_type_id?: string;
-    transaction_type_id?: string;
-    max_price?: number;
-  };
+  initialFilters?: FilterCriteria;
   hideHeader?: boolean;
-  onSelectProperty: (property: Property) => void;
+  onSelectProperty?: (property: Property) => void;
+  onFilterChange?: (filters: FilterCriteria) => void;
 }
 
 export const PropertyListingView: React.FC<PropertyListingViewProps> = ({ 
   initialFilters, 
   hideHeader = false,
-  onSelectProperty 
+  onSelectProperty,
+  onFilterChange
 }) => {
   const { 
     getPublishedProperties, 
@@ -31,25 +32,42 @@ export const PropertyListingView: React.FC<PropertyListingViewProps> = ({
     transactionTypes 
   } = useApp();
 
-  const [selectedGov, setSelectedGov] = useState(initialFilters?.governorate_id || 'gov-kfs');
-  const [selectedCity, setSelectedCity] = useState(initialFilters?.city_id || '');
-  const [selectedArea, setSelectedArea] = useState(initialFilters?.area_id || '');
-  const [selectedType, setSelectedType] = useState(initialFilters?.property_type_id || '');
-  const [selectedTx, setSelectedTx] = useState(initialFilters?.transaction_type_id || '');
-  const [minPrice, setMinPrice] = useState<string>('');
-  const [maxPrice, setMaxPrice] = useState<string>(initialFilters?.max_price ? String(initialFilters.max_price) : '');
-  const [minArea, setMinArea] = useState<string>('');
-  const [maxArea, setMaxArea] = useState<string>('');
-  const [bedrooms, setBedrooms] = useState<string>('');
-  const [sortBy, setSortBy] = useState<'NEWEST' | 'PRICE_ASC' | 'PRICE_DESC'>('NEWEST');
+  const [selectedGov, setSelectedGov] = useState(initialFilters?.governorate_id || initialFilters?.selectedGov || 'gov-kfs');
+  const [selectedCity, setSelectedCity] = useState(initialFilters?.city_id || initialFilters?.selectedCity || '');
+  const [selectedArea, setSelectedArea] = useState(initialFilters?.area_id || initialFilters?.selectedArea || '');
+  const [selectedType, setSelectedType] = useState(initialFilters?.property_type_id || initialFilters?.selectedType || '');
+  const [selectedTx, setSelectedTx] = useState(initialFilters?.transaction_type_id || initialFilters?.selectedTx || '');
+  const [searchQuery, setSearchQuery] = useState(initialFilters?.search_query || initialFilters?.searchQuery || '');
+  const [minPrice, setMinPrice] = useState<string>(
+    initialFilters?.minPrice !== undefined ? String(initialFilters.minPrice) : (initialFilters?.min_price !== undefined ? String(initialFilters.min_price) : '')
+  );
+  const [maxPrice, setMaxPrice] = useState<string>(
+    initialFilters?.maxPrice !== undefined ? String(initialFilters.maxPrice) : (initialFilters?.max_price !== undefined ? String(initialFilters.max_price) : '')
+  );
+  const [minArea, setMinArea] = useState<string>(
+    initialFilters?.minArea !== undefined ? String(initialFilters.minArea) : ''
+  );
+  const [maxArea, setMaxArea] = useState<string>(
+    initialFilters?.maxArea !== undefined ? String(initialFilters.maxArea) : ''
+  );
+  const [bedrooms, setBedrooms] = useState<string>(
+    initialFilters?.bedrooms !== undefined ? String(initialFilters.bedrooms) : (initialFilters?.rooms !== undefined ? String(initialFilters.rooms) : '')
+  );
+  const [bathrooms, setBathrooms] = useState<string>(
+    initialFilters?.bathrooms !== undefined ? String(initialFilters.bathrooms) : ''
+  );
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [sortBy, setSortBy] = useState<'NEWEST' | 'PRICE_ASC' | 'PRICE_DESC'>(initialFilters?.sortBy || 'NEWEST');
   const [currentPage, setCurrentPage] = useState(1);
   const [showMobileFilters, setShowMobileFilters] = useState(false);
+  const [showDesktopSidebar, setShowDesktopSidebar] = useState(true);
+  const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
 
   const PAGE_SIZE = 6;
 
-  const activeGovs = governorates.filter(g => g.is_active);
-  const activeCities = cities.filter(c => c.is_active && c.governorate_id === selectedGov);
-  const activeAreas = areas.filter(a => a.is_active && (!selectedCity || a.city_id === selectedCity));
+  const activeGovs = useMemo(() => governorates.filter(g => g.is_active), [governorates]);
+  const activeCities = useMemo(() => cities.filter(c => c.is_active && c.governorate_id === selectedGov), [cities, selectedGov]);
+  const activeAreas = useMemo(() => areas.filter(a => a.is_active && (!selectedCity || a.city_id === selectedCity)), [areas, selectedCity]);
 
   // Validation message if min > max
   const filterValidationError = useMemo(() => {
@@ -62,7 +80,7 @@ export const PropertyListingView: React.FC<PropertyListingViewProps> = ({
     return null;
   }, [minPrice, maxPrice, minArea, maxArea]);
 
-  const handleCardFilterTag = (filterType: 'property_type_id' | 'transaction_type_id' | 'city_id' | 'area_id', value: string) => {
+  const handleCardFilterTag = useCallback((filterType: 'property_type_id' | 'transaction_type_id' | 'city_id' | 'area_id', value: string) => {
     if (filterType === 'property_type_id') {
       setSelectedType(value);
     } else if (filterType === 'transaction_type_id') {
@@ -74,67 +92,47 @@ export const PropertyListingView: React.FC<PropertyListingViewProps> = ({
       setSelectedArea(value);
     }
     setCurrentPage(1);
-  };
+  }, []);
 
-  // Filter and Sort properties
-  const filteredProperties = useMemo(() => {
-    const published = getPublishedProperties();
-
-    return published.filter(p => {
-      const activeVerId = p.current_published_version_id || p.versions[0]?.id;
-      const ver = p.versions.find(v => v.id === activeVerId) || p.versions[0];
-
-      if (!ver) return false;
-
-      // Governorate
-      if (selectedGov && ver.governorate_id !== selectedGov) return false;
-      // City
-      if (selectedCity && ver.city_id !== selectedCity) return false;
-      // Area
-      if (selectedArea && ver.area_id !== selectedArea) return false;
-      // Property type
-      if (selectedType && p.property_type_id !== selectedType) return false;
-      // Transaction type
-      if (selectedTx && p.transaction_type_id !== selectedTx) return false;
-      // Min price
-      if (minPrice && ver.price < Number(minPrice)) return false;
-      // Max price
-      if (maxPrice && ver.price > Number(maxPrice)) return false;
-      // Min area
-      if (minArea && ver.area_sqm < Number(minArea)) return false;
-      // Max area
-      if (maxArea && ver.area_sqm > Number(maxArea)) return false;
-      // Bedrooms
-      if (bedrooms && (ver.bedrooms || 0) < Number(bedrooms)) return false;
-
-      return true;
-    }).sort((a, b) => {
-      const verA = a.versions.find(v => v.id === a.current_published_version_id) || a.versions[0];
-      const verB = b.versions.find(v => v.id === b.current_published_version_id) || b.versions[0];
-
-      if (sortBy === 'PRICE_ASC') {
-        return (verA?.price || 0) - (verB?.price || 0);
-      }
-      if (sortBy === 'PRICE_DESC') {
-        return (verB?.price || 0) - (verA?.price || 0);
-      }
-      // NEWEST
-      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-    });
-  }, [
-    getPublishedProperties,
+  // Centralized Filter State
+  const currentFilterState: PropertyFilterState = useMemo(() => ({
+    transactionType: selectedTx || undefined,
+    propertyType: selectedType || undefined,
+    location: {
+      governorate_id: selectedGov || undefined,
+      city_id: selectedCity || undefined,
+      area_id: selectedArea || undefined,
+    },
+    minPrice: minPrice ? Number(minPrice) : undefined,
+    maxPrice: maxPrice ? Number(maxPrice) : undefined,
+    rooms: bedrooms ? Number(bedrooms) : undefined,
+    bathrooms: bathrooms ? Number(bathrooms) : undefined,
+    minArea: minArea ? Number(minArea) : undefined,
+    maxArea: maxArea ? Number(maxArea) : undefined,
+    searchQuery: searchQuery.trim() || undefined,
+    sortBy,
+  }), [
+    selectedTx,
+    selectedType,
     selectedGov,
     selectedCity,
     selectedArea,
-    selectedType,
-    selectedTx,
     minPrice,
     maxPrice,
+    bedrooms,
+    bathrooms,
     minArea,
     maxArea,
-    bedrooms,
-    sortBy
+    searchQuery,
+    sortBy,
   ]);
+
+  // Filter and Sort properties using Centralized Filter Engine
+  const filteredProperties = useMemo(() => {
+    const published = getPublishedProperties();
+    const filtered = filterProperties(published, currentFilterState);
+    return sortProperties(filtered, sortBy);
+  }, [getPublishedProperties, currentFilterState, sortBy]);
 
   // Paginated slice
   const totalPages = Math.ceil(filteredProperties.length / PAGE_SIZE) || 1;
@@ -144,6 +142,7 @@ export const PropertyListingView: React.FC<PropertyListingViewProps> = ({
   }, [filteredProperties, currentPage]);
 
   const activeFiltersCount = [
+    searchQuery,
     selectedCity,
     selectedArea,
     selectedType,
@@ -152,7 +151,8 @@ export const PropertyListingView: React.FC<PropertyListingViewProps> = ({
     maxPrice,
     minArea,
     maxArea,
-    bedrooms
+    bedrooms,
+    bathrooms
   ].filter(Boolean).length;
 
   const resetFilters = () => {
@@ -161,17 +161,19 @@ export const PropertyListingView: React.FC<PropertyListingViewProps> = ({
     setSelectedArea('');
     setSelectedType('');
     setSelectedTx('');
+    setSearchQuery('');
     setMinPrice('');
     setMaxPrice('');
     setMinArea('');
     setMaxArea('');
     setBedrooms('');
+    setBathrooms('');
     setSortBy('NEWEST');
     setCurrentPage(1);
   };
 
   return (
-    <div className={`max-w-7xl mx-auto ${hideHeader ? 'p-0' : 'px-4 sm:px-6 lg:px-8 py-6 sm:py-10'} relative text-right w-full max-w-full overflow-x-hidden`}>
+    <div className={`w-full max-w-[1600px] mx-auto ${hideHeader ? 'p-0' : 'py-2 sm:py-4'} relative text-right`}>
       
       {/* Page Header (Upwork Style) */}
       {!hideHeader ? (
@@ -184,27 +186,69 @@ export const PropertyListingView: React.FC<PropertyListingViewProps> = ({
           </div>
 
           <div className="flex items-center gap-2.5 w-full md:w-auto">
-            {/* Mobile Filter Toggle */}
+            {/* Mobile/Tablet Filter Toggle */}
             <button
               onClick={() => setShowMobileFilters(true)}
-              className="md:hidden flex-1 px-4 py-2.5 bg-[#14a800] text-white rounded-full text-xs font-bold flex items-center justify-center gap-2 active:scale-95 whitespace-nowrap shadow-xs cursor-pointer"
+              className="lg:hidden flex-1 px-4 py-2.5 bg-[#14a800] hover:bg-[#108a00] text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 active:scale-95 whitespace-nowrap shadow-xs cursor-pointer"
             >
               <Filter className="w-4 h-4" />
               <span>تصفية وفلاتر البحث</span>
               {activeFiltersCount > 0 && (
-                <span className="bg-white text-[#14a800] text-[11px] px-2 py-0.2 rounded-full font-bold">
+                <span className="bg-white text-[#14a800] text-[11px] px-2 py-0.2 rounded-lg font-bold">
                   {activeFiltersCount}
                 </span>
               )}
             </button>
 
+            {/* View Mode Toggle */}
+            <div className="flex items-center bg-slate-100 p-0.5 rounded-xl border border-slate-200 shrink-0">
+              <button
+                type="button"
+                onClick={() => setViewMode('grid')}
+                className={`p-1.5 rounded-lg transition cursor-pointer ${
+                  viewMode === 'grid' ? 'bg-white text-[#14a800] shadow-xs' : 'text-slate-500 hover:text-slate-800'
+                }`}
+                title="عرض شبكي"
+              >
+                <LayoutGrid className="w-4 h-4" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode('list')}
+                className={`p-1.5 rounded-lg transition cursor-pointer ${
+                  viewMode === 'list' ? 'bg-white text-[#14a800] shadow-xs' : 'text-slate-500 hover:text-slate-800'
+                }`}
+                title="عرض قائمة"
+              >
+                <List className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Desktop Filter Sidebar Toggle */}
+            {!hideHeader && (
+              <button
+                type="button"
+                onClick={() => setShowDesktopSidebar(prev => !prev)}
+                className="hidden lg:flex items-center gap-1.5 px-3 py-2 bg-white hover:bg-slate-50 text-slate-700 rounded-xl border border-[#e4ebe4] text-xs font-bold transition shadow-xs cursor-pointer select-none"
+                title={showDesktopSidebar ? 'إخفاء الفلاتر' : 'إظهار الفلاتر'}
+              >
+                <Filter className="w-3.5 h-3.5 text-[#14a800]" />
+                <span>{showDesktopSidebar ? 'إخفاء الفلاتر' : 'إظهار الفلاتر'}</span>
+                {activeFiltersCount > 0 && (
+                  <span className="bg-[#14a800] text-white text-[10px] px-1.5 py-0.2 rounded-full font-bold">
+                    {activeFiltersCount}
+                  </span>
+                )}
+              </button>
+            )}
+
             {/* Sort selector */}
-            <div className="flex items-center gap-2 bg-white border border-[#e4ebe4] rounded-full px-3.5 py-2 shadow-xs w-auto">
+            <div className="flex items-center gap-2 bg-white border border-[#e4ebe4] rounded-xl px-3.5 py-2 shadow-xs w-auto">
               <ArrowUpDown className="w-3.5 h-3.5 text-slate-400" />
               <span className="text-xs font-bold text-slate-700 hidden sm:inline whitespace-nowrap">الترتيب:</span>
               <select
                 value={sortBy}
-                onChange={e => setSortBy(e.target.value as any)}
+                onChange={e => setSortBy(e.target.value as PropertySortOption)}
                 className="bg-transparent text-xs font-bold text-[#001e00] focus:outline-hidden py-0.5 cursor-pointer"
               >
                 <option value="NEWEST">الأحدث أولاً</option>
@@ -223,26 +267,50 @@ export const PropertyListingView: React.FC<PropertyListingViewProps> = ({
           </div>
 
           <div className="flex items-center gap-2">
-            {/* Mobile Filter Toggle */}
+            {/* View Mode Toggle */}
+            <div className="flex items-center bg-slate-100 p-0.5 rounded-xl border border-slate-200 shrink-0">
+              <button
+                type="button"
+                onClick={() => setViewMode('grid')}
+                className={`p-1.5 rounded-lg transition cursor-pointer ${
+                  viewMode === 'grid' ? 'bg-white text-[#14a800] shadow-xs' : 'text-slate-500 hover:text-slate-800'
+                }`}
+                title="عرض شبكي"
+              >
+                <LayoutGrid className="w-3.5 h-3.5" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode('list')}
+                className={`p-1.5 rounded-lg transition cursor-pointer ${
+                  viewMode === 'list' ? 'bg-white text-[#14a800] shadow-xs' : 'text-slate-500 hover:text-slate-800'
+                }`}
+                title="عرض قائمة"
+              >
+                <List className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
+            {/* Mobile/Tablet Filter Toggle */}
             <button
               onClick={() => setShowMobileFilters(true)}
-              className="md:hidden px-3.5 py-1.5 bg-[#14a800] text-white rounded-full text-xs font-bold flex items-center gap-1.5 active:scale-95 shadow-xs cursor-pointer"
+              className="lg:hidden px-3.5 py-1.5 bg-[#14a800] hover:bg-[#108a00] text-white rounded-xl text-xs font-bold flex items-center gap-1.5 active:scale-95 shadow-xs cursor-pointer"
             >
               <Filter className="w-3.5 h-3.5" />
               <span>تصفية</span>
               {activeFiltersCount > 0 && (
-                <span className="bg-white text-[#14a800] text-[10px] px-1.5 rounded-full font-bold">
+                <span className="bg-white text-[#14a800] text-[10px] px-1.5 rounded-lg font-bold">
                   {activeFiltersCount}
                 </span>
               )}
             </button>
 
             {/* Sort selector */}
-            <div className="flex items-center gap-1.5 bg-white border border-[#e4ebe4] rounded-full px-3 py-1.5 shadow-2xs">
+            <div className="flex items-center gap-1.5 bg-white border border-[#e4ebe4] rounded-xl px-3 py-1.5 shadow-2xs">
               <ArrowUpDown className="w-3 h-3 text-slate-400" />
               <select
                 value={sortBy}
-                onChange={e => setSortBy(e.target.value as any)}
+                onChange={e => setSortBy(e.target.value as PropertySortOption)}
                 className="bg-transparent text-xs font-bold text-[#001e00] focus:outline-hidden py-0.5 cursor-pointer"
               >
                 <option value="NEWEST">الأحدث</option>
@@ -255,11 +323,15 @@ export const PropertyListingView: React.FC<PropertyListingViewProps> = ({
       )}
 
       {/* Main Grid: Filters Sidebar + Properties list */}
-      <div className={`grid grid-cols-1 md:grid-cols-4 gap-6 lg:gap-8 ${hideHeader ? 'pt-2' : 'pt-6'}`}>
+      <div className={`grid grid-cols-1 ${!hideHeader && showDesktopSidebar ? 'lg:grid-cols-12' : 'lg:grid-cols-1'} gap-6 lg:gap-8 items-start relative ${hideHeader ? 'pt-2' : 'pt-6'} w-full max-w-full`}>
         
-        {/* Filters Sidebar (Desktop) */}
-        <div className="hidden md:block space-y-6">
-          <div className="bg-white rounded-3xl p-5 border border-[#e4ebe4] shadow-xs space-y-5 text-right sticky top-24">
+        {/* Permanent Sticky Filters Sidebar (Desktop lg+: 1024px+) */}
+        {!hideHeader && showDesktopSidebar && (
+          <aside 
+            id="property-filters-sidebar"
+            className="hidden lg:block lg:col-span-3 lg:sticky lg:top-24 self-start z-10"
+          >
+          <div className="bg-white rounded-xl p-5 border border-[#e4ebe4] shadow-xs space-y-5 text-right max-h-[calc(100vh-7rem)] overflow-y-auto overscroll-contain">
             
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <span className="text-sm font-bold text-[#001e00] flex items-center gap-1.5">
@@ -281,6 +353,24 @@ export const PropertyListingView: React.FC<PropertyListingViewProps> = ({
                 <span>{filterValidationError}</span>
               </div>
             )}
+
+            {/* Search Query Input */}
+            <div>
+              <label className="block text-xs font-bold text-[#001e00] mb-1.5">البحث بالكلمة أو الكود</label>
+              <div className="relative">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                  placeholder="مثال: شقة، دسوق، RWT..."
+                  className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-[#e4ebe4] focus:border-[#14a800] focus:bg-white rounded-xl text-xs font-bold text-[#001e00] outline-hidden transition"
+                />
+                <Search className="w-4 h-4 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+              </div>
+            </div>
 
             {/* Transaction Type */}
             <div>
@@ -407,7 +497,7 @@ export const PropertyListingView: React.FC<PropertyListingViewProps> = ({
 
             {/* Bedrooms count */}
             <div>
-              <label className="block text-xs font-bold text-[#001e00] mb-1">عدد الغرف (حد أدنى)</label>
+              <label className="block text-xs font-bold text-[#001e00] mb-1">عدد الغرف</label>
               <select
                 value={bedrooms}
                 onChange={e => setBedrooms(e.target.value)}
@@ -422,11 +512,27 @@ export const PropertyListingView: React.FC<PropertyListingViewProps> = ({
               </select>
             </div>
 
+            {/* Bathrooms count */}
+            <div>
+              <label className="block text-xs font-bold text-[#001e00] mb-1">عدد الحمامات</label>
+              <select
+                value={bathrooms}
+                onChange={e => setBathrooms(e.target.value)}
+                className="w-full px-3.5 py-2.5 bg-slate-50 border border-[#e4ebe4] rounded-xl text-xs font-bold text-slate-800 focus:bg-white focus:border-[#14a800] focus:outline-hidden cursor-pointer"
+              >
+                <option value="">أي عدد حمامات</option>
+                <option value="1">1 حمام فأكثر</option>
+                <option value="2">2 حمام فأكثر</option>
+                <option value="3">3 حمامات فأكثر</option>
+              </select>
+            </div>
+
           </div>
-        </div>
+        </aside>
+        )}
 
         {/* Results Area */}
-        <div className="md:col-span-3 space-y-6">
+        <section id="property-results-grid" className={`${hideHeader || !showDesktopSidebar ? 'col-span-12' : 'lg:col-span-9'} space-y-5 min-w-0 w-full`}>
           
           {/* Results count indicator */}
           <div className="flex items-center justify-between text-xs sm:text-sm text-slate-600 font-bold px-1">
@@ -434,91 +540,200 @@ export const PropertyListingView: React.FC<PropertyListingViewProps> = ({
             <span>الصفحة {currentPage} من {totalPages}</span>
           </div>
 
-          {/* Cards Grid */}
-          {paginatedProperties.length === 0 ? (
-            <div className="bg-white rounded-3xl p-10 sm:p-14 text-center border border-[#e4ebe4] shadow-xs space-y-4">
-              <div className="w-12 h-12 rounded-full bg-[#f2f7f2] text-[#14a800] flex items-center justify-center mx-auto">
-                <Building2 className="w-6 h-6" />
-              </div>
-              <h3 className="text-base sm:text-lg font-bold text-[#001e00]">
-                لا توجد عقارات مطابقة لخيارات البحث
-              </h3>
-              <p className="text-xs sm:text-sm text-slate-600 max-w-sm mx-auto leading-relaxed font-normal">
-                جرّب تغيير فلاتر البحث أو تصفح كافة مراكز كفر الشيخ للاطلاع على كافة الفرص المتاحة.
-              </p>
+          {/* Active Filters Display Chips */}
+          {activeFiltersCount > 0 && (
+            <div className="bg-white p-3 sm:p-3.5 rounded-xl border border-slate-200 shadow-2xs flex flex-wrap items-center gap-2 text-xs">
+              <span className="font-bold text-slate-500">الفلاتر المطبقة:</span>
+
+              {selectedCity && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-emerald-50 text-emerald-800 font-bold border border-emerald-200">
+                  <span>المركز: {cities.find(c => c.id === selectedCity)?.name_ar}</span>
+                  <button onClick={() => setSelectedCity('')} className="hover:text-emerald-950 cursor-pointer">
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </span>
+              )}
+
+              {selectedArea && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-emerald-50 text-emerald-800 font-bold border border-emerald-200">
+                  <span>المنطقة: {areas.find(a => a.id === selectedArea)?.name_ar}</span>
+                  <button onClick={() => setSelectedArea('')} className="hover:text-emerald-950 cursor-pointer">
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </span>
+              )}
+
+              {selectedType && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-emerald-50 text-emerald-800 font-bold border border-emerald-200">
+                  <span>النوع: {propertyTypes.find(pt => pt.id === selectedType)?.name_ar}</span>
+                  <button onClick={() => setSelectedType('')} className="hover:text-emerald-950 cursor-pointer">
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </span>
+              )}
+
+              {selectedTx && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-emerald-50 text-emerald-800 font-bold border border-emerald-200">
+                  <span>المعاملة: {transactionTypes.find(tx => tx.id === selectedTx)?.name_ar}</span>
+                  <button onClick={() => setSelectedTx('')} className="hover:text-emerald-950 cursor-pointer">
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </span>
+              )}
+
+              {(minPrice || maxPrice) && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-emerald-50 text-emerald-800 font-bold border border-emerald-200">
+                  <span>السعر: {minPrice ? `من ${minPrice}` : ''} {maxPrice ? `إلى ${maxPrice}` : ''} ج.م</span>
+                  <button onClick={() => { setMinPrice(''); setMaxPrice(''); }} className="hover:text-emerald-950 cursor-pointer">
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </span>
+              )}
+
+              {(minArea || maxArea) && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-emerald-50 text-emerald-800 font-bold border border-emerald-200">
+                  <span>المساحة: {minArea ? `من ${minArea}` : ''} {maxArea ? `إلى ${maxArea}` : ''} م²</span>
+                  <button onClick={() => { setMinArea(''); setMaxArea(''); }} className="hover:text-emerald-950 cursor-pointer">
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </span>
+              )}
+
+              {bedrooms && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-emerald-50 text-emerald-800 font-bold border border-emerald-200">
+                  <span>الغرف: {bedrooms}+</span>
+                  <button onClick={() => setBedrooms('')} className="hover:text-emerald-950 cursor-pointer">
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </span>
+              )}
+
+              {bathrooms && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-emerald-50 text-emerald-800 font-bold border border-emerald-200">
+                  <span>الحمامات: {bathrooms}+</span>
+                  <button onClick={() => setBathrooms('')} className="hover:text-emerald-950 cursor-pointer">
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </span>
+              )}
+
               <button
+                type="button"
                 onClick={resetFilters}
-                className="px-6 py-2.5 bg-[#14a800] hover:bg-[#108a00] text-white text-xs sm:text-sm font-bold rounded-full transition shadow-xs active:scale-95 cursor-pointer"
+                className="mr-auto text-xs font-black text-rose-600 hover:text-rose-800 hover:underline cursor-pointer"
               >
-                إعادة ضبط الفلاتر
+                مسح كافة الفلاتر
               </button>
+            </div>
+          )}
+
+          {/* Cards Grid with subtle fade transition */}
+          {paginatedProperties.length === 0 ? (
+            <div className="bg-white rounded-xl p-8 sm:p-12 text-center border border-[#e4ebe4] shadow-xs space-y-5 animate-soft-fade">
+              <div className="w-16 h-16 rounded-xl bg-[#f2f7f2] text-[#14a800] flex items-center justify-center mx-auto shadow-xs">
+                <Sparkles className="w-8 h-8" />
+              </div>
+              <div className="space-y-2">
+                <h3 className="text-lg sm:text-xl font-black text-[#001e00]">
+                  لم نجد العقار المثالي بالمواصفات الحالية
+                </h3>
+                <p className="text-xs sm:text-sm text-slate-600 max-w-md mx-auto leading-relaxed font-medium">
+                  فريق مستشاري ووسطاء روابط يمكنه توفير العقار بالمواصفات والسعر المطلوب نيابة عنك بدون أي عناء.
+                </p>
+              </div>
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setIsRequestModalOpen(true)}
+                  className="w-full sm:w-auto px-7 py-3 bg-[#14a800] hover:bg-[#108a00] text-white text-xs sm:text-sm font-bold rounded-xl transition shadow-xs flex items-center justify-center gap-2 active:scale-95 cursor-pointer"
+                >
+                  <Sparkles className="w-4 h-4" />
+                  <span>اطلب عقارك بمواصفات خاصة</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={resetFilters}
+                  className="w-full sm:w-auto px-5 py-3 border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs sm:text-sm font-bold rounded-xl transition cursor-pointer"
+                >
+                  إعادة ضبط فلاتر البحث
+                </button>
+              </div>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
+            <div className={
+              viewMode === 'list' 
+                ? "flex flex-col gap-4 animate-soft-fade w-full" 
+                : `grid grid-cols-1 sm:grid-cols-2 ${showDesktopSidebar && !hideHeader ? 'lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4' : 'lg:grid-cols-3 xl:grid-cols-4'} gap-4 sm:gap-5 lg:gap-6 animate-soft-fade w-full`
+            }>
               {paginatedProperties.map(property => (
-                <PropertyCard
-                  key={property.id}
-                  property={property}
-                  onSelect={onSelectProperty}
-                  onFilterTag={handleCardFilterTag}
-                />
+                <div key={property.id} className="w-full min-w-0 max-w-full h-full flex flex-col overflow-hidden">
+                  <PropertyCard
+                    property={property}
+                    viewMode={viewMode}
+                    onSelect={onSelectProperty}
+                    onFilterTag={handleCardFilterTag}
+                  />
+                </div>
               ))}
             </div>
           )}
 
-          {/* Pagination Controls (Upwork Style) */}
+          {/* Reusable Enterprise Pagination */}
           {totalPages > 1 && (
-            <div className="flex items-center justify-center gap-2 pt-6 border-t border-[#e4ebe4]">
-              <button
-                disabled={currentPage <= 1}
-                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                className="px-3.5 py-2 rounded-full border border-[#e4ebe4] text-xs font-bold disabled:opacity-30 hover:bg-[#f2f7f2] transition cursor-pointer"
-              >
-                السابق
-              </button>
-
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-                <button
-                  key={page}
-                  onClick={() => setCurrentPage(page)}
-                  className={`w-9 h-9 rounded-full text-xs font-bold transition cursor-pointer ${
-                    currentPage === page 
-                      ? 'bg-[#14a800] text-white shadow-xs' 
-                      : 'border border-[#e4ebe4] text-slate-700 hover:bg-[#f2f7f2]'
-                  }`}
-                >
-                  {page}
-                </button>
-              ))}
-
-              <button
-                disabled={currentPage >= totalPages}
-                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                className="px-3.5 py-2 rounded-full border border-[#e4ebe4] text-xs font-bold disabled:opacity-30 hover:bg-[#f2f7f2] transition cursor-pointer"
-              >
-                التالي
-              </button>
-            </div>
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={(page) => setCurrentPage(page)}
+              scrollTargetId="property-results-grid"
+              showItemCount={true}
+              totalItems={filteredProperties.length}
+              pageSize={PAGE_SIZE}
+            />
           )}
 
-        </div>
+        </section>
 
       </div>
 
-      {/* Mobile Filters Modal */}
+      {/* Floating Filter Button when scrolled (Mobile & Tablet only) */}
+      <FloatingFilterButton
+        onOpenFilters={() => setShowMobileFilters(true)}
+        activeFiltersCount={activeFiltersCount}
+        triggerScrollOffset={400}
+      />
+
+      {/* Mobile & Tablet Filters Modal */}
       {showMobileFilters && (
-        <div className="md:hidden fixed inset-0 z-50 flex items-end justify-center bg-slate-900/60 backdrop-blur-xs animate-soft-fade">
-          <div className="bg-white rounded-t-3xl w-full max-h-[85vh] overflow-y-auto p-5 text-right space-y-5 border-t border-[#e4ebe4] shadow-2xl">
+        <div className="lg:hidden fixed inset-0 z-50 flex items-end justify-center bg-slate-900/60 backdrop-blur-xs animate-soft-fade">
+          <div className="bg-white rounded-t-2xl w-full max-h-[85vh] overflow-y-auto p-5 text-right space-y-5 border-t border-[#e4ebe4] shadow-2xl">
             
             {/* Header */}
             <div className="flex items-center justify-between pb-3 border-b border-[#e4ebe4]">
               <span className="text-base font-bold text-[#001e00]">تصفية نتائج البحث</span>
               <button
                 onClick={() => setShowMobileFilters(false)}
-                className="text-xs font-bold text-slate-600 hover:text-slate-900 px-3 py-1.5 bg-slate-100 rounded-full cursor-pointer"
+                className="text-xs font-bold text-slate-600 hover:text-slate-900 px-3 py-1.5 bg-slate-100 rounded-lg cursor-pointer"
               >
                 إغلاق
               </button>
+            </div>
+
+            {/* Search Input in Mobile Drawer */}
+            <div>
+              <label className="block text-xs font-bold text-[#001e00] mb-1.5">البحث بالكلمة أو الكود</label>
+              <div className="relative">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                  placeholder="مثال: شقة، دسوق، RWT..."
+                  className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-[#e4ebe4] focus:border-[#14a800] focus:bg-white rounded-xl text-xs font-bold text-[#001e00] outline-hidden transition"
+                />
+                <Search className="w-4 h-4 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+              </div>
             </div>
 
             {/* Transaction Type */}
@@ -618,19 +833,73 @@ export const PropertyListingView: React.FC<PropertyListingViewProps> = ({
               </div>
             </div>
 
+            {/* Area Range */}
+            <div>
+              <label className="block text-xs font-bold text-[#001e00] mb-1">المساحة (م²)</label>
+              <div className="grid grid-cols-2 gap-2">
+                <input
+                  type="number"
+                  placeholder="أقل مساحة"
+                  value={minArea}
+                  onChange={e => setMinArea(e.target.value)}
+                  className="w-full px-3 py-2 bg-slate-50 border border-[#e4ebe4] rounded-xl text-xs font-bold text-slate-900 dir-ltr text-right"
+                />
+                <input
+                  type="number"
+                  placeholder="أكبر مساحة"
+                  value={maxArea}
+                  onChange={e => setMaxArea(e.target.value)}
+                  className="w-full px-3 py-2 bg-slate-50 border border-[#e4ebe4] rounded-xl text-xs font-bold text-slate-900 dir-ltr text-right"
+                />
+              </div>
+            </div>
+
+            {/* Rooms and Bathrooms */}
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <label className="block text-xs font-bold text-[#001e00] mb-1">الغرف</label>
+                <select
+                  value={bedrooms}
+                  onChange={e => setBedrooms(e.target.value)}
+                  className="w-full px-3 py-2 bg-slate-50 border border-[#e4ebe4] rounded-xl text-xs font-bold text-slate-800"
+                >
+                  <option value="">أي عدد</option>
+                  <option value="1">1+</option>
+                  <option value="2">2+</option>
+                  <option value="3">3+</option>
+                  <option value="4">4+</option>
+                  <option value="5">5+</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-[#001e00] mb-1">الحمامات</label>
+                <select
+                  value={bathrooms}
+                  onChange={e => setBathrooms(e.target.value)}
+                  className="w-full px-3 py-2 bg-slate-50 border border-[#e4ebe4] rounded-xl text-xs font-bold text-slate-800"
+                >
+                  <option value="">أي عدد</option>
+                  <option value="1">1+</option>
+                  <option value="2">2+</option>
+                  <option value="3">3+</option>
+                </select>
+              </div>
+            </div>
+
             {/* Apply & Reset Buttons */}
             <div className="flex items-center gap-3 pt-3 border-t border-[#e4ebe4] sticky bottom-0 bg-white pb-3">
               <button
                 type="button"
                 onClick={resetFilters}
-                className="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold rounded-full transition cursor-pointer"
+                className="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold rounded-xl transition cursor-pointer"
               >
                 إعادة ضبط
               </button>
               <button
                 type="button"
                 onClick={() => setShowMobileFilters(false)}
-                className="flex-2 py-3 bg-[#14a800] hover:bg-[#108a00] text-white text-xs font-bold rounded-full transition shadow-xs cursor-pointer"
+                className="flex-2 py-3 bg-[#14a800] hover:bg-[#108a00] text-white text-xs font-bold rounded-xl transition shadow-xs cursor-pointer"
               >
                 عرض {filteredProperties.length} عقار
               </button>
@@ -638,6 +907,21 @@ export const PropertyListingView: React.FC<PropertyListingViewProps> = ({
 
           </div>
         </div>
+      )}
+
+      {/* Request Property Modal for Demand Capture */}
+      {isRequestModalOpen && (
+        <Suspense fallback={null}>
+          <RequestPropertyModal
+            isOpen={isRequestModalOpen}
+            onClose={() => setIsRequestModalOpen(false)}
+            initialValues={{
+              transaction_type: selectedTx === 'tx-rent' ? 'RENT' : 'BUY',
+              property_type: propertyTypes.find(pt => pt.id === selectedType)?.name_ar,
+              city_or_area: cities.find(c => c.id === selectedCity)?.name_ar,
+            }}
+          />
+        </Suspense>
       )}
 
     </div>

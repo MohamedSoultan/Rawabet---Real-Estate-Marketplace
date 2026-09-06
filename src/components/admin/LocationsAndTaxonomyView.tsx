@@ -58,10 +58,10 @@ export const LocationsAndTaxonomyView: React.FC = () => {
         </div>
 
         {/* Sub-tabs */}
-        <div className="flex items-center gap-2 bg-slate-100 p-1 rounded-2xl">
+        <div className="flex items-center gap-2 bg-slate-100 p-1 rounded-xl">
           <button
             onClick={() => setActiveTab('LOCATIONS')}
-            className={`px-4 py-1.5 rounded-xl text-xs font-bold transition ${
+            className={`px-4 py-1.5 rounded-lg text-xs font-bold transition ${
               activeTab === 'LOCATIONS' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600'
             }`}
           >
@@ -69,7 +69,7 @@ export const LocationsAndTaxonomyView: React.FC = () => {
           </button>
           <button
             onClick={() => setActiveTab('TAXONOMY')}
-            className={`px-4 py-1.5 rounded-xl text-xs font-bold transition ${
+            className={`px-4 py-1.5 rounded-lg text-xs font-bold transition ${
               activeTab === 'TAXONOMY' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600'
             }`}
           >
@@ -79,7 +79,7 @@ export const LocationsAndTaxonomyView: React.FC = () => {
       </div>
 
       {toastMsg && (
-        <div className="p-3 bg-emerald-600 text-white text-xs font-bold rounded-2xl flex items-center justify-center gap-2 animate-in slide-in-from-top-1">
+        <div className="p-3 bg-emerald-600 text-white text-xs font-bold rounded-xl flex items-center justify-center gap-2 animate-in slide-in-from-top-1">
           <CheckCircle2 className="w-4 h-4" />
           <span>{toastMsg}</span>
         </div>
@@ -90,7 +90,7 @@ export const LocationsAndTaxonomyView: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           
           {/* 1. Governorates Column */}
-          <div className="bg-white rounded-3xl p-5 border border-slate-200 shadow-xs space-y-4">
+          <div className="bg-white rounded-xl p-5 border border-slate-200 shadow-xs space-y-4">
             <h3 className="text-sm font-extrabold text-slate-900 flex items-center gap-2">
               <MapPin className="w-4 h-4 text-emerald-600" />
               <span>المحافظات ({governorates.length})</span>
@@ -101,7 +101,7 @@ export const LocationsAndTaxonomyView: React.FC = () => {
                 <div
                   key={gov.id}
                   onClick={() => setSelectedGovId(gov.id)}
-                  className={`p-3 rounded-2xl border transition cursor-pointer flex items-center justify-between ${
+                  className={`p-3 rounded-xl border transition cursor-pointer flex items-center justify-between ${
                     selectedGovId === gov.id ? 'border-emerald-600 bg-emerald-50 text-emerald-950 font-bold' : 'border-slate-200 hover:bg-slate-50'
                   }`}
                 >
@@ -128,7 +128,7 @@ export const LocationsAndTaxonomyView: React.FC = () => {
           </div>
 
           {/* 2. Cities / Centers Column */}
-          <div className="bg-white rounded-3xl p-5 border border-slate-200 shadow-xs space-y-4">
+          <div className="bg-white rounded-xl p-5 border border-slate-200 shadow-xs space-y-4">
             <h3 className="text-sm font-extrabold text-slate-900 flex items-center gap-2">
               <Building2 className="w-4 h-4 text-blue-600" />
               <span>المراكز والمدن ({filteredCities.length})</span>
@@ -139,7 +139,7 @@ export const LocationsAndTaxonomyView: React.FC = () => {
                 <div
                   key={city.id}
                   onClick={() => setSelectedCityId(city.id)}
-                  className={`p-3 rounded-2xl border transition cursor-pointer flex items-center justify-between ${
+                  className={`p-3 rounded-xl border transition cursor-pointer flex items-center justify-between ${
                     selectedCityId === city.id ? 'border-blue-600 bg-blue-50 text-blue-950 font-bold' : 'border-slate-200 hover:bg-slate-50'
                   }`}
                 >
@@ -165,14 +165,14 @@ export const LocationsAndTaxonomyView: React.FC = () => {
           </div>
 
           {/* 3. Areas / Neighborhoods Column + Add Area Form */}
-          <div className="bg-white rounded-3xl p-5 border border-slate-200 shadow-xs space-y-4">
+          <div className="bg-white rounded-xl p-5 border border-slate-200 shadow-xs space-y-4">
             <h3 className="text-sm font-extrabold text-slate-900 flex items-center gap-2">
               <Layers className="w-4 h-4 text-purple-600" />
               <span>الأحياء والمناطق ({filteredAreas.length})</span>
             </h3>
 
             {/* Add new area */}
-            <form onSubmit={handleAddArea} className="p-3 bg-slate-50 rounded-2xl border border-slate-200 space-y-2">
+            <form onSubmit={handleAddArea} className="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
               <label className="block text-[11px] font-bold text-slate-700">إضافة حي / منطقة جديدة:</label>
               <input
                 type="text"
@@ -215,7 +215,7 @@ export const LocationsAndTaxonomyView: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           
           {/* Property Types */}
-          <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-xs space-y-4">
+          <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-xs space-y-4">
             <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
               <Building2 className="w-5 h-5 text-emerald-600" />
               <span>أنواع العقارات (Property Types)</span>
@@ -223,7 +223,7 @@ export const LocationsAndTaxonomyView: React.FC = () => {
 
             <div className="space-y-2.5">
               {propertyTypes.map(pt => (
-                <div key={pt.id} className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between">
+                <div key={pt.id} className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
                   <div>
                     <div className="text-xs font-bold text-slate-900">{pt.name_ar}</div>
                     <span className="text-[11px] text-slate-400 font-mono">slug: {pt.slug} • صور: {pt.min_images}-{pt.max_images}</span>
@@ -237,7 +237,7 @@ export const LocationsAndTaxonomyView: React.FC = () => {
           </div>
 
           {/* Transaction Types */}
-          <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-xs space-y-4">
+          <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-xs space-y-4">
             <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
               <Tag className="w-5 h-5 text-blue-600" />
               <span>أنواع المعاملات (Transaction Types)</span>
@@ -245,7 +245,7 @@ export const LocationsAndTaxonomyView: React.FC = () => {
 
             <div className="space-y-2.5">
               {transactionTypes.map(tx => (
-                <div key={tx.id} className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between">
+                <div key={tx.id} className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
                   <div>
                     <div className="text-xs font-bold text-slate-900">{tx.name_ar}</div>
                     <span className="text-[11px] text-slate-400 font-mono">slug: {tx.slug}</span>

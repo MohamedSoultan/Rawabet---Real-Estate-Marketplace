@@ -97,14 +97,14 @@ export const SellerVerificationView: React.FC = () => {
       </div>
 
       {toastMsg && (
-        <div className="p-3 bg-[#14a800] text-white text-xs font-bold rounded-2xl flex items-center justify-center gap-2 animate-soft-fade shadow-sm">
+        <div className="p-3 bg-[#14a800] text-white text-xs font-bold rounded-xl flex items-center justify-center gap-2 animate-soft-fade shadow-sm">
           <CheckCircle2 className="w-4 h-4" />
           <span>{toastMsg}</span>
         </div>
       )}
 
       {/* Filter Tabs & Search Bar */}
-      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 bg-white p-3 rounded-2xl border border-[#e4ebe4] shadow-2xs">
+      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 bg-white p-3 rounded-xl border border-[#e4ebe4] shadow-2xs">
         
         {/* Status Filter Buttons */}
         <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
@@ -182,7 +182,7 @@ export const SellerVerificationView: React.FC = () => {
       {/* Requests List */}
       <div className="space-y-3.5">
         {filteredUsers.length === 0 ? (
-          <div className="bg-white rounded-3xl p-12 text-center border border-[#e4ebe4] text-slate-500 space-y-2">
+          <div className="bg-white rounded-xl p-12 text-center border border-[#e4ebe4] text-slate-500 space-y-2">
             <ShieldCheck className="w-10 h-10 text-slate-300 mx-auto" />
             <h3 className="text-sm font-black text-slate-700">لا توجد طلبات توثيق مطابقة للفلاتر الحالية</h3>
             <p className="text-xs text-slate-400">يمكنك تعديل خيارات التصفية أو البحث أعلاه لعرض النتائج.</p>
@@ -195,7 +195,7 @@ export const SellerVerificationView: React.FC = () => {
             return (
               <div
                 key={user.id}
-                className="bg-white rounded-2xl p-5 border border-[#e4ebe4] hover:border-[#14a800] shadow-2xs transition flex flex-col md:flex-row items-start md:items-center justify-between gap-4"
+                className="bg-white rounded-xl p-5 border border-[#e4ebe4] hover:border-[#14a800] shadow-2xs transition flex flex-col md:flex-row items-start md:items-center justify-between gap-4"
               >
                 
                 {/* Info Block */}
@@ -291,7 +291,7 @@ export const SellerVerificationView: React.FC = () => {
       {/* Reject Modal */}
       {rejectingUserId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
-          <div className="bg-white rounded-3xl p-6 max-w-md w-full border border-slate-200 shadow-2xl space-y-4 text-right animate-soft-fade">
+          <div className="bg-white rounded-xl p-6 max-w-md w-full border border-slate-200 shadow-2xl space-y-4 text-right animate-soft-fade">
             <div className="flex items-center gap-2 text-rose-600">
               <AlertCircle className="w-5 h-5" />
               <h3 className="text-base font-black">رفض طلب توثيق البائع</h3>
