@@ -379,7 +379,7 @@ export const PropertyPreviewModal: React.FC<PropertyPreviewModalProps> = ({
             }}
             className="w-full py-3.5 px-4 bg-[#14a800] hover:bg-[#108a00] active:bg-[#108a00] text-white text-sm sm:text-base font-black rounded-xl transition-all shadow-md shadow-[#14a800]/20 flex items-center justify-center gap-2 active:scale-[0.98] cursor-pointer min-h-[48px] focus:outline-none focus:ring-2 focus:ring-[#14a800] focus:ring-offset-2"
           >
-            <span>عرض تفاصيل العقار كاملة</span>
+            <span>شوف كل التفاصيل</span>
             <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 text-white shrink-0" aria-hidden="true" />
           </button>
 
@@ -390,11 +390,11 @@ export const PropertyPreviewModal: React.FC<PropertyPreviewModalProps> = ({
               type="button"
               onClick={handleWhatsAppContact}
               className="py-3 px-3 bg-[#001e00] hover:bg-[#002f00] active:bg-[#002f00] text-white text-xs sm:text-sm font-bold rounded-xl transition flex items-center justify-center gap-1.5 active:scale-95 cursor-pointer min-h-[44px] min-w-0 focus:outline-none focus:ring-2 focus:ring-[#14a800]"
-              title="محادثة واتساب الرسمية"
-              aria-label="محادثة واتساب الرسمية"
+              title="محادثة واتساب"
+              aria-label="محادثة واتساب"
             >
               <MessageSquare className="w-4 h-4 text-[#14a800] shrink-0" aria-hidden="true" />
-              <span className="truncate">محادثة واتساب</span>
+              <span className="truncate">واتساب مباشر</span>
             </button>
 
             {/* Request Viewing */}
@@ -402,11 +402,11 @@ export const PropertyPreviewModal: React.FC<PropertyPreviewModalProps> = ({
               type="button"
               onClick={() => setIsViewingModalOpen(true)}
               className="py-3 px-3 bg-[#f2f7f2] hover:bg-[#e4ebe4] active:bg-[#e4ebe4] text-[#14a800] border border-[#14a800]/30 text-xs sm:text-sm font-bold rounded-xl transition flex items-center justify-center gap-1.5 active:scale-95 cursor-pointer min-h-[44px] min-w-0 focus:outline-none focus:ring-2 focus:ring-[#14a800]"
-              title="طلب معاينة ميدانية"
-              aria-label="طلب معاينة ميدانية للعقار"
+              title="طلب معاينة"
+              aria-label="طلب معاينة للعقار"
             >
               <Calendar className="w-4 h-4 shrink-0" aria-hidden="true" />
-              <span className="truncate">طلب معاينة</span>
+              <span className="truncate">احجز معاينة</span>
             </button>
           </div>
 
@@ -425,3 +425,5 @@ export const PropertyPreviewModal: React.FC<PropertyPreviewModalProps> = ({
     document.body
   );
 };
+
+export default PropertyPreviewModal;

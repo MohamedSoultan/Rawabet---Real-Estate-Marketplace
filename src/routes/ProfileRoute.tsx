@@ -22,9 +22,9 @@ export const ProfileRoute: React.FC = () => {
           <User className="w-8 h-8" />
         </div>
         <div className="space-y-2">
-          <h2 className="text-2xl font-black text-[#001e00]">يرجى تسجيل الدخول لعرض حسابك</h2>
+          <h2 className="text-2xl font-black text-[#001e00]">سجل دخولك لعرض حسابك</h2>
           <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-            يتطلب عرض الملف الشخصي والعقارات المفضلة وسجل طلبات المعاينة تسجيل الدخول إلى حسابك أو إنشاء حساب جديد.
+            تقدر من هنا تتابع مفضلتك، وطلبات المعاينات اللي حجزتها، وتعدل بياناتك الشخصية بكل سهولة.
           </p>
         </div>
         <div className="flex items-center justify-center gap-3 pt-2">
@@ -40,7 +40,7 @@ export const ProfileRoute: React.FC = () => {
             className="px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 transition cursor-pointer"
           >
             <Home className="w-4 h-4" />
-            <span>العودة للرئيسية</span>
+            <span>الرئيسية</span>
           </button>
         </div>
       </div>

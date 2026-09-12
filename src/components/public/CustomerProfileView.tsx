@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { PropertyCard } from './PropertyCard';
+import { PropertySlider } from './PropertySlider';
 import { Property } from '../../types';
 import { RequestPropertyModal } from './RequestPropertyModal';
 import { 
@@ -290,17 +291,23 @@ export const CustomerProfileView: React.FC<CustomerProfileViewProps> = ({
           </div>
 
           {favoritedProperties.length === 0 ? (
-            <div className="bg-white rounded-xl p-12 text-center border border-slate-200 shadow-xs space-y-3">
-              <div className="w-14 h-14 rounded-xl bg-rose-50 text-rose-500 flex items-center justify-center mx-auto">
-                <Heart className="w-7 h-7" />
+            <div className="bg-white rounded-xl p-10 text-center border border-slate-200 shadow-xs space-y-2">
+              <div className="w-12 h-12 rounded-xl bg-rose-50 text-rose-500 flex items-center justify-center mx-auto">
+                <Heart className="w-6 h-6" />
               </div>
-              <h3 className="text-sm font-bold text-slate-800">لا توجد عقارات في المفضلة حالياً</h3>
+              <h3 className="text-sm font-bold text-slate-800">مفيش عقارات في المفضلة</h3>
               <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                أثناء تصفحك للعقارات في كفر الشيخ، اضغط على زر القلب لحفظ العقار والعودة إليه لاحقاً.
+                دوس على علامة القلب على أي عقار عشان تحفظه هنا وترجعله بسهولة.
               </p>
             </div>
+          ) : favoritedProperties.length > 3 ? (
+            <PropertySlider
+              properties={favoritedProperties}
+              onSelectProperty={onSelectProperty}
+              hideHeader={true}
+            />
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-full">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 w-full max-w-full">
               {favoritedProperties.map(prop => (
                 <div key={prop.id} className="w-full min-w-0 max-w-full h-full flex flex-col overflow-hidden">
                   <PropertyCard

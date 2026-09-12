@@ -26,6 +26,25 @@ export class ErrorBoundary extends Component<Props, State> {
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error('ErrorBoundary caught an error:', error, errorInfo);
+
+    // Auto-recover from stale dynamic module imports or Vite server restarts
+    const errorMessage = error?.message || '';
+    const isModuleLoadError = 
+      errorMessage.includes('Failed to fetch dynamically imported module') ||
+      errorMessage.includes('dynamically imported module') ||
+      errorMessage.includes('Loading chunk') ||
+      errorMessage.includes('Failed to fetch');
+
+    if (isModuleLoadError) {
+      const storageKey = 'rawabet_last_chunk_reload';
+      const lastReload = sessionStorage.getItem(storageKey);
+      const now = Date.now();
+      // Allow auto-reload if not already reloaded in the last 15 seconds
+      if (!lastReload || now - Number(lastReload) > 15000) {
+        sessionStorage.setItem(storageKey, String(now));
+        window.location.reload();
+      }
+    }
   }
 
   private handleReset = () => {

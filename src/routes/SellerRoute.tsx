@@ -22,9 +22,9 @@ export const SellerRoute: React.FC = () => {
           <ShieldAlert className="w-8 h-8" />
         </div>
         <div className="space-y-2">
-          <h2 className="text-2xl font-black text-[#001e00]">يرجى تسجيل الدخول للوصول لبوابة الملاك والوسطاء</h2>
+          <h2 className="text-2xl font-black text-[#001e00]">سجل دخولك عشان تتابع عقاراتك</h2>
           <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-            لإدارة عقاراتك المعروضة للبيع أو الإيجار، ومتابعة طابور المراجعة والاعتماد، وتعديل الأسعار والمواصفات عبر نظام النسخ المعتمد، يرجى تسجيل الدخول أو إنشاء حسابك.
+            من هنا تقدر تدير كل عقاراتك المعروضة للبيع أو الإيجار، وتتابع طلبات المعاينة وتعدل الأسعار بسهولة.
           </p>
         </div>
         <div className="flex items-center justify-center gap-3 pt-2">
@@ -33,14 +33,14 @@ export const SellerRoute: React.FC = () => {
             className="px-6 py-3 bg-[#14a800] hover:bg-[#108a00] text-white rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 shadow-xs transition cursor-pointer"
           >
             <LogIn className="w-4 h-4" />
-            <span>تسجيل الدخول / إنشاء حساب</span>
+            <span>تسجيل الدخول / حساب جديد</span>
           </button>
           <button
             onClick={() => navigate('/')}
             className="px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 transition cursor-pointer"
           >
             <Home className="w-4 h-4" />
-            <span>العودة للرئيسية</span>
+            <span>الرئيسية</span>
           </button>
         </div>
       </div>

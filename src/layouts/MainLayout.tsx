@@ -6,11 +6,11 @@ import { Footer } from '../components/common/Footer';
 import { MobileBottomNav } from '../components/common/MobileBottomNav';
 import { FloatingAddPropertyButton } from '../components/common/FloatingAddPropertyButton';
 import { AuthModal } from '../components/auth/AuthModal';
+import { PropertyPreviewModal } from '../components/public/PropertyPreviewModal';
 import { ErrorBoundary } from '../components/common/ErrorBoundary';
 import { Property } from '../types';
 
 // Code split heavy modals - only loaded when requested
-const PropertyPreviewModal = lazy(() => import('../components/public/PropertyPreviewModal').then(m => ({ default: m.PropertyPreviewModal })));
 const PropertyWizardModal = lazy(() => import('../components/seller/PropertyWizardModal').then(m => ({ default: m.PropertyWizardModal })));
 const LegalModal = lazy(() => import('../components/common/LegalModal').then(m => ({ default: m.LegalModal })));
 
@@ -138,7 +138,7 @@ export const MainLayout: React.FC = () => {
       />
 
       {/* Main Content View with Error Boundary */}
-      <main id="main-content" tabIndex={-1} className="flex-1 w-full pb-20 md:pb-12 outline-none">
+      <main id="main-content" tabIndex={-1} className={`flex-1 w-full outline-none ${currentTab === 'START' ? 'pb-8 md:pb-6' : 'pb-20 md:pb-12'}`}>
         <ErrorBoundary>
           <Outlet context={outletContextValue} />
         </ErrorBoundary>
@@ -172,21 +172,19 @@ export const MainLayout: React.FC = () => {
 
       {/* Quick Property Preview Modal (Reserved strictly for quick inspection) */}
       {previewProperty && (
-        <Suspense fallback={null}>
-          <PropertyPreviewModal
-            property={previewProperty}
-            onClose={() => setPreviewProperty(null)}
-            onViewFullDetails={(prop) => {
-              setPreviewProperty(null);
-              navigate(`/property/${prop.reference_number || prop.id}`);
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }}
-            onFilterByTag={(filterType, value) => {
-              setPreviewProperty(null);
-              navigate(`/properties?${filterType}=${encodeURIComponent(value)}`);
-            }}
-          />
-        </Suspense>
+        <PropertyPreviewModal
+          property={previewProperty}
+          onClose={() => setPreviewProperty(null)}
+          onViewFullDetails={(prop) => {
+            setPreviewProperty(null);
+            navigate(`/property/${prop.reference_number || prop.id}`);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+          onFilterByTag={(filterType, value) => {
+            setPreviewProperty(null);
+            navigate(`/properties?${filterType}=${encodeURIComponent(value)}`);
+          }}
+        />
       )}
 
       {/* Property Wizard Modal (5 Steps) */}

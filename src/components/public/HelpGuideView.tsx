@@ -54,13 +54,13 @@ export const HelpGuideView: React.FC<HelpGuideViewProps> = ({ onOpenAddProperty 
       <div className="bg-gradient-to-r from-emerald-900 via-slate-900 to-slate-900 text-white rounded-xl p-8 sm:p-10 border border-emerald-800/40 shadow-xl space-y-4">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-bold">
           <HelpCircle className="w-4 h-4" />
-          <span>مركز المساعدة وإرشادات النشر في كفر الشيخ</span>
+          <span>مركز المساعدة وإرشادات روابط</span>
         </div>
         <h1 className="text-2xl sm:text-4xl font-black">
-          دليل أصحاب العقارات والوسطاء الشامل
+          دليل الملاك والوسطاء والمشترين
         </h1>
         <p className="text-xs sm:text-sm text-slate-300 max-w-2xl leading-relaxed font-medium">
-          تعرف على كيفية نشر عقاراتك باحترافية، ومعايير قبول الإعلانات، وحماية بياناتك وسريتها وفق نموذج الوساطة الموثوق لمنصة روابط.
+          اعرف إزاي تعرض عقارك بأعلى جودة، وشروط نشر العروض، وإزاي بنحمي بياناتك وسريتك من أي إزعاج.
         </p>
 
         <div className="pt-2 flex flex-wrap items-center gap-3">
@@ -68,7 +68,7 @@ export const HelpGuideView: React.FC<HelpGuideViewProps> = ({ onOpenAddProperty 
             onClick={onOpenAddProperty}
             className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-extrabold rounded-xl transition shadow-lg shadow-emerald-600/30"
           >
-            + أضف عقارك الآن
+            + أضف عقارك
           </button>
 
           <a
@@ -76,7 +76,7 @@ export const HelpGuideView: React.FC<HelpGuideViewProps> = ({ onOpenAddProperty 
             className="px-5 py-3 bg-white/10 hover:bg-white/20 text-white text-xs sm:text-sm font-bold rounded-xl transition border border-white/20 flex items-center gap-2"
           >
             <PhoneCall className="w-4 h-4 text-emerald-400" />
-            <span>تحدث مع مستشار روابط: {settings.primary_phone}</span>
+            <span>كلمنا مباشرة: {settings.primary_phone}</span>
           </a>
         </div>
       </div>

@@ -68,14 +68,14 @@ export const PropertyComparisonView: React.FC<PropertyComparisonViewProps> = ({
               <GitCompare className="w-5 h-5" />
             </span>
             <h1 className="text-xl sm:text-2xl font-black text-white">
-              مقارنة العقارات المباشرة
+              مقارنة العقارات
             </h1>
             <span className="text-xs font-bold px-2.5 py-0.5 rounded-lg bg-[#002f00] text-[#14a800] border border-[#14a800]/30">
               {comparedProperties.length} / 4 عقارات
             </span>
           </div>
           <p className="text-xs text-slate-300 font-medium max-w-2xl">
-            قارن بين أسعار ومساحات وتشطيبات ومواصفات العقارات جنباً إلى جنب لاتخاذ أفضل قرار استثماري وسكني.
+            قارن بين الأسعار والمساحات والتشطيبات جنب بعض عشان تختار الأنسب ليك ولميزانيتك.
           </p>
         </div>
 
@@ -87,7 +87,7 @@ export const PropertyComparisonView: React.FC<PropertyComparisonViewProps> = ({
               className="px-4 py-2.5 bg-white/10 hover:bg-rose-900/40 text-slate-200 hover:text-rose-200 border border-white/20 hover:border-rose-500/40 text-xs font-bold rounded-xl transition flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
             >
               <Trash2 className="w-4 h-4" />
-              <span>إفراغ المقارنة</span>
+              <span>مسح المقارنة</span>
             </button>
           )}
 
@@ -97,7 +97,7 @@ export const PropertyComparisonView: React.FC<PropertyComparisonViewProps> = ({
             className="px-5 py-2.5 bg-[#14a800] hover:bg-[#108a00] text-white text-xs font-black rounded-xl transition flex items-center gap-1.5 shadow-2xs cursor-pointer whitespace-nowrap"
           >
             <Plus className="w-4 h-4" />
-            <span>إضافة عقارات أخرى</span>
+            <span>ضيف عقار تاني</span>
           </button>
         </div>
       </div>
@@ -109,9 +109,9 @@ export const PropertyComparisonView: React.FC<PropertyComparisonViewProps> = ({
             <GitCompare className="w-8 h-8" />
           </div>
           <div className="space-y-1 max-w-md mx-auto">
-            <h3 className="text-base font-black text-[#001e00]">لم تختر أي عقارات للمقارنة بعد</h3>
+            <h3 className="text-base font-black text-[#001e00]">مفيش عقارات مضافة للمقارنة</h3>
             <p className="text-xs text-slate-500 font-medium">
-              تصفح قائمة العقارات واضغط على زر "مقارنة" على أي عقار لإضافته إلى جدول المقارنة الفوري.
+              تصفح العقارات ودوس على "مقارنة" على أي عقار عشان تقارن بينهم هنا في ثواني.
             </p>
           </div>
           <button
@@ -119,7 +119,7 @@ export const PropertyComparisonView: React.FC<PropertyComparisonViewProps> = ({
             onClick={onExploreListings}
             className="px-6 py-3 bg-[#14a800] hover:bg-[#108a00] text-white text-xs sm:text-sm font-black rounded-xl transition shadow-2xs inline-flex items-center gap-2 cursor-pointer"
           >
-            <span>استعراض كافة العقارات المتاحة</span>
+            <span>شوف كل العقارات المتاحة</span>
             <ArrowLeft className="w-4 h-4" />
           </button>
         </div>

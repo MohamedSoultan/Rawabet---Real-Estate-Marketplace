@@ -680,7 +680,7 @@ export const PropertyDetailsPage: React.FC<PropertyDetailsPageProps> = ({
                 className="w-full py-3.5 px-4 bg-[#14a800] hover:bg-[#108a00] text-white text-sm font-black rounded-xl transition shadow-md shadow-[#14a800]/20 flex items-center justify-center gap-2 active:scale-98 cursor-pointer min-h-[48px]"
               >
                 <Calendar className="w-4 h-4 text-white" />
-                <span>طلب حجز معاينة ميدانية</span>
+                <span>احجز معاينة على الطبيعة</span>
               </button>
 
               {/* Main CTA 2: WhatsApp */}
@@ -690,7 +690,7 @@ export const PropertyDetailsPage: React.FC<PropertyDetailsPageProps> = ({
                 className="w-full py-3 px-4 bg-[#001e00] hover:bg-[#002f00] text-white text-xs sm:text-sm font-black rounded-xl transition flex items-center justify-center gap-2 active:scale-98 cursor-pointer min-h-[44px]"
               >
                 <MessageSquare className="w-4 h-4 text-[#14a800]" />
-                <span>محادثة واتساب الرسمية</span>
+                <span>واتساب مباشر</span>
               </button>
 
               {/* Main CTA 3: Call */}
@@ -707,15 +707,15 @@ export const PropertyDetailsPage: React.FC<PropertyDetailsPageProps> = ({
               <div className="pt-3 border-t border-slate-100 space-y-2">
                 <div className="flex items-center gap-2 text-xs font-semibold text-slate-700">
                   <CheckCircle2 className="w-3.5 h-3.5 text-[#14a800] shrink-0" />
-                  <span>معاينة حقيقية بحضور ممثل رسمي</span>
+                  <span>معاينة حقيقية مع مستشار روابط</span>
                 </div>
                 <div className="flex items-center gap-2 text-xs font-semibold text-slate-700">
                   <CheckCircle2 className="w-3.5 h-3.5 text-[#14a800] shrink-0" />
-                  <span>مراجعة المستندات والعقود قانونياً</span>
+                  <span>مراجعة العقود وأوراق الملكية</span>
                 </div>
                 <div className="flex items-center gap-2 text-xs font-semibold text-slate-700">
                   <CheckCircle2 className="w-3.5 h-3.5 text-[#14a800] shrink-0" />
-                  <span>وساطة معتمدة بدون عمولات خفية</span>
+                  <span>وساطة أمينة بدون عمولات مستخبية</span>
                 </div>
               </div>
 

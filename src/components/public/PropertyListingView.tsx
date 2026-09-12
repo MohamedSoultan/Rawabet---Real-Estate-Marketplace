@@ -3,6 +3,7 @@ import { Property, FilterCriteria, PropertySortOption, PropertyFilterState } fro
 import { useApp } from '../../context/AppContext';
 import { filterProperties, sortProperties, toFilterCriteria } from '../../services/filterEngine';
 import { PropertyCard } from './PropertyCard';
+import { PropertySlider } from './PropertySlider';
 import { Pagination } from '../common/Pagination';
 import { FloatingFilterButton } from './FloatingFilterButton';
 import { Filter, RotateCcw, ArrowUpDown, ChevronRight, ChevronLeft, Building2, MapPin, Sparkles, LayoutGrid, List, X, SlidersHorizontal, ChevronDown, Search } from 'lucide-react';
@@ -179,9 +180,9 @@ export const PropertyListingView: React.FC<PropertyListingViewProps> = ({
       {!hideHeader ? (
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-6 border-b border-[#e4ebe4]">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-black text-[#001e00]">تصفح العقارات المعتمدة في كفر الشيخ</h1>
+            <h1 className="text-2xl sm:text-3xl font-black text-[#001e00]">عقارات كفر الشيخ المضمونة</h1>
             <p className="text-xs sm:text-sm text-slate-600 font-semibold mt-1">
-              جميع العقارات المعروضة تم فحصها وتدقيق أوراقها من قبل فريق منصة روابط
+              كل المعروض مفحوص ومطابق على الطبيعة من فريق روابط
             </p>
           </div>
 
@@ -192,7 +193,7 @@ export const PropertyListingView: React.FC<PropertyListingViewProps> = ({
               className="lg:hidden flex-1 px-4 py-2.5 bg-[#14a800] hover:bg-[#108a00] text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 active:scale-95 whitespace-nowrap shadow-xs cursor-pointer"
             >
               <Filter className="w-4 h-4" />
-              <span>تصفية وفلاتر البحث</span>
+              <span>فلاتر البحث</span>
               {activeFiltersCount > 0 && (
                 <span className="bg-white text-[#14a800] text-[11px] px-2 py-0.2 rounded-lg font-bold">
                   {activeFiltersCount}
@@ -252,8 +253,8 @@ export const PropertyListingView: React.FC<PropertyListingViewProps> = ({
                 className="bg-transparent text-xs font-bold text-[#001e00] focus:outline-hidden py-0.5 cursor-pointer"
               >
                 <option value="NEWEST">الأحدث أولاً</option>
-                <option value="PRICE_ASC">السعر: من الأقل للأعلى</option>
-                <option value="PRICE_DESC">السعر: من الأعلى للأقل</option>
+                <option value="PRICE_ASC">السعر: الأقل للأعلى</option>
+                <option value="PRICE_DESC">السعر: الأعلى للأقل</option>
               </select>
             </div>
           </div>
@@ -297,7 +298,7 @@ export const PropertyListingView: React.FC<PropertyListingViewProps> = ({
               className="lg:hidden px-3.5 py-1.5 bg-[#14a800] hover:bg-[#108a00] text-white rounded-xl text-xs font-bold flex items-center gap-1.5 active:scale-95 shadow-xs cursor-pointer"
             >
               <Filter className="w-3.5 h-3.5" />
-              <span>تصفية</span>
+              <span>فلاتر</span>
               {activeFiltersCount > 0 && (
                 <span className="bg-white text-[#14a800] text-[10px] px-1.5 rounded-lg font-bold">
                   {activeFiltersCount}
@@ -627,68 +628,64 @@ export const PropertyListingView: React.FC<PropertyListingViewProps> = ({
             </div>
           )}
 
-          {/* Cards Grid with subtle fade transition */}
-          {paginatedProperties.length === 0 ? (
-            <div className="bg-white rounded-xl p-8 sm:p-12 text-center border border-[#e4ebe4] shadow-xs space-y-5 animate-soft-fade">
-              <div className="w-16 h-16 rounded-xl bg-[#f2f7f2] text-[#14a800] flex items-center justify-center mx-auto shadow-xs">
-                <Sparkles className="w-8 h-8" />
+          {/* Results Display - Threshold Rule: Carousel/Slider when > 3 cards, Grid when <= 3 */}
+          {filteredProperties.length === 0 ? (
+            <div className="bg-white rounded-xl p-6 sm:p-10 text-center border border-[#e4ebe4] shadow-xs space-y-4 animate-soft-fade">
+              <div className="w-14 h-14 rounded-xl bg-[#f2f7f2] text-[#14a800] flex items-center justify-center mx-auto shadow-xs">
+                <Sparkles className="w-7 h-7" />
               </div>
-              <div className="space-y-2">
-                <h3 className="text-lg sm:text-xl font-black text-[#001e00]">
-                  لم نجد العقار المثالي بالمواصفات الحالية
+              <div className="space-y-1">
+                <h3 className="text-base sm:text-lg font-black text-[#001e00]">
+                  ملقناش عقار بالمواصفات دي
                 </h3>
                 <p className="text-xs sm:text-sm text-slate-600 max-w-md mx-auto leading-relaxed font-medium">
-                  فريق مستشاري ووسطاء روابط يمكنه توفير العقار بالمواصفات والسعر المطلوب نيابة عنك بدون أي عناء.
+                  اكتب مواصفاتك وفريقنا هيوفرهالك بالسعر اللي يناسبك وبدون لفة.
                 </p>
               </div>
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-2.5 pt-1">
                 <button
                   type="button"
                   onClick={() => setIsRequestModalOpen(true)}
-                  className="w-full sm:w-auto px-7 py-3 bg-[#14a800] hover:bg-[#108a00] text-white text-xs sm:text-sm font-bold rounded-xl transition shadow-xs flex items-center justify-center gap-2 active:scale-95 cursor-pointer"
+                  className="w-full sm:w-auto px-6 py-2.5 bg-[#14a800] hover:bg-[#108a00] text-white text-xs sm:text-sm font-bold rounded-xl transition shadow-xs flex items-center justify-center gap-2 active:scale-95 cursor-pointer"
                 >
                   <Sparkles className="w-4 h-4" />
-                  <span>اطلب عقارك بمواصفات خاصة</span>
+                  <span>اطلب عقارك</span>
                 </button>
                 <button
                   type="button"
                   onClick={resetFilters}
-                  className="w-full sm:w-auto px-5 py-3 border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs sm:text-sm font-bold rounded-xl transition cursor-pointer"
+                  className="w-full sm:w-auto px-5 py-2.5 border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs sm:text-sm font-bold rounded-xl transition cursor-pointer"
                 >
-                  إعادة ضبط فلاتر البحث
+                  مسح الفلاتر
                 </button>
               </div>
             </div>
+          ) : filteredProperties.length > 3 ? (
+            /* Threshold Rule: > 3 properties rendered as horizontal Carousel/Slider */
+            <div className="space-y-4">
+              <PropertySlider
+                properties={filteredProperties}
+                onSelectProperty={onSelectProperty}
+                onPreviewClick={onSelectProperty}
+                onFilterByTag={handleCardFilterTag}
+                hideHeader={false}
+                title="العقارات المتاحة"
+                subtitle={`لقينا ${filteredProperties.length} عقار متراجع ومفحوص`}
+              />
+            </div>
           ) : (
-            <div className={
-              viewMode === 'list' 
-                ? "flex flex-col gap-4 animate-soft-fade w-full" 
-                : `grid grid-cols-1 sm:grid-cols-2 ${showDesktopSidebar && !hideHeader ? 'lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4' : 'lg:grid-cols-3 xl:grid-cols-4'} gap-4 sm:gap-5 lg:gap-6 animate-soft-fade w-full`
-            }>
-              {paginatedProperties.map(property => (
+            /* Grid for <= 3 properties */
+            <div className={`grid grid-cols-1 sm:grid-cols-2 ${showDesktopSidebar && !hideHeader ? 'lg:grid-cols-2 xl:grid-cols-3' : 'lg:grid-cols-3'} gap-4 sm:gap-5 animate-soft-fade w-full`}>
+              {filteredProperties.map(property => (
                 <div key={property.id} className="w-full min-w-0 max-w-full h-full flex flex-col overflow-hidden">
                   <PropertyCard
                     property={property}
-                    viewMode={viewMode}
                     onSelect={onSelectProperty}
                     onFilterTag={handleCardFilterTag}
                   />
                 </div>
               ))}
             </div>
-          )}
-
-          {/* Reusable Enterprise Pagination */}
-          {totalPages > 1 && (
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={(page) => setCurrentPage(page)}
-              scrollTargetId="property-results-grid"
-              showItemCount={true}
-              totalItems={filteredProperties.length}
-              pageSize={PAGE_SIZE}
-            />
           )}
 
         </section>

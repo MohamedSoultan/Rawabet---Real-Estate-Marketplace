@@ -149,7 +149,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
                   <span className="w-1.5 h-1.5 rounded-full bg-[#14a800]"></span>
                 </div>
                 <span className="text-[10.5px] font-bold text-slate-500 mt-0.5">
-                  عقارات كفر الشيخ المعتمدة
+                  عقارات كفر الشيخ المضمونة
                 </span>
               </div>
             </div>
@@ -202,8 +202,8 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
             ) : (
               <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <div className="text-xs font-black text-slate-800">مرحباً بك في روابط</div>
-                  <div className="text-[11px] text-slate-500 font-bold">سجّل دخولك للوصول لكامل المزايا</div>
+                  <div className="text-xs font-black text-slate-800">أهلاً بيك في روابط</div>
+                  <div className="text-[11px] text-slate-500 font-bold">سجّل دخولك عشان تكمل بسهولة</div>
                 </div>
                 <button
                   type="button"
@@ -307,9 +307,9 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
             >
               <div className="flex items-center gap-2.5">
                 <Layers className="w-4 h-4" />
-                <span>بوابة الملاك والوسطاء والمستثمرين</span>
+                <span>لوحة أصحاب العقارات</span>
               </div>
-              <span className="text-[10px] text-slate-400 font-semibold">إدارة المعروض</span>
+              <span className="text-[10px] text-slate-400 font-semibold">إدارة عقاراتك</span>
             </button>
 
             {/* 5. لوحة العمليات للموظفين المصرح لهم فقط */}
@@ -325,7 +325,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
               >
                 <div className="flex items-center gap-2.5">
                   <LayoutDashboard className="w-4 h-4" />
-                  <span>لوحة العمليات والمراجعة</span>
+                  <span>لوحة العمليات</span>
                 </div>
               </button>
             )}
@@ -339,7 +339,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
               >
                 <div className="flex items-center gap-2.5">
                   <ShieldCheck className="w-4 h-4 text-purple-700" />
-                  <span>إدارة المستخدمين والأدوار (RBAC)</span>
+                  <span>إدارة المستخدمين والأدوار</span>
                 </div>
               </button>
             )}

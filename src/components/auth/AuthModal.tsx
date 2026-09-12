@@ -244,13 +244,13 @@ export const AuthModal: React.FC = () => {
             </div>
             <div>
               <span className="text-[11px] font-bold uppercase tracking-wider text-[#14a800] block mb-0.5">
-                منصة روابط العقارية
+                منصة روابط
               </span>
               <h3 id="auth-modal-title" className="text-base sm:text-lg font-black text-white">
-                {activeTab === 'LOGIN' && 'تسجيل الدخول للمنصة'}
-                {activeTab === 'REGISTER' && 'إنشاء حساب جديد'}
-                {activeTab === 'OTP' && 'تأكيد البريد الإلكتروني (OTP)'}
-                {activeTab === 'FORGOT_PASSWORD' && 'استعادة كلمة المرور'}
+                {activeTab === 'LOGIN' && 'تسجيل الدخول'}
+                {activeTab === 'REGISTER' && 'حساب جديد'}
+                {activeTab === 'OTP' && 'كود التأكيد (OTP)'}
+                {activeTab === 'FORGOT_PASSWORD' && 'نسيت كلمة السر'}
               </h3>
             </div>
           </div>
@@ -292,7 +292,7 @@ export const AuthModal: React.FC = () => {
               }`}
             >
               <UserIcon className="w-4 h-4 text-[#14a800]" />
-              <span>إنشاء حساب جديد</span>
+              <span>حساب جديد</span>
             </button>
           </div>
         )}
@@ -595,7 +595,7 @@ export const AuthModal: React.FC = () => {
                 type="submit"
                 className="w-full py-3 px-4 bg-[#14a800] hover:bg-[#108a00] text-white text-sm font-bold rounded-xl transition shadow-xs flex items-center justify-center gap-2 active:scale-98 cursor-pointer"
               >
-                <span>إنشاء الحساب والمتابعة</span>
+                <span>إنشاء الحساب</span>
                 <ArrowRight className="w-4 h-4 rotate-180" />
               </button>
             </div>
@@ -606,7 +606,7 @@ export const AuthModal: React.FC = () => {
         {activeTab === 'FORGOT_PASSWORD' && (
           <form onSubmit={handleForgotPasswordSubmit} className="p-6 space-y-4">
             <p className="text-xs text-slate-600 font-bold leading-relaxed">
-              أدخل بريدك الإلكتروني أو رقم هاتفك المسجل وسنرسل لك رابطاً مباشراً لتعيين كلمة مرور جديدة فوراً.
+              اكتب إيميلك أو رقم موبايلك المسجل وهنبعتلك رابط لعمل كلمة سر جديدة في ثواني.
             </p>
 
             <div>
@@ -631,7 +631,7 @@ export const AuthModal: React.FC = () => {
                 type="submit"
                 className="flex-1 py-3 px-4 bg-[#14a800] hover:bg-[#108a00] text-white text-xs sm:text-sm font-bold rounded-xl transition shadow-xs flex items-center justify-center gap-2 cursor-pointer"
               >
-                <span>إرسال رابط الاستعادة</span>
+                <span>إرسال الرابط</span>
               </button>
 
               <button
@@ -639,7 +639,7 @@ export const AuthModal: React.FC = () => {
                 onClick={() => { setActiveTab('LOGIN'); setErrorMessage(''); setSuccessMessage(''); }}
                 className="py-3 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs sm:text-sm font-bold rounded-xl transition cursor-pointer"
               >
-                <span>إلغاء والعودة</span>
+                <span>رجوع</span>
               </button>
             </div>
           </form>
@@ -653,9 +653,9 @@ export const AuthModal: React.FC = () => {
             </div>
 
             <div>
-              <h4 className="text-base font-black text-slate-900">أدخل كود التحقق (OTP)</h4>
+              <h4 className="text-base font-black text-slate-900">كود التحقق (OTP)</h4>
               <p className="text-xs text-slate-600 mt-1 leading-relaxed font-bold">
-                تم إرسال كود تأكيد مكوّن من 6 أرقام إلى:
+                بعتنا كود تأكيد 6 أرقام إلى:
                 <br />
                 <span className="font-black text-slate-900 dir-ltr inline-block mt-0.5">{email}</span>
               </p>
@@ -677,7 +677,7 @@ export const AuthModal: React.FC = () => {
             {/* Countdown & Resend */}
             <div className="flex items-center justify-center gap-2 text-xs text-slate-500 font-bold">
               {countdown > 0 ? (
-                <span>يمكنك إعادة إرسال الكود بعد ({countdown} ثانية)</span>
+                <span>إعادة الإرسال بعد ({countdown} ثانية)</span>
               ) : (
                 <button
                   type="button"
@@ -685,7 +685,7 @@ export const AuthModal: React.FC = () => {
                   className="text-[#14a800] font-bold hover:underline inline-flex items-center gap-1 cursor-pointer"
                 >
                   <RotateCw className="w-3.5 h-3.5" />
-                  <span>إرسال الكود مجدداً</span>
+                  <span>إرسال الكود تاني</span>
                 </button>
               )}
             </div>
@@ -696,7 +696,7 @@ export const AuthModal: React.FC = () => {
               className="w-full py-3.5 px-4 bg-[#14a800] hover:bg-[#108a00] text-white text-sm font-bold rounded-xl transition shadow-xs flex items-center justify-center gap-2 active:scale-98 cursor-pointer"
             >
               <CheckCircle2 className="w-4 h-4" />
-              <span>تأكيد وتسجيل الدخول</span>
+              <span>تأكيد ودخول</span>
             </button>
           </form>
         )}

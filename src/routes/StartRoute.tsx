@@ -43,6 +43,15 @@ export const StartRoute: React.FC = () => {
 
   const [currentStep, setCurrentStep] = useState<number>(1);
   const totalSteps = 5;
+  // Gamified progress percentage map
+  const stepProgressPercentage: Record<number, number> = {
+    1: 30,
+    2: 60,
+    3: 90,
+    4: 95,
+    5: 100,
+  };
+  const currentProgress = stepProgressPercentage[currentStep] || 30;
 
   // Loading transition state for Phase 6
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -152,43 +161,43 @@ export const StartRoute: React.FC = () => {
   const interestQuestions = useMemo(() => {
     if (typeName.includes('شقة') || typeName.includes('استوديو') || typeName.includes('دوبلكس')) {
       return [
-        { id: 'near_services', label: 'قريب من الخدمات والمدارس؟', internalFeature: 'خدمات', desc: 'موقع حيوي يسهل الوصول للمرافق اليومية' },
-        { id: 'family_suitable', label: 'مناسب لعائلة؟', internalFeature: 'عائلي', desc: 'تقسيم عملي وعدد غرف كافٍ للأسرة' },
-        { id: 'larger_area', label: 'مساحة أكبر؟', internalFeature: 'مساحة واسعة', desc: 'غرف رحبة واستقبال مريح' },
-        { id: 'luxury_finishing', label: 'تشطيب فاخر وجاهز للسكن؟', internalFeature: 'تشطيب سوبر لوكس', desc: 'تجهيزات راقية دون حاجة لمصروفات إضافية' }
+        { id: 'near_services', label: 'قريب من الخدمات', internalFeature: 'خدمات', desc: '', icon: Store },
+        { id: 'family_suitable', label: 'مناسب لعائلة', internalFeature: 'عائلي', desc: '', icon: Home },
+        { id: 'larger_area', label: 'مساحة واسعة', internalFeature: 'مساحة واسعة', desc: '', icon: Layers },
+        { id: 'luxury_finishing', label: 'تشطيب سوبر لوكس', internalFeature: 'تشطيب سوبر لوكس', desc: '', icon: Sparkles }
       ];
     }
     if (typeName.includes('فيلا') || typeName.includes('بيت') || typeName.includes('تاون')) {
       return [
-        { id: 'privacy', label: 'خصوصية تامة؟', internalFeature: 'خصوصية', desc: 'مدخل مستقل وإحساس كامل بالراحة والهدوء' },
-        { id: 'garden', label: 'حديقة أو مساحة خارجية؟', internalFeature: 'حديقة', desc: 'مساحة خضراء للاسترخاء وجلسات العائلة' },
-        { id: 'large_space', label: 'مساحة كبيرة وتعدد أدوار؟', internalFeature: 'مساحة واسعة', desc: 'مساحات مخصصة للمعيشة والضيوف' },
-        { id: 'upscale_area', label: 'منطقة راقية ومميزة؟', internalFeature: 'حي راقي', desc: 'موقع هادئ بمستوى اجتماعي متميز' }
+        { id: 'privacy', label: 'خصوصية وهدوء', internalFeature: 'خصوصية', desc: '', icon: ShieldCheck },
+        { id: 'garden', label: 'حديقة خاصة', internalFeature: 'حديقة', desc: '', icon: Trees },
+        { id: 'large_space', label: 'مساحة كبيرة', internalFeature: 'مساحة واسعة', desc: '', icon: Layers },
+        { id: 'upscale_area', label: 'منطقة راقية', internalFeature: 'حي راقي', desc: '', icon: Compass }
       ];
     }
     if (typeName.includes('محل') || typeName.includes('تجاري') || typeName.includes('مكتب') || selectedIntent === 'COMMERCIAL') {
       return [
-        { id: 'main_street', label: 'شارع رئيسي؟', internalFeature: 'شارع رئيسي', desc: 'واجهة واضحة على محور حركة رئيسي' },
-        { id: 'vital_area', label: 'منطقة حيوية تجارياً؟', internalFeature: 'منطقة حيوية', desc: 'سوق نشط يجذب العملاء والمترددين' },
-        { id: 'customer_traffic', label: 'حركة عملاء وكثافة مرورية؟', internalFeature: 'كثافة مرورية', desc: 'فرصة تشغيلية مرتفعة لنجاح النشاط' },
-        { id: 'strong_facade', label: 'واجهة قوية وإمكانية لافتة؟', internalFeature: 'واجهة عريضة', desc: 'رؤية بصرية واضحة للعلامة التجارية' }
+        { id: 'main_street', label: 'شارع رئيسي', internalFeature: 'شارع رئيسي', desc: '', icon: Compass },
+        { id: 'vital_area', label: 'منطقة حيوية', internalFeature: 'منطقة حيوية', desc: '', icon: Store },
+        { id: 'customer_traffic', label: 'كثافة مرورية', internalFeature: 'كثافة مرورية', desc: '', icon: TrendingUp },
+        { id: 'strong_facade', label: 'واجهة عريضة', internalFeature: 'واجهة عريضة', desc: '', icon: Building2 }
       ];
     }
     if (typeName.includes('أرض') || selectedIntent === 'INVEST') {
       return [
-        { id: 'investment_potential', label: 'فرصة استثمار ونمو للقيمة؟', internalFeature: 'استثمار', desc: 'عائد واعد وزيادة سنوية متوقعة في السعر' },
-        { id: 'ready_building', label: 'صالحة للبناء الفوري وتراخيص؟', internalFeature: 'بناء', desc: 'موقف تخطيطي وقانوني واضح للبناء' },
-        { id: 'future_location', label: 'موقع مستقبلي وامتداد عمراني؟', internalFeature: 'امتداد عمراني', desc: 'مناطق واعدة تشهد توسعاً حضرياً مستمراً' },
-        { id: 'clear_documents', label: 'أوراق ملكية مسجلة وموثقة؟', internalFeature: 'حصة بالأرض', desc: 'تسلسل ملكية واضح وسندات سليمة 100%' }
+        { id: 'investment_potential', label: 'عائد استثماري', internalFeature: 'استثمار', desc: '', icon: TrendingUp },
+        { id: 'ready_building', label: 'بناء وتراخيص', internalFeature: 'بناء', desc: '', icon: Building2 },
+        { id: 'future_location', label: 'امتداد عمراني', internalFeature: 'امتداد عمراني', desc: '', icon: Compass },
+        { id: 'clear_documents', label: 'أوراق مسجلة', internalFeature: 'حصة بالأرض', desc: '', icon: ShieldCheck }
       ];
     }
 
     // Default general preferences
     return [
-      { id: 'near_services', label: 'قريب من الخدمات الحيوية؟', internalFeature: 'خدمات', desc: 'موقع مناسب يلبي كافة الاحتياجات' },
-      { id: 'family_suitable', label: 'مناسب لأسرة واستقرار طويل الأجل؟', internalFeature: 'عائلي', desc: 'بيئة هادئة ومريحة' },
-      { id: 'luxury_finishing', label: 'تشطيب فوري وجاهز للاستخدام؟', internalFeature: 'تشطيب سوبر لوكس', desc: 'جاهز للمعاينة والانتقال مباشرة' },
-      { id: 'main_street', label: 'مطل على شارع واسع ومريح؟', internalFeature: 'شارع رئيسي', desc: 'سهولة الدخول والخروج وصف السيارات' }
+      { id: 'near_services', label: 'قريب من الخدمات', internalFeature: 'خدمات', desc: '', icon: Store },
+      { id: 'family_suitable', label: 'مناسب لعائلة', internalFeature: 'عائلي', desc: '', icon: Home },
+      { id: 'luxury_finishing', label: 'تشطيب فوري', internalFeature: 'تشطيب سوبر لوكس', desc: '', icon: Sparkles },
+      { id: 'main_street', label: 'شارع رئيسي', internalFeature: 'شارع رئيسي', desc: '', icon: Compass }
     ];
   }, [typeName, selectedIntent]);
 
@@ -270,349 +279,219 @@ export const StartRoute: React.FC = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-10 space-y-6 sm:space-y-8 animate-soft-fade" dir="rtl">
+    <div className="max-w-2xl lg:max-w-3xl mx-auto px-3 sm:px-4 py-1.5 sm:py-2 flex flex-col justify-center min-h-[calc(100vh-85px)] animate-soft-fade" dir="rtl">
       
       {/* PHASE 6: Elegant Loading Overlay Transition */}
       {isSubmitting && (
         <div className="fixed inset-0 z-50 bg-white/95 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center animate-soft-fade">
-          <div className="w-20 h-20 rounded-2xl bg-[#f0faf0] border-2 border-[#14a800]/20 flex items-center justify-center shadow-lg mb-6 relative">
+          <div className="w-14 h-14 rounded-2xl bg-[#f0faf0] border-2 border-[#14a800]/20 flex items-center justify-center shadow-lg mb-3 relative">
             <div className="absolute inset-0 rounded-2xl bg-[#14a800]/10 animate-ping opacity-30"></div>
             {loadingPhase === 'SEARCHING' ? (
-              <Loader2 className="w-10 h-10 text-[#14a800] animate-spin" />
+              <Loader2 className="w-7 h-7 text-[#14a800] animate-spin" />
             ) : (
-              <CheckCircle2 className="w-10 h-10 text-[#14a800] animate-bounce" />
+              <CheckCircle2 className="w-7 h-7 text-[#14a800] animate-bounce" />
             )}
           </div>
 
-          <div className="space-y-2 max-w-md">
-            <h3 className="text-xl sm:text-2xl font-black text-[#001e00]">
-              {loadingPhase === 'SEARCHING' ? 'نبحث عن أفضل الخيارات لك...' : 'وجدنا لك عقارات تناسب اهتماماتك'}
+          <div className="space-y-1 max-w-md">
+            <h3 className="text-base sm:text-lg font-black text-[#001e00]">
+              {loadingPhase === 'SEARCHING' ? 'بندورلك على أحسن الخيارات...' : 'لقينا عقارات مناسبة لطلبك!'}
             </h3>
-            <p className="text-sm text-slate-500 font-medium">
+            <p className="text-xs text-slate-500 font-medium">
               {loadingPhase === 'SEARCHING'
-                ? 'نقوم بمطابقة تفضيلاتك مع كافة العقارات المعتمدة والمفحوصة بكفر الشيخ'
-                : 'يتم تحويلك الآن لاستعراض الخيارات المختارة بعناية لك'}
+                ? 'بنطابق مواصفاتك مع كافة العقارات المعتمدة بكفر الشيخ'
+                : 'ثواني وهتتفرج على العقارات المختارة ليك'}
             </p>
-          </div>
-
-          <div className="mt-8 flex items-center gap-2 text-xs font-bold text-[#14a800] bg-[#f0faf0] px-4 py-2 rounded-xl border border-[#14a800]/20">
-            <ShieldCheck className="w-4 h-4" />
-            <span>روابط - مستشارك العقاري الرقمي الموثوق</span>
           </div>
         </div>
       )}
 
-      {/* Header Banner — Advisor Persona (Not a robotic filter form) */}
-      <div className="text-center space-y-3">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-[#f0faf0] border border-[#14a800]/30 text-[#14a800] text-xs font-bold shadow-2xs">
-          <Sparkles className="w-3.5 h-3.5 text-[#14a800]" />
-          <span>البحث الذكي — روابط مستشارك العقاري الرقمي</span>
-        </div>
-
-        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-[#001e00] tracking-tight">
-          البحث الذكي
-        </h1>
-
-        {/* Value Proposition — 60s Goal without stressful countdown */}
-        <div className="flex items-center justify-center gap-2 text-xs sm:text-sm font-bold text-slate-600">
-          <Clock className="w-4 h-4 text-[#14a800]" />
-          <span>سنساعدك للوصول للعقار المناسب خلال أقل من دقيقة</span>
-        </div>
-
-        <p className="text-xs sm:text-sm text-slate-500 font-medium max-w-lg mx-auto">
-          أجب عن خطوات بسيطة لنوجهك مباشرة إلى الخيارات الأنسب لاحتياجاتك دون عناء البحث العشوائي
-        </p>
-      </div>
-
-      {/* Elegant Progress Indicator (No stressful countdown, clean visual steps) */}
-      <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-3">
-        <div className="flex items-center justify-between text-xs font-bold text-slate-600">
-          <span className="flex items-center gap-1.5 text-[#14a800]">
-            <Compass className="w-4 h-4" />
-            <span>الخطوة {currentStep} من {totalSteps}:</span>
-            <span className="text-[#001e00] font-black">
-              {currentStep === 1 && 'ما الذي تبحث عنه؟'}
-              {currentStep === 2 && 'نوع العقار'}
-              {currentStep === 3 && 'الموقع والمنطقة'}
-              {currentStep === 4 && 'الميزانية المناسبة'}
-              {currentStep === 5 && 'تفضيلاتك واهتماماتك'}
-            </span>
-          </span>
-
+      {/* Main Wizard Card Container - Tight vertical footprint to fit cleanly in 100vh */}
+      <div className="space-y-2">
+        {/* Compact Header */}
+        <div className="flex items-center justify-between px-1">
+          <div className="flex items-center gap-1.5">
+            <Sparkles className="w-4 h-4 text-[#14a800]" />
+            <h1 className="text-sm sm:text-base font-black text-[#001e00]">
+              يلا نبدأ البحث الذكي؟
+            </h1>
+          </div>
           <button
             type="button"
             onClick={handleReset}
             className="inline-flex items-center gap-1 text-[11px] font-bold text-slate-400 hover:text-slate-700 transition cursor-pointer"
-            title="إعادة البدء من جديد"
+            title="إعادة البدء"
           >
             <RotateCcw className="w-3 h-3" />
-            <span>إعادة ضبط</span>
+            <span>من الأول</span>
           </button>
         </div>
 
-        {/* Step Progress Bar */}
-        <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+        {/* Gamified Progress Bar (30% -> 60% -> 90% -> 95% -> 100%) - Visual only */}
+        <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden relative shadow-2xs">
           <div 
-            className="bg-[#14a800] h-full rounded-full transition-all duration-300 ease-out"
-            style={{ width: `${(currentStep / totalSteps) * 100}%` }}
+            className="bg-gradient-to-l from-[#14a800] to-emerald-500 h-full rounded-full transition-all duration-500 ease-out"
+            style={{ width: `${currentProgress}%` }}
           />
         </div>
 
-        {/* Visual Step Dots */}
-        <div className="flex items-center justify-between pt-1 text-[11px] font-bold text-slate-400">
-          {['الهدف', 'النوع', 'الموقع', 'الميزانية', 'التفضيلات'].map((label, idx) => {
-            const stepNum = idx + 1;
-            const isDone = stepNum < currentStep;
-            const isCurrent = stepNum === currentStep;
-            return (
-              <div 
-                key={idx}
-                className={`flex items-center gap-1 transition ${
-                  isCurrent ? 'text-[#14a800] font-black' : isDone ? 'text-slate-700' : 'text-slate-400'
-                }`}
-              >
-                <div className={`w-4 h-4 rounded-full flex items-center justify-center text-[10px] ${
-                  isCurrent 
-                    ? 'bg-[#14a800] text-white' 
-                    : isDone 
-                      ? 'bg-emerald-100 text-[#14a800]' 
-                      : 'bg-slate-100 text-slate-400'
-                }`}>
-                  {isDone ? '✓' : stepNum}
+        {/* Step Content Card */}
+        <div className="bg-white rounded-xl sm:rounded-2xl p-3.5 sm:p-4.5 border border-slate-200 shadow-2xs">
+          {/* STEP 1: What are you looking for? */}
+          {currentStep === 1 && (
+            <div className="space-y-2.5 animate-soft-fade">
+              <h2 className="text-sm sm:text-base font-black text-[#001e00] flex items-center gap-1.5">
+                <Compass className="w-4 h-4 text-[#14a800]" />
+                <span>عايز إيه بالضبط؟</span>
+              </h2>
+
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-2.5">
+                {[
+                  { id: 'BUY', title: 'شراء عقار', icon: Home },
+                  { id: 'RENT', title: 'إيجار عقار', icon: Key },
+                  { id: 'INVEST', title: 'فرصة استثمار', icon: TrendingUp },
+                  { id: 'COMMERCIAL', title: 'عقار تجاري', icon: Store },
+                ].map((choice) => {
+                  const isSelected = selectedIntent === choice.id;
+                  const IconComponent = choice.icon;
+                  return (
+                    <button
+                      key={choice.id}
+                      type="button"
+                      onClick={() => handleSelectIntent(choice.id as any)}
+                      className={`p-2.5 sm:p-3 rounded-xl border-2 text-center transition cursor-pointer flex flex-col items-center justify-center gap-1.5 group relative ${
+                        isSelected
+                          ? 'border-[#14a800] bg-[#f0faf0] shadow-2xs'
+                          : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/70'
+                      }`}
+                    >
+                      <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center transition ${
+                        isSelected ? 'bg-[#14a800] text-white' : 'bg-slate-100 text-slate-700'
+                      }`}>
+                        <IconComponent className="w-4 h-4" />
+                      </div>
+                      <span className="font-black text-xs text-[#001e00] block">{choice.title}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* STEP 2: Property Type */}
+          {currentStep === 2 && (
+            <div className="space-y-2.5 animate-soft-fade">
+              <h2 className="text-sm sm:text-base font-black text-[#001e00] flex items-center gap-1.5">
+                <Building2 className="w-4 h-4 text-[#14a800]" />
+                <span>نوع العقار اللي بتدور عليه</span>
+              </h2>
+
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setFilterState(prev => ({ ...prev, propertyType: '' }))}
+                  className={`p-2 sm:p-2.5 rounded-xl border text-center transition cursor-pointer flex flex-col items-center justify-center gap-1 ${
+                    !filterState.propertyType
+                      ? 'border-[#14a800] bg-[#f0faf0] text-[#14a800] font-black shadow-2xs'
+                      : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50 font-bold'
+                  }`}
+                >
+                  <Compass className="w-4 h-4 text-[#14a800]" />
+                  <span className="text-xs">كل الأنواع</span>
+                </button>
+
+                {propertyTypes.slice(0, 7).map(pt => {
+                  const isSelected = filterState.propertyType === pt.id;
+                  const IconComponent = getPropertyIcon(pt.name_ar);
+                  return (
+                    <button
+                      key={pt.id}
+                      type="button"
+                      onClick={() => setFilterState(prev => ({ ...prev, propertyType: pt.id }))}
+                      className={`p-2 sm:p-2.5 rounded-xl border text-center transition cursor-pointer flex flex-col items-center justify-center gap-1 ${
+                        isSelected
+                          ? 'border-[#14a800] bg-[#f0faf0] text-[#14a800] font-black shadow-2xs'
+                          : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50 font-bold'
+                      }`}
+                    >
+                      <IconComponent className={`w-4 h-4 ${isSelected ? 'text-[#14a800]' : 'text-slate-500'}`} />
+                      <span className="text-xs">{pt.name_ar}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* STEP 3: Location */}
+          {currentStep === 3 && (
+            <div className="space-y-2.5 animate-soft-fade">
+              <h2 className="text-sm sm:text-base font-black text-[#001e00] flex items-center gap-1.5">
+                <MapPin className="w-4 h-4 text-[#14a800]" />
+                <span>فين في كفر الشيخ؟</span>
+              </h2>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                <div className="space-y-1">
+                  <label className="block text-xs font-bold text-slate-800">
+                    المركز / المدينة
+                  </label>
+                  <select
+                    value={filterState.location?.city_id || ''}
+                    onChange={e => {
+                      const nextCity = e.target.value;
+                      setFilterState(prev => ({
+                        ...prev,
+                        location: {
+                          ...prev.location,
+                          city_id: nextCity,
+                          area_id: '',
+                        },
+                      }));
+                    }}
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-900 focus:bg-white focus:border-[#14a800] outline-hidden cursor-pointer"
+                  >
+                    <option value="">كل مدن كفر الشيخ</option>
+                    {cities.filter(c => c.is_active).map(c => (
+                      <option key={c.id} value={c.id}>
+                        {c.name_ar}
+                      </option>
+                    ))}
+                  </select>
                 </div>
-                <span className="hidden sm:inline">{label}</span>
-              </div>
-            );
-          })}
-        </div>
-      </div>
 
-      {/* Main Form Container */}
-      <div className="bg-white rounded-2xl p-5 sm:p-8 border border-slate-200 shadow-sm relative">
-        
-        {/* STEP 1: What are you looking for? */}
-        {currentStep === 1 && (
-          <div className="space-y-6 animate-soft-fade">
-            <div className="space-y-1">
-              <h2 className="text-lg sm:text-xl font-black text-[#001e00] flex items-center gap-2">
-                <Compass className="w-5 h-5 text-[#14a800]" />
-                <span>ما الذي تبحث عنه اليوم؟</span>
-              </h2>
-              <p className="text-xs sm:text-sm text-slate-500 font-medium">
-                اختر الغرض الأساسي لنرشدك إلى الخيارات الأنسب لاحتياجك
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {[
-                {
-                  id: 'BUY',
-                  title: 'شراء عقار',
-                  desc: 'البحث عن فرصة شراء وتملك سكني أو عائلي دائم بأوراق قانونية مؤكدة',
-                  icon: Home,
-                  badge: 'شراء وتملك'
-                },
-                {
-                  id: 'RENT',
-                  title: 'إيجار عقار',
-                  desc: 'خيارات إيجار سكني وتجاري مرنة وموثقة بعقود واضحة وبدون وسطاء عشوائيين',
-                  icon: Key,
-                  badge: 'إيجار شهري / سنوي'
-                },
-                {
-                  id: 'INVEST',
-                  title: 'فرصة استثمار',
-                  desc: 'عقارات وأراضٍ ذات عائد إيجاري ونمو رأسمالي واعد في محافظة كفر الشيخ',
-                  icon: TrendingUp,
-                  badge: 'عوائد ونمو'
-                },
-                {
-                  id: 'COMMERCIAL',
-                  title: 'عقار تجاري',
-                  desc: 'محلات، مكاتب، وعيادات في مواقع استراتيجية ذات حركة تجارية نشطة',
-                  icon: Store,
-                  badge: 'أنشطة وأعمال'
-                },
-              ].map((choice) => {
-                const isSelected = selectedIntent === choice.id;
-                const IconComponent = choice.icon;
-                return (
-                  <button
-                    key={choice.id}
-                    type="button"
-                    onClick={() => handleSelectIntent(choice.id as any)}
-                    className={`p-5 rounded-2xl border-2 text-right transition cursor-pointer flex flex-col justify-between gap-4 group ${
-                      isSelected
-                        ? 'border-[#14a800] bg-[#f0faf0] shadow-sm'
-                        : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/60'
-                    }`}
+                <div className="space-y-1">
+                  <label className="block text-xs font-bold text-slate-800">
+                    الحي / المنطقة
+                  </label>
+                  <select
+                    disabled={!filterState.location?.city_id}
+                    value={filterState.location?.area_id || ''}
+                    onChange={e =>
+                      setFilterState(prev => ({
+                        ...prev,
+                        location: {
+                          ...prev.location,
+                          area_id: e.target.value,
+                        },
+                      }))
+                    }
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-900 focus:bg-white focus:border-[#14a800] outline-hidden cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    <div className="flex items-center justify-between">
-                      <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition ${
-                        isSelected ? 'bg-[#14a800] text-white shadow-xs' : 'bg-slate-100 text-slate-700 group-hover:bg-slate-200'
-                      }`}>
-                        <IconComponent className="w-6 h-6" />
-                      </div>
-                      <div className={`w-6 h-6 rounded-full flex items-center justify-center border transition ${
-                        isSelected 
-                          ? 'border-[#14a800] bg-[#14a800] text-white' 
-                          : 'border-slate-300 bg-white'
-                      }`}>
-                        {isSelected && <Check className="w-4 h-4 stroke-[3]" />}
-                      </div>
-                    </div>
-
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2">
-                        <span className="font-black text-base sm:text-lg text-[#001e00]">{choice.title}</span>
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-100 text-slate-600">
-                          {choice.badge}
-                        </span>
-                      </div>
-                      <p className="text-xs text-slate-500 font-medium leading-relaxed">
-                        {choice.desc}
-                      </p>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        )}
-
-        {/* STEP 2: Property Type (Dynamic from existing types) */}
-        {currentStep === 2 && (
-          <div className="space-y-6 animate-soft-fade">
-            <div className="space-y-1">
-              <h2 className="text-lg sm:text-xl font-black text-[#001e00] flex items-center gap-2">
-                <Building2 className="w-5 h-5 text-[#14a800]" />
-                <span>ما هو نوع العقار المفضل؟</span>
-              </h2>
-              <p className="text-xs sm:text-sm text-slate-500 font-medium">
-                اختر التصنيف الأكثر ملاءمة لاحتياجك، أو اختر "كافة الأنواع" للاستعراض الشامل
-              </p>
-            </div>
-
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-              {/* All types option */}
-              <button
-                type="button"
-                onClick={() => setFilterState(prev => ({ ...prev, propertyType: '' }))}
-                className={`p-4 rounded-xl border text-center transition cursor-pointer flex flex-col items-center justify-center gap-2.5 ${
-                  !filterState.propertyType
-                    ? 'border-[#14a800] bg-[#f0faf0] text-[#14a800] font-black shadow-2xs'
-                    : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50 font-bold'
-                }`}
-              >
-                <Compass className="w-6 h-6 text-[#14a800]" />
-                <span className="text-xs sm:text-sm">كافة الأنواع</span>
-              </button>
-
-              {propertyTypes.map(pt => {
-                const isSelected = filterState.propertyType === pt.id;
-                const IconComponent = getPropertyIcon(pt.name_ar);
-                return (
-                  <button
-                    key={pt.id}
-                    type="button"
-                    onClick={() => setFilterState(prev => ({ ...prev, propertyType: pt.id }))}
-                    className={`p-4 rounded-xl border text-center transition cursor-pointer flex flex-col items-center justify-center gap-2.5 ${
-                      isSelected
-                        ? 'border-[#14a800] bg-[#f0faf0] text-[#14a800] font-black shadow-2xs'
-                        : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50 font-bold'
-                    }`}
-                  >
-                    <IconComponent className={`w-6 h-6 ${isSelected ? 'text-[#14a800]' : 'text-slate-500'}`} />
-                    <span className="text-xs sm:text-sm">{pt.name_ar}</span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        )}
-
-        {/* STEP 3: Location (Governorate, City, Area) */}
-        {currentStep === 3 && (
-          <div className="space-y-6 animate-soft-fade">
-            <div className="space-y-1">
-              <h2 className="text-lg sm:text-xl font-black text-[#001e00] flex items-center gap-2">
-                <MapPin className="w-5 h-5 text-[#14a800]" />
-                <span>أين تفضل موقع العقار في كفر الشيخ؟</span>
-              </h2>
-              <p className="text-xs sm:text-sm text-slate-500 font-medium">
-                حدد المركز أو المدينة ثم الحي والمنطقة المفضلة لديك
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-              {/* City Selection */}
-              <div className="space-y-2">
-                <label className="block text-xs font-black text-slate-800">
-                  المركز / المدينة
-                </label>
-                <select
-                  value={filterState.location?.city_id || ''}
-                  onChange={e => {
-                    const nextCity = e.target.value;
-                    setFilterState(prev => ({
-                      ...prev,
-                      location: {
-                        ...prev.location,
-                        city_id: nextCity,
-                        area_id: '',
-                      },
-                    }));
-                  }}
-                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm font-bold text-slate-900 focus:bg-white focus:border-[#14a800] outline-hidden transition cursor-pointer"
-                >
-                  <option value="">كافة مراكز ومدن محافظة كفر الشيخ</option>
-                  {cities.filter(c => c.is_active).map(c => (
-                    <option key={c.id} value={c.id}>
-                      {c.name_ar}
-                    </option>
-                  ))}
-                </select>
+                    <option value="">كل الأحياء والمناطق</option>
+                    {availableAreas.map(a => (
+                      <option key={a.id} value={a.id}>
+                        {a.name_ar}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
 
-              {/* Area Selection */}
-              <div className="space-y-2">
-                <label className="block text-xs font-black text-slate-800">
-                  الحي / المنطقة (اختياري)
-                </label>
-                <select
-                  disabled={!filterState.location?.city_id}
-                  value={filterState.location?.area_id || ''}
-                  onChange={e =>
-                    setFilterState(prev => ({
-                      ...prev,
-                      location: {
-                        ...prev.location,
-                        area_id: e.target.value,
-                      },
-                    }))
-                  }
-                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm font-bold text-slate-900 focus:bg-white focus:border-[#14a800] outline-hidden transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <option value="">كافة الأحياء والمناطق بالمدينة</option>
-                  {availableAreas.map(a => (
-                    <option key={a.id} value={a.id}>
-                      {a.name_ar}
-                    </option>
-                  ))}
-                </select>
-                {!filterState.location?.city_id && (
-                  <span className="text-[11px] text-slate-500 block">
-                    * اختر المركز أو المدينة أولاً لعرض أحيائها
-                  </span>
-                )}
-              </div>
-            </div>
-
-            {/* Popular City Quick Pills */}
-            <div className="pt-2 space-y-2">
-              <span className="text-xs font-bold text-slate-600 block">مراكز شائعة للبحث السريع:</span>
-              <div className="flex flex-wrap gap-2">
-                {cities.filter(c => c.is_active).slice(0, 6).map(city => {
+              {/* Popular City Quick Pills */}
+              <div className="pt-0.5 flex flex-wrap items-center gap-1.5">
+                <span className="text-xs font-bold text-slate-500">الأكتر طلباً:</span>
+                {cities.filter(c => c.is_active).slice(0, 5).map(city => {
                   const isSelected = filterState.location?.city_id === city.id;
                   return (
                     <button
@@ -628,7 +507,7 @@ export const StartRoute: React.FC = () => {
                           },
                         }))
                       }
-                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
+                      className={`px-2.5 py-1 rounded-lg text-xs font-bold transition cursor-pointer ${
                         isSelected
                           ? 'bg-[#14a800] text-white shadow-2xs'
                           : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
@@ -640,223 +519,198 @@ export const StartRoute: React.FC = () => {
                 })}
               </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* STEP 4: Budget (min_price, max_price) */}
-        {currentStep === 4 && (
-          <div className="space-y-6 animate-soft-fade">
-            <div className="space-y-1">
-              <h2 className="text-lg sm:text-xl font-black text-[#001e00] flex items-center gap-2">
-                <Banknote className="w-5 h-5 text-[#14a800]" />
-                <span>ما هي الميزانية المناسبة لك (بالجنيه المصري)؟</span>
+          {/* STEP 4: Budget */}
+          {currentStep === 4 && (
+            <div className="space-y-2.5 animate-soft-fade">
+              <h2 className="text-sm sm:text-base font-black text-[#001e00] flex items-center gap-1.5">
+                <Banknote className="w-4 h-4 text-[#14a800]" />
+                <span>الميزانية المتوقعة</span>
               </h2>
-              <p className="text-xs sm:text-sm text-slate-500 font-medium">
-                اختر نطاقاً سريعاً أو أدخل القيمة التقريبية لميزانيتك
-              </p>
-            </div>
 
-            {/* Presets */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {budgetPresets.map((preset, idx) => {
-                const isSelected =
-                  filterState.minPrice === preset.min &&
-                  filterState.maxPrice === preset.max;
-                return (
-                  <button
-                    key={idx}
-                    type="button"
-                    onClick={() =>
-                      setFilterState(prev => ({
-                        ...prev,
-                        minPrice: preset.min,
-                        maxPrice: preset.max,
-                      }))
-                    }
-                    className={`p-4 rounded-xl border text-right transition cursor-pointer flex items-center justify-between ${
-                      isSelected
-                        ? 'border-[#14a800] bg-[#f0faf0] text-[#14a800] font-black'
-                        : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50 font-bold'
-                    }`}
-                  >
-                    <span className="text-xs sm:text-sm">{preset.label}</span>
-                    {isSelected && <Check className="w-4 h-4 text-[#14a800] stroke-[3]" />}
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Custom Inputs */}
-            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-3">
-              <span className="text-xs font-black text-slate-800 block">
-                أو حدد نطاق الميزانية بالجنيه المصري:
-              </span>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <label className="text-xs font-bold text-slate-600">الحد الأدنى (ج.م)</label>
-                  <input
-                    type="number"
-                    placeholder="مثال: 500000"
-                    value={filterState.minPrice || ''}
-                    onChange={e =>
-                      setFilterState(prev => ({
-                        ...prev,
-                        minPrice: e.target.value ? Number(e.target.value) : undefined,
-                      }))
-                    }
-                    className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-900 focus:border-[#14a800] outline-hidden"
-                  />
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-xs font-bold text-slate-600">الحد الأقصى (ج.م)</label>
-                  <input
-                    type="number"
-                    placeholder="مثال: 2500000"
-                    value={filterState.maxPrice || ''}
-                    onChange={e =>
-                      setFilterState(prev => ({
-                        ...prev,
-                        maxPrice: e.target.value ? Number(e.target.value) : undefined,
-                      }))
-                    }
-                    className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-900 focus:border-[#14a800] outline-hidden"
-                  />
-                </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {budgetPresets.map((preset, idx) => {
+                  const isSelected =
+                    filterState.minPrice === preset.min &&
+                    filterState.maxPrice === preset.max;
+                  return (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() =>
+                        setFilterState(prev => ({
+                          ...prev,
+                          minPrice: preset.min,
+                          maxPrice: preset.max,
+                        }))
+                      }
+                      className={`p-2 sm:p-2.5 rounded-xl border text-right transition cursor-pointer flex items-center justify-between ${
+                        isSelected
+                          ? 'border-[#14a800] bg-[#f0faf0] text-[#14a800] font-black shadow-2xs'
+                          : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50 font-bold'
+                      }`}
+                    >
+                      <span className="text-xs">{preset.label}</span>
+                      {isSelected && <Check className="w-3.5 h-3.5 text-[#14a800] stroke-[3]" />}
+                    </button>
+                  );
+                })}
               </div>
-            </div>
-          </div>
-        )}
 
-        {/* STEP 5: Interest-based questions (Preferences, NOT filters visually) */}
-        {currentStep === 5 && (
-          <div className="space-y-6 animate-soft-fade">
-            <div className="space-y-1">
-              <h2 className="text-lg sm:text-xl font-black text-[#001e00] flex items-center gap-2">
-                <HeartHandshake className="w-5 h-5 text-[#14a800]" />
-                <span>ما هي أهم التفضيلات التي تهمك في هذا العقار؟</span>
-              </h2>
-              <p className="text-xs sm:text-sm text-slate-500 font-medium">
-                هذه التفضيلات تساعدنا على ترشيح العقارات الأقرب لأسلوب حياتك واحتياجك الفعلي
-              </p>
-            </div>
-
-            {/* Interest Preference Cards (NOT standard boring filters) */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-              {interestQuestions.map((q) => {
-                const isSelected = selectedPreferences.includes(q.id);
-                return (
-                  <div
-                    key={q.id}
-                    onClick={() => togglePreference(q.id)}
-                    className={`p-4 rounded-2xl border-2 text-right transition cursor-pointer flex items-start justify-between gap-3 ${
-                      isSelected
-                        ? 'border-[#14a800] bg-[#f0faf0] shadow-2xs'
-                        : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'
-                    }`}
-                  >
-                    <div className="space-y-1">
-                      <div className="text-sm font-black text-[#001e00] flex items-center gap-2">
-                        <span>{q.label}</span>
-                      </div>
-                      <p className="text-xs text-slate-500 font-medium leading-relaxed">
-                        {q.desc}
-                      </p>
-                    </div>
-
-                    <div className={`w-6 h-6 rounded-full shrink-0 flex items-center justify-center border transition mt-0.5 ${
-                      isSelected 
-                        ? 'border-[#14a800] bg-[#14a800] text-white' 
-                        : 'border-slate-300 bg-white'
-                    }`}>
-                      {isSelected && <Check className="w-3.5 h-3.5 stroke-[3]" />}
-                    </div>
+              {/* Custom Inputs */}
+              <div className="p-2 sm:p-2.5 rounded-xl bg-slate-50 border border-slate-200/80">
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="space-y-0.5">
+                    <label className="text-[11px] font-bold text-slate-600">من (ج.م)</label>
+                    <input
+                      type="number"
+                      placeholder="500,000"
+                      value={filterState.minPrice || ''}
+                      onChange={e =>
+                        setFilterState(prev => ({
+                          ...prev,
+                          minPrice: e.target.value ? Number(e.target.value) : undefined,
+                        }))
+                      }
+                      className="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-900 focus:border-[#14a800] outline-hidden"
+                    />
                   </div>
-                );
-              })}
-            </div>
 
-            {/* Live Matches Count Assurance */}
-            <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between text-xs font-bold text-slate-700">
-              <div className="flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-[#14a800]" />
-                <span>عقارات جاهزة ومطابقة لمواصفاتك الآن:</span>
+                  <div className="space-y-0.5">
+                    <label className="text-[11px] font-bold text-slate-600">إلى (ج.م)</label>
+                    <input
+                      type="number"
+                      placeholder="2,500,000"
+                      value={filterState.maxPrice || ''}
+                      onChange={e =>
+                        setFilterState(prev => ({
+                          ...prev,
+                          maxPrice: e.target.value ? Number(e.target.value) : undefined,
+                        }))
+                      }
+                      className="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-900 focus:border-[#14a800] outline-hidden"
+                    />
+                  </div>
+                </div>
               </div>
-              {matchingProperties.length > 0 ? (
-                <span className="text-[#14a800] font-black text-sm">
-                  {matchingProperties.length} عقار متاح
-                </span>
-              ) : (
-                <span className="text-amber-800 bg-amber-50 px-2.5 py-1 rounded-md text-xs font-bold border border-amber-200/60">
-                  سيتم تجهيز وتوفير طلب خاص لك
-                </span>
-              )}
             </div>
-          </div>
-        )}
-
-        {/* Stepper Navigation Footer */}
-        <div className="flex items-center justify-between pt-6 mt-6 border-t border-slate-100">
-          {currentStep > 1 ? (
-            <Button
-              variant="outline"
-              size="md"
-              onClick={() => setCurrentStep(s => s - 1)}
-              rightIcon={<ArrowRight className="w-4 h-4" />}
-            >
-              السابق
-            </Button>
-          ) : (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => navigate('/properties')}
-              className="text-slate-600"
-            >
-              استكشاف جميع العقارات بدلاً من ذلك
-            </Button>
           )}
 
-          {currentStep < totalSteps ? (
-            <Button
-              variant="primary"
-              size="md"
-              onClick={() => setCurrentStep(s => s + 1)}
-              leftIcon={<ArrowLeft className="w-4 h-4" />}
-            >
-              التالي
-            </Button>
-          ) : (
-            <Button
-              variant="primary"
-              size="lg"
-              onClick={handleCompleteSmartSearch}
-              leftIcon={<Sparkles className="w-5 h-5" />}
-              className="shadow-md"
-            >
-              {matchingProperties.length > 0 ? 'استعراض العقارات المطابقة' : 'متابعة الطلب وتوفير العقار'}
-            </Button>
-          )}
-        </div>
-      </div>
+          {/* STEP 5: Interest questions */}
+          {currentStep === 5 && (
+            <div className="space-y-2.5 animate-soft-fade">
+              <h2 className="text-sm sm:text-base font-black text-[#001e00] flex items-center gap-1.5">
+                <HeartHandshake className="w-4 h-4 text-[#14a800]" />
+                <span>حاجات تانية تهمك؟</span>
+              </h2>
 
-      {/* Trust & Guarantee Info */}
-      <div className="bg-[#f0faf0] rounded-2xl p-5 border border-[#d7eed7] flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-white text-[#14a800] flex items-center justify-center border border-[#d7eed7] shrink-0">
-            <ShieldCheck className="w-5 h-5" />
-          </div>
-          <div className="text-xs text-slate-700 leading-relaxed font-medium">
-            <strong className="text-[#001e00] font-bold">وساطة رقمية موثوقة بنسبة 100%:</strong> كافة العقارات مفحوصة ومطابقة الأوراق القانونية، لضمان استثمار آمن وإجراءات سليمة تماماً.
+              <div className="grid grid-cols-2 gap-2">
+                {interestQuestions.map((q) => {
+                  const isSelected = selectedPreferences.includes(q.id);
+                  const IconComponent = (q as any).icon || Sparkles;
+                  return (
+                    <button
+                      key={q.id}
+                      type="button"
+                      onClick={() => togglePreference(q.id)}
+                      className={`p-2 sm:p-2.5 rounded-xl border-2 text-right transition cursor-pointer flex items-center justify-between gap-1.5 group ${
+                        isSelected
+                          ? 'border-[#14a800] bg-[#f0faf0] shadow-2xs'
+                          : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'
+                      }`}
+                    >
+                      <div className="flex items-center gap-1.5 min-w-0 flex-1">
+                        <div className={`w-6 h-6 rounded-lg flex items-center justify-center shrink-0 transition ${
+                          isSelected ? 'bg-[#14a800] text-white' : 'bg-slate-100 text-slate-600'
+                        }`}>
+                          <IconComponent className="w-3.5 h-3.5" />
+                        </div>
+                        <span className="text-xs font-bold text-[#001e00] truncate">
+                          {q.label}
+                        </span>
+                      </div>
+
+                      <div className={`w-4 h-4 rounded-full shrink-0 flex items-center justify-center border transition ${
+                        isSelected 
+                          ? 'border-[#14a800] bg-[#14a800] text-white' 
+                          : 'border-slate-300 bg-white'
+                      }`}>
+                        {isSelected && <Check className="w-2.5 h-2.5 stroke-[3]" />}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Live Matches Count Assurance */}
+              <div className="py-1.5 px-3 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between text-xs font-bold text-slate-700">
+                <div className="flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5 text-[#14a800]" />
+                  <span className="text-xs">عقارات مطابقة:</span>
+                </div>
+                {matchingProperties.length > 0 ? (
+                  <span className="text-[#14a800] font-black text-xs">
+                    {matchingProperties.length} عقار جاهز
+                  </span>
+                ) : (
+                  <span className="text-amber-800 bg-amber-50 px-2 py-0.5 rounded-md text-[11px] font-bold border border-amber-200/60">
+                    طلب خاص
+                  </span>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Stepper Navigation Footer */}
+          <div className="flex items-center justify-between pt-2.5 mt-2.5 border-t border-slate-100">
+            {currentStep > 1 ? (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentStep(s => s - 1)}
+                rightIcon={<ArrowRight className="w-3.5 h-3.5" />}
+              >
+                السابق
+              </Button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => navigate('/properties')}
+                className="text-slate-500 hover:text-slate-800 text-xs font-bold cursor-pointer"
+              >
+                شوف كل العقارات
+              </button>
+            )}
+
+            {currentStep < totalSteps ? (
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={() => setCurrentStep(s => s + 1)}
+                leftIcon={<ArrowLeft className="w-3.5 h-3.5" />}
+              >
+                التالي
+              </Button>
+            ) : (
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={handleCompleteSmartSearch}
+                leftIcon={<Sparkles className="w-4 h-4" />}
+                className="shadow-xs text-xs font-bold"
+              >
+                {matchingProperties.length > 0 ? 'شوف العقارات المطابقة' : 'كمّل الطلب'}
+              </Button>
+            )}
           </div>
         </div>
-        <button
-          type="button"
-          onClick={() => navigate('/properties')}
-          className="text-xs font-bold text-[#14a800] hover:underline whitespace-nowrap cursor-pointer"
-        >
-          تصفح مباشر لكافة العقارات &larr;
-        </button>
+
+        {/* Discreet 1-liner Trust Tag (Safe for 100vh) */}
+        <div className="flex items-center justify-center gap-2 text-[11px] font-bold text-slate-500 py-1">
+          <ShieldCheck className="w-3.5 h-3.5 text-[#14a800]" />
+          <span>عقارات مفحوصة ومضمونة 100% بكفر الشيخ</span>
+        </div>
       </div>
 
       {/* No Match Smart Request Experience Modal */}

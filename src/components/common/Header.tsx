@@ -202,7 +202,7 @@ export const Header: React.FC<HeaderProps> = ({
                     <span className="w-2 h-2 rounded-full bg-[#14a800]"></span>
                   </div>
                   <span className="text-[10px] sm:text-[11px] font-bold text-slate-500 mt-0.5 whitespace-nowrap hidden sm:inline">
-                    عقارات كفر الشيخ المعتمدة
+                    عقارات كفر الشيخ المضمونة
                   </span>
                 </div>
               </button>
@@ -325,7 +325,7 @@ export const Header: React.FC<HeaderProps> = ({
                   }`}
                 >
                   <Layers className="w-4 h-4 text-[#14a800]" />
-                  <span>بوابة الملاك والوسطاء والمستثمرين</span>
+                  <span>لوحة أصحاب العقارات</span>
                 </button>
 
                 {/* 7. لوحة العمليات للموظفين المصرح لهم فقط */}
@@ -357,7 +357,7 @@ export const Header: React.FC<HeaderProps> = ({
                         ? 'bg-slate-100 text-[#001e00]'
                         : 'text-slate-600 hover:text-[#001e00] hover:bg-[#f2f7f2]'
                     }`}
-                    title="المزيد من الأقسام والخدمات"
+                    title="المزيد من الخدمات"
                     aria-expanded={showMoreMenu}
                   >
                     <span>المزيد</span>
@@ -368,7 +368,7 @@ export const Header: React.FC<HeaderProps> = ({
                   {showMoreMenu && (
                     <div className="absolute right-0 top-full mt-2 w-72 bg-white rounded-xl shadow-xl border border-[#e4ebe4] py-2 z-50 animate-soft-fade text-right">
                       <div className="px-3.5 py-1.5 text-[11px] font-black text-slate-400 border-b border-slate-100 mb-1 flex items-center justify-between">
-                        <span>خدمات منصة روابط</span>
+                        <span>خدمات روابط</span>
                         <Sparkles className="w-3 h-3 text-[#14a800]" />
                       </div>
 
@@ -384,7 +384,7 @@ export const Header: React.FC<HeaderProps> = ({
                         <PhoneCall className="w-4 h-4 text-[#14a800] shrink-0" />
                         <div>
                           <div className="font-bold">تواصل معنا</div>
-                          <div className="text-[10px] text-slate-500 font-normal">استفسارات العملاء وحجز المعاينات</div>
+                          <div className="text-[10px] text-slate-500 font-normal">خدمة العملاء وحجز المعاينة</div>
                         </div>
                       </button>
 
@@ -402,8 +402,8 @@ export const Header: React.FC<HeaderProps> = ({
                       >
                         <Layers className="w-4 h-4 text-[#14a800] shrink-0" />
                         <div>
-                          <div className="font-bold">بوابة الملاك والوسطاء</div>
-                          <div className="text-[10px] text-slate-500 font-normal">إدارة العقارات وتحديث الأسعار ومتابعة الحالات</div>
+                          <div className="font-bold">لوحة أصحاب العقارات</div>
+                          <div className="text-[10px] text-slate-500 font-normal">إدارة عقاراتك ومتابعة الطلبات</div>
                         </div>
                       </button>
 
@@ -418,8 +418,8 @@ export const Header: React.FC<HeaderProps> = ({
                         >
                           <Shield className="w-4 h-4 text-purple-700 shrink-0" />
                           <div>
-                            <div className="font-bold">إدارة المستخدمين والأدوار (RBAC)</div>
-                            <div className="text-[10px] text-purple-700 font-normal">صلاحيات الموظفين والمراجعين</div>
+                            <div className="font-bold">إدارة المستخدمين والأدوار</div>
+                            <div className="text-[10px] text-purple-700 font-normal">صلاحيات الفريق والمشرفين</div>
                           </div>
                         </button>
                       )}
@@ -434,8 +434,8 @@ export const Header: React.FC<HeaderProps> = ({
                       >
                         <HelpCircle className="w-4 h-4 text-[#14a800] shrink-0" />
                         <div>
-                          <div className="font-bold">دليل التصوير والرفع للمالك</div>
-                          <div className="text-[10px] text-slate-500 font-normal">إرشادات قبول العقارات وتجنب الرفض</div>
+                          <div className="font-bold">إزاي تصور وترفع عقارك؟</div>
+                          <div className="text-[10px] text-slate-500 font-normal">نصائح بسيطة عشان عقارك يتقبل فوراً</div>
                         </div>
                       </button>
 
@@ -449,7 +449,7 @@ export const Header: React.FC<HeaderProps> = ({
                           className="w-full text-right px-3.5 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-50 hover:text-slate-900 flex items-center gap-2 transition cursor-pointer"
                         >
                           <Info className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                          <span>عن منصة روابط العقارية</span>
+                          <span>عن روابط</span>
                         </button>
 
                         <button
@@ -478,7 +478,7 @@ export const Header: React.FC<HeaderProps> = ({
                       </div>
 
                       <div className="pt-2 mt-1.5 border-t border-slate-100 px-3.5 py-1.5 flex items-center justify-between text-[11px] bg-slate-50 rounded-b-2xl">
-                        <span className="text-slate-600 font-bold">الخط المباشر:</span>
+                        <span className="text-slate-600 font-bold">الخط الساخن:</span>
                         <a href={`tel:${settings.primary_phone}`} className="text-[#14a800] font-black dir-ltr hover:underline">
                           {settings.primary_phone}
                         </a>
@@ -520,7 +520,7 @@ export const Header: React.FC<HeaderProps> = ({
                       <div className="px-4 pb-2.5 border-b border-slate-100 flex items-center justify-between">
                         <div className="flex items-center gap-1.5">
                           <Bell className="w-4 h-4 text-[#14a800]" />
-                          <span className="font-bold text-sm text-[#001e00]">الإشعارات والتنبيهات</span>
+                          <span className="font-bold text-sm text-[#001e00]">الإشعارات</span>
                           {unreadNotificationsCount > 0 && (
                             <span className="bg-[#f2f7f2] text-[#14a800] text-[10.5px] font-bold px-2 py-0.5 rounded-lg border border-[#14a800]/20">
                               {unreadNotificationsCount} جديدة
@@ -541,7 +541,7 @@ export const Header: React.FC<HeaderProps> = ({
                       <div className="max-h-80 overflow-y-auto divide-y divide-slate-100">
                         {userNotifications.length === 0 ? (
                           <div className="py-8 text-center text-xs text-slate-500 font-semibold">
-                            لا توجد إشعارات جديدة في الوقت الحالي
+                            مفيش إشعارات جديدة دلوقتي
                           </div>
                         ) : (
                           userNotifications.map(n => (
@@ -643,7 +643,7 @@ export const Header: React.FC<HeaderProps> = ({
                           className="w-full text-right px-4 py-2.5 text-xs font-bold text-slate-700 hover:bg-[#f2f7f2] flex items-center gap-2 cursor-pointer"
                         >
                           <UserIcon className="w-4 h-4 text-slate-400" />
-                          <span>الملف الشخصي والتوثيق</span>
+                          <span>الملف الشخصي والبيانات</span>
                         </button>
 
                         <button
@@ -652,7 +652,7 @@ export const Header: React.FC<HeaderProps> = ({
                           className="w-full text-right px-4 py-2.5 text-xs font-bold text-slate-700 hover:bg-[#f2f7f2] flex items-center gap-2 cursor-pointer"
                         >
                           <Layers className="w-4 h-4 text-[#14a800]" />
-                          <span>لوحة عقاراتي وإدارتها</span>
+                          <span>عقاراتي المعروضة</span>
                         </button>
 
                         <button
@@ -661,7 +661,7 @@ export const Header: React.FC<HeaderProps> = ({
                           className="w-full text-right px-4 py-2.5 text-xs font-bold text-slate-700 hover:bg-[#f2f7f2] flex items-center gap-2 cursor-pointer"
                         >
                           <Heart className="w-4 h-4 text-[#14a800]" />
-                          <span>العقارات المفضلة</span>
+                          <span>العقارات المحفوظة</span>
                         </button>
 
                         {/* Internal Operations Dashboard Link */}
@@ -672,7 +672,7 @@ export const Header: React.FC<HeaderProps> = ({
                             className="w-full text-right px-4 py-2.5 text-xs font-bold text-[#001e00] bg-[#f2f7f2] hover:bg-[#e4ebe4] flex items-center gap-2 border-t border-slate-100 cursor-pointer"
                           >
                             <LayoutDashboard className="w-4 h-4 text-[#14a800]" />
-                            <span>لوحة الإدارة والعمليات</span>
+                            <span>لوحة العمليات</span>
                           </button>
                         )}
 
@@ -683,7 +683,7 @@ export const Header: React.FC<HeaderProps> = ({
                             className="w-full text-right px-4 py-2.5 text-xs font-bold text-purple-950 bg-purple-50/60 hover:bg-purple-100 flex items-center gap-2 cursor-pointer"
                           >
                             <ShieldCheck className="w-4 h-4 text-purple-700" />
-                            <span>إدارة الأدوار والمستخدمين (RBAC)</span>
+                            <span>إدارة المستخدمين والأدوار</span>
                           </button>
                         )}
 

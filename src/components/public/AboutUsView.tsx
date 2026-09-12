@@ -43,11 +43,11 @@ export const AboutUsView: React.FC<AboutUsViewProps> = ({
           </div>
 
           <h1 className="text-2xl sm:text-4xl font-black text-white leading-tight">
-            نحن نبني المعيار الجديد للسوق العقاري في كفر الشيخ والدلتا
+            بنعمل تجربة عقارية سهلة ومضمونة في كفر الشيخ والدلتا
           </h1>
 
           <p className="text-xs sm:text-sm text-slate-300 font-medium leading-relaxed">
-            تأسست روابط لتجمع عروض البيع والإيجار وتنظيم البيانات وتحسين جودة الإعلانات، بهدف توفير تجربة رقمية بسيطة ومنظمة تساعد العملاء على البحث واكتشاف ومقارنة الخيارات والتواصل لإتمام خطواتهم بشكل أكثر احترافية.
+            روابط معمولة عشان تجمعلك عروض البيع والإيجار الحقيقية وتفحصها على الطبيعة، وتساعدك تلاقي وتفاوض وتقارن وتخلص ورقك وأنت مطمن وبدون أي إزعاج.
           </p>
 
           <div className="pt-2 flex flex-wrap items-center gap-3">
@@ -56,7 +56,7 @@ export const AboutUsView: React.FC<AboutUsViewProps> = ({
               onClick={onExploreProperties}
               className="px-6 py-3 bg-[#14a800] hover:bg-[#108a00] text-white text-xs sm:text-sm font-black rounded-xl transition shadow-2xs flex items-center gap-2 cursor-pointer whitespace-nowrap"
             >
-              <span>تصفح العقارات المعتمدة</span>
+              <span>شوف العقارات المتاحة</span>
               <ArrowLeft className="w-4 h-4" />
             </button>
 

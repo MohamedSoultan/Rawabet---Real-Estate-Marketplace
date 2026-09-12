@@ -181,10 +181,10 @@ export const RequestPropertyModal: React.FC<RequestPropertyModalProps> = ({
             </div>
             <div>
               <h2 id="request-modal-title" className="text-lg sm:text-xl font-black text-white">
-                اطلب عقار بمواصفاتك الخاصة
+                اطلب عقارك بمواصفاتك
               </h2>
               <p className="text-xs text-slate-300 mt-0.5 font-medium">
-                لم تجد العقار المناسب؟ فريق روابط سيبحث ويفاوض نيابة عنك لتوفير طلبك
+                ملقتش اللي بتدور عليه؟ فريق روابط هيجيبهولك ويفاوض بدالك كمان
               </p>
             </div>
           </div>
@@ -290,7 +290,7 @@ export const RequestPropertyModal: React.FC<RequestPropertyModalProps> = ({
                       : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
                   }`}
                 >
-                  <span>أرغب في الشراء (تمليك)</span>
+                  <span>شراء (تمليك)</span>
                 </button>
                 <button
                   type="button"
@@ -301,7 +301,7 @@ export const RequestPropertyModal: React.FC<RequestPropertyModalProps> = ({
                       : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
                   }`}
                 >
-                  <span>أرغب في الإيجار (شهري / سنوي)</span>
+                  <span>إيجار (شهري)</span>
                 </button>
               </div>
             </div>
@@ -540,7 +540,7 @@ export const RequestPropertyModal: React.FC<RequestPropertyModalProps> = ({
                 className="px-7 py-3 min-h-[44px] bg-[#14a800] hover:bg-[#108a00] active:bg-[#108a00] text-white text-xs sm:text-sm font-bold rounded-xl transition shadow-xs flex items-center gap-2 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#14a800] focus:ring-offset-2 disabled:opacity-50"
               >
                 <Send className="w-4 h-4" aria-hidden="true" />
-                <span>{isSubmitting ? 'جاري الإرسال...' : 'إرسال الطلب لمستشار روابط'}</span>
+                <span>{isSubmitting ? 'ثواني...' : 'ابعت الطلب لفريق روابط'}</span>
               </button>
             </div>
 

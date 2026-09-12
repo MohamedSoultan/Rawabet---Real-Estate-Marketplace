@@ -105,8 +105,8 @@ export const RequestViewingModal: React.FC<RequestViewingModalProps> = ({
               <Calendar className="w-5 h-5" aria-hidden="true" />
             </div>
             <div>
-              <h3 id="request-viewing-title" className="text-base font-black text-[#001e00]">طلب حجز معاينة ميدانية</h3>
-              <p className="text-xs text-slate-500 font-semibold">بمرافقة مندوب مبيعات روابط المعتمد</p>
+              <h3 id="request-viewing-title" className="text-base font-black text-[#001e00]">احجز معاينة للعقار</h3>
+              <p className="text-xs text-slate-500 font-semibold">مندوب روابط هيكون معاك خطوة بخطوة</p>
             </div>
           </div>
 
@@ -139,9 +139,9 @@ export const RequestViewingModal: React.FC<RequestViewingModalProps> = ({
               <div className="w-16 h-16 bg-[#f2f7f2] text-[#14a800] rounded-xl flex items-center justify-center mx-auto shadow-sm">
                 <CheckCircle2 className="w-9 h-9" />
               </div>
-              <h4 className="text-lg font-black text-[#001e00]">تم استلام طلب المعاينة بنجاح!</h4>
+              <h4 className="text-lg font-black text-[#001e00]">طلبك وصل بنجاح!</h4>
               <p className="text-xs sm:text-sm text-slate-600 max-w-sm mx-auto font-medium leading-relaxed">
-                سيقوم فريق مبيعات روابط في كفر الشيخ بالتواصل معك هاتفياً لتأكيد الموعد ومرافقتك في المعاينة الميدانية.
+                فريق روابط في كفر الشيخ هيكلمك في أقرب وقت لتأكيد الموعد المناسب وترتيب المعاينة.
               </p>
             </div>
           ) : (
@@ -155,7 +155,7 @@ export const RequestViewingModal: React.FC<RequestViewingModalProps> = ({
               {/* Customer Name */}
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">
-                  الاسم بالكامل <span className="text-rose-500">*</span>
+                  اسمك الكريم <span className="text-rose-500">*</span>
                 </label>
                 <div className="relative">
                   <User className="w-4 h-4 text-slate-400 absolute right-3 top-3" />
@@ -164,7 +164,7 @@ export const RequestViewingModal: React.FC<RequestViewingModalProps> = ({
                     required
                     value={customerName}
                     onChange={(e) => setCustomerName(e.target.value)}
-                    placeholder="مثال: أحمد محمد رضوان"
+                    placeholder="اكتب اسمك هنا"
                     className="w-full pr-9 pl-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 focus:bg-white focus:border-[#14a800] focus:outline-hidden"
                   />
                 </div>
@@ -173,7 +173,7 @@ export const RequestViewingModal: React.FC<RequestViewingModalProps> = ({
               {/* Customer Mobile */}
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">
-                  رقم الهاتف للتواصل <span className="text-rose-500">*</span>
+                  رقم الموبايل <span className="text-rose-500">*</span>
                 </label>
                 <div className="relative">
                   <Phone className="w-4 h-4 text-slate-400 absolute right-3 top-3" />
@@ -193,7 +193,7 @@ export const RequestViewingModal: React.FC<RequestViewingModalProps> = ({
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-1">
-                    تاريخ المعاينة المفضل <span className="text-rose-500">*</span>
+                    اليوم المناسب ليك <span className="text-rose-500">*</span>
                   </label>
                   <div className="relative">
                     <Calendar className="w-4 h-4 text-slate-400 absolute right-3 top-3 pointer-events-none" />
@@ -210,7 +210,7 @@ export const RequestViewingModal: React.FC<RequestViewingModalProps> = ({
 
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-1">
-                    الوقت المناسب <span className="text-rose-500">*</span>
+                    الوقت المفضل <span className="text-rose-500">*</span>
                   </label>
                   <div className="relative">
                     <Clock className="w-4 h-4 text-slate-400 absolute right-3 top-3 pointer-events-none" />
@@ -219,10 +219,10 @@ export const RequestViewingModal: React.FC<RequestViewingModalProps> = ({
                       onChange={(e) => setPreferredTime(e.target.value)}
                       className="w-full pr-9 pl-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 focus:bg-white focus:border-[#14a800] focus:outline-hidden cursor-pointer"
                     >
-                      <option value="11:00">صباحاً (11:00 ص - 01:00 م)</option>
-                      <option value="14:00">ظهراً (02:00 م - 04:00 م)</option>
-                      <option value="16:00">عصراً (04:00 م - 06:00 م)</option>
-                      <option value="18:00">مساءً (06:00 م - 08:00 م)</option>
+                      <option value="11:00">الصبح (11 ص - 1 ظهراً)</option>
+                      <option value="14:00">الظهر (2 م - 4 عصراً)</option>
+                      <option value="16:00">العصر (4 م - 6 مساءً)</option>
+                      <option value="18:00">بالليل (6 م - 8 مساءً)</option>
                     </select>
                   </div>
                 </div>
@@ -231,7 +231,7 @@ export const RequestViewingModal: React.FC<RequestViewingModalProps> = ({
               {/* Notes */}
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">
-                  ملاحظات أو استفسارات إضافية (اختياري)
+                  ملاحظات إضافية (اختياري)
                 </label>
                 <div className="relative">
                   <FileText className="w-4 h-4 text-slate-400 absolute right-3 top-3" />
@@ -239,7 +239,7 @@ export const RequestViewingModal: React.FC<RequestViewingModalProps> = ({
                     rows={2}
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
-                    placeholder="أي مواعيد بديلة أو استفسارات تود توضيحها لفريق روابط قبل المعاينة..."
+                    placeholder="أي ملاحظة تحب توضحها لفريق روابط قبل المعاينة..."
                     className="w-full pr-9 pl-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 focus:bg-white focus:border-[#14a800] focus:outline-hidden resize-none"
                   />
                 </div>
@@ -247,7 +247,7 @@ export const RequestViewingModal: React.FC<RequestViewingModalProps> = ({
 
               {/* Trust disclaimer */}
               <p className="text-[11px] text-slate-500 font-medium leading-relaxed bg-slate-50 p-2.5 rounded-xl border border-slate-200/80">
-                🔒 المعاينة مجانية بالكامل. يتم التنسيق الرسمي مع ممثل روابط في كفر الشيخ ولا تتم مشاركة رقم هاتفك مع أي أطراف ثالثة.
+                🔒 المعاينة مجانية 100% وبدون أي التزام، وبياناتك في أمان تام.
               </p>
 
               {/* Submit Button */}
@@ -265,7 +265,7 @@ export const RequestViewingModal: React.FC<RequestViewingModalProps> = ({
                   className="px-6 py-2.5 min-h-[44px] bg-[#14a800] hover:bg-[#108a00] active:bg-[#108a00] text-white text-xs font-black rounded-xl transition shadow-md shadow-[#14a800]/20 flex items-center gap-2 cursor-pointer disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-[#14a800] focus:ring-offset-2"
                 >
                   <Calendar className="w-4 h-4" aria-hidden="true" />
-                  <span>{isSubmitting ? 'جاري الإرسال...' : 'تأكيد طلب المعاينة'}</span>
+                  <span>{isSubmitting ? 'ثواني...' : 'تأكيد حجز المعاينة'}</span>
                 </button>
               </div>
             </form>

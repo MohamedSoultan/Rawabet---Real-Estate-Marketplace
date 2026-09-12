@@ -68,10 +68,10 @@ export const ContactUsView: React.FC<ContactUsViewProps> = ({ onExplorePropertie
           <span>خدمة عملاء ومعاينات روابط</span>
         </div>
         <h1 className="text-2xl sm:text-4xl font-black text-[#001e00]">
-          تواصل مع فريق روابط العقاري
+          تواصل مع فريق روابط
         </h1>
         <p className="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed">
-          يتواصل معك فريق خدمة عملاء روابط لمساعدتك والإجابة على استفساراتك وتنظيم خطواتك القادمة.
+          فريقنا معاك خطوة بخطوة عشان يجاوب على كل استفساراتك وينسق معاك المعاينات في أي وقت.
         </p>
       </div>
 
@@ -293,7 +293,7 @@ export const ContactUsView: React.FC<ContactUsViewProps> = ({ onExplorePropertie
               className="w-full py-3.5 bg-[#14a800] hover:bg-[#108a00] text-white text-xs sm:text-sm font-black rounded-xl transition shadow-2xs flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap"
             >
               <Send className="w-4 h-4" />
-              <span>إرسال الرسالة إلى فريق روابط</span>
+              <span>ابعت رسالتك لفريق روابط</span>
             </button>
 
           </form>

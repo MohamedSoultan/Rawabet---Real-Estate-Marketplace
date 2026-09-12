@@ -86,8 +86,8 @@ export const SimilarPropertiesCarousel = React.memo<SimilarPropertiesCarouselPro
   onDetailsClick,
   onFilterByTag,
   onViewAll,
-  title = 'عقارات مشابهة قد تهمك',
-  subtitle = 'خيارات مختارة بعناية في نفس النطاق الجغرافي والمواصفات',
+  title = 'عقارات قد تهمك',
+  subtitle = 'اختيارات قريبة من نفس مواصفاتك',
 }) => {
   const navigate = useNavigate();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -333,26 +333,20 @@ export const SimilarPropertiesCarousel = React.memo<SimilarPropertiesCarouselPro
               id="carousel-view-all-btn"
               type="button"
               onClick={onViewAll}
-              className="inline-flex items-center gap-1 px-3 sm:px-3.5 py-2 rounded-xl bg-white hover:bg-[#e4ebe4] text-[#14a800] text-xs sm:text-sm font-bold border border-slate-200/80 shadow-2xs transition cursor-pointer min-h-[38px] sm:min-h-[40px] shrink-0 active:scale-95 focus:outline-none focus:ring-2 focus:ring-[#14a800]"
+              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-white hover:bg-slate-50 text-[#14a800] text-xs font-bold border border-slate-200/80 shadow-2xs transition cursor-pointer min-h-[36px] shrink-0 active:scale-95"
             >
-              <Compass className="w-3.5 h-3.5 text-[#14a800] hidden sm:inline-block shrink-0" />
-              <span>استعراض الكل</span>
-              <ChevronLeft className="w-4 h-4 shrink-0" aria-hidden="true" />
+              <span>شوف الكل</span>
+              <ChevronLeft className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
             </button>
           )}
         </div>
       </div>
 
-      {/* Premium Smart Carousel Track:
-          Mobile: One card (100% visible item snap)
-          Tablet (sm/md): Reduced cards (2 cards)
-          Desktop (lg/xl): Multiple cards (3 to 4 cards)
-          Cards keep strict same height, identical spacing, and zero overflow.
-      */}
+      {/* Premium Smart Carousel Track with Peek Sizing */}
       <div className="relative w-full overflow-hidden">
         {/* Subtle Luxury Gradient Edge Masks on Large Screens */}
-        <div className="hidden xl:block pointer-events-none absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-white to-transparent z-10" />
-        <div className="hidden xl:block pointer-events-none absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-white to-transparent z-10" />
+        <div className="hidden xl:block pointer-events-none absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white to-transparent z-10" />
+        <div className="hidden xl:block pointer-events-none absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-white to-transparent z-10" />
 
         <div
           ref={containerRef}
@@ -360,7 +354,7 @@ export const SimilarPropertiesCarousel = React.memo<SimilarPropertiesCarouselPro
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
           onMouseLeave={handleMouseLeave}
-          className={`w-full overflow-x-auto snap-x snap-mandatory flex gap-4 sm:gap-5 px-3 sm:px-6 lg:px-8 xl:max-w-7xl xl:mx-auto pb-5 pt-1 scroll-smooth touch-pan-x [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden items-stretch ${
+          className={`w-full overflow-x-auto snap-x snap-mandatory flex gap-3.5 sm:gap-4.5 px-3 sm:px-6 lg:px-8 xl:max-w-7xl xl:mx-auto pb-5 pt-1 scroll-smooth touch-pan-x [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden items-stretch ${
             isDragging ? 'cursor-grabbing select-none scroll-auto' : 'cursor-grab'
           }`}
           style={{ WebkitOverflowScrolling: 'touch' }}
@@ -371,14 +365,13 @@ export const SimilarPropertiesCarousel = React.memo<SimilarPropertiesCarouselPro
               ref={el => {
                 cardRefs.current[idx] = el;
               }}
-              /* Responsive card column width:
-                 - Mobile (<640px): Exactly 1 card visible (w-[86vw] max-w-[340px] centered snap)
-                 - Tablet (640px-1023px): 2 cards visible (w-[calc(50%-10px)] max-w-[360px])
-                 - Desktop (1024px-1279px): 3 cards visible (w-[calc(33.333%-14px)] max-w-[370px])
-                 - Large Desktop (>=1280px): 4 cards visible (w-[calc(25%-15px)] max-w-[340px])
-                 - items-stretch and h-full ensure all cards have uniform height
+              /* Reduced and locked card width with peek effect:
+                 - Mobile: w-[74vw] xs:w-[70vw] max-w-[280px] (leaves 26-30vw of the next card visibly peeking!)
+                 - Tablet: sm:w-[280px] md:w-[290px]
+                 - Desktop: lg:w-[290px] xl:w-[300px]
+                 - shrink-0 ensures locked width and uniform aspect ratio
               */
-              className="w-[86vw] xs:w-[82vw] max-w-[340px] sm:w-[calc(50%-10px)] sm:max-w-[360px] lg:w-[calc(33.333%-14px)] lg:max-w-[370px] xl:w-[calc(25%-15px)] xl:max-w-[340px] shrink-0 snap-center sm:snap-start flex flex-col min-w-0 h-auto self-stretch overflow-hidden transition-all duration-200"
+              className="w-[74vw] xs:w-[70vw] max-w-[280px] sm:w-[280px] md:w-[290px] lg:w-[290px] xl:w-[300px] shrink-0 snap-center sm:snap-start flex flex-col min-w-0 h-auto self-stretch overflow-hidden transition-all duration-200"
               onClickCapture={e => {
                 if (hasMoved) {
                   e.stopPropagation();

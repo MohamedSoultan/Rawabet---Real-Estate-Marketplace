@@ -24,15 +24,15 @@ export const Footer: React.FC<FooterProps> = ({ onOpenLegal, onNavigate }) => {
               </div>
               <div>
                 <span className="text-xl font-black text-white tracking-tight">روابط</span>
-                <span className="block text-xs text-[#22c55e] font-bold">وساطة عقارية رقمية موثوقة</span>
+                <span className="block text-xs text-[#22c55e] font-bold">وساطة عقارية مضمونة</span>
               </div>
             </div>
             <p className="text-xs text-slate-300 leading-relaxed font-normal">
-              منصة روابط هي البوابة الرقمية المنظمة للوساطة العقارية في كفر الشيخ، نضمن خصوصية الملاك وندقق بيانات العقارات لتقديم تجربة شراء وتأجير آمنة وشفافة.
+              منصة روابط بتساعدك تشتري وتأجر وتبيع عقارك في كفر الشيخ بأمان، مع فحص ميداني وسرية كاملة للبيانات.
             </p>
             <div className="inline-flex items-center gap-2 text-xs text-white font-semibold bg-[#002800] border border-[#14a800]/40 px-3.5 py-2 rounded-xl">
               <ShieldCheck className="w-4 h-4 shrink-0 text-[#22c55e]" />
-              <span>فحص ميداني وتوثيق معتمد للعقارات</span>
+              <span>فحص ومعاينة وتوثيق لكل عقار</span>
             </div>
           </div>
 
@@ -42,32 +42,32 @@ export const Footer: React.FC<FooterProps> = ({ onOpenLegal, onNavigate }) => {
             <ul className="space-y-2 text-xs font-medium text-slate-300">
               <li>
                 <button type="button" onClick={() => onNavigate?.('HOME')} className="hover:text-[#22c55e] transition cursor-pointer">
-                  الصفحة الرئيسية
+                  الرئيسية
                 </button>
               </li>
               <li>
                 <button type="button" onClick={() => onNavigate?.('PROPERTIES')} className="hover:text-[#22c55e] transition cursor-pointer">
-                  تصفح كافة العقارات المعتمدة
+                  شوف كل العقارات
                 </button>
               </li>
               <li>
                 <button type="button" onClick={() => onNavigate?.('COMPARE')} className="hover:text-[#22c55e] transition cursor-pointer">
-                  مقارنة العقارات المباشرة
+                  مقارنة العقارات
                 </button>
               </li>
               <li>
                 <button type="button" onClick={() => onNavigate?.('ABOUT')} className="hover:text-[#22c55e] transition cursor-pointer">
-                  عن منصة روابط
+                  عن روابط
                 </button>
               </li>
               <li>
                 <button type="button" onClick={() => onNavigate?.('CONTACT')} className="hover:text-[#22c55e] transition cursor-pointer">
-                  تواصل معنا وحجز المعاينات
+                  تواصل معنا وحجز المعاينة
                 </button>
               </li>
               <li>
                 <button type="button" onClick={() => onNavigate?.('SELLER')} className="hover:text-[#22c55e] transition cursor-pointer">
-                  بوابة أصحاب العقارات والوسطاء
+                  لوحة أصحاب العقارات
                 </button>
               </li>
             </ul>
@@ -77,7 +77,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenLegal, onNavigate }) => {
           <div className="space-y-3">
             <h4 className="text-sm font-bold text-white tracking-wider">نطاق التغطية</h4>
             <p className="text-xs text-slate-300 font-normal">
-              المناطق المغطاة حالياً بمحافظة كفر الشيخ:
+              أماكن تغطيتنا في كفر الشيخ:
             </p>
             <div className="flex flex-wrap gap-2">
               {activeGovs.map(g => (
@@ -86,20 +86,20 @@ export const Footer: React.FC<FooterProps> = ({ onOpenLegal, onNavigate }) => {
                   className="inline-flex items-center gap-1.5 text-xs font-semibold bg-[#002800] text-emerald-200 border border-[#14a800]/40 px-3 py-1.5 rounded-xl"
                 >
                   <MapPin className="w-3.5 h-3.5 text-[#22c55e]" />
-                  {g.name_ar} (مفعل بالكامل)
+                  {g.name_ar} (متاح بالكامل)
                 </span>
               ))}
             </div>
             <p className="text-[11px] text-slate-400 pt-1 leading-relaxed">
-              المراكز: مدينة كفر الشيخ، دسوق، فوه، مطوبس، بيلا، بلطيم ومصيف بلطيم، سيدي سالم، الحامول، الرياض.
+              مدينة كفر الشيخ، دسوق، فوه، مطوبس، بيلا، بلطيم ومصيف بلطيم، سيدي سالم، الحامول، الرياض.
             </p>
           </div>
 
           {/* Direct Communication */}
           <div className="space-y-3">
-            <h4 className="text-sm font-bold text-white tracking-wider">الاتصال وخدمة العملاء</h4>
+            <h4 className="text-sm font-bold text-white tracking-wider">خدمة العملاء</h4>
             <p className="text-xs text-slate-300 font-normal">
-              فريق المبيعات متاح يومياً لتنسيق المعاينات والإجابة عن استفساراتكم:
+              فريقنا جاهز كل يوم لمساعدتك وتنسيق المعاينات:
             </p>
             
             <div className="space-y-2.5 text-xs">
@@ -111,7 +111,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenLegal, onNavigate }) => {
                   <Phone className="w-4 h-4 text-[#22c55e]" />
                 </div>
                 <div className="text-right">
-                  <span className="block text-[10px] text-slate-400 font-normal">الخط المباشر:</span>
+                  <span className="block text-[10px] text-slate-400 font-normal">الخط الساخن:</span>
                   <span className="dir-ltr text-white">{settings.primary_phone}</span>
                 </div>
               </a>

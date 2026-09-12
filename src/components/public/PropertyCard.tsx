@@ -265,7 +265,7 @@ export const PropertyCard = memo<PropertyCardProps>(({
             onClick={triggerFullDetails}
             className="w-full py-3 px-4 bg-slate-100 hover:bg-[#14a800] text-slate-800 hover:text-white text-xs sm:text-sm font-bold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-2xs min-h-[44px] min-w-0 overflow-hidden cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#14a800]"
           >
-            <span className="truncate">عرض تفاصيل العقار</span>
+            <span className="truncate">التفاصيل الكاملة</span>
             <ChevronLeft className="w-4 h-4 text-slate-500 group-hover:text-white transition-colors shrink-0" aria-hidden="true" />
           </button>
         </div>
